@@ -1,0 +1,1513 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Le Passe · L31</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Karla:ital,wght@0,400..800;1,400..800&family=JetBrains+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="../_shared/deck.css">
+<link rel="stylesheet" href="../track.css">
+<style>
+/* ---------- L31 only ---------- */
+.state { background: #1d1816; color: #e9dcc8; border-radius: 12px; padding: 16px 20px; font: 500 18px/1.55 var(--f-mono); white-space: pre; box-shadow: var(--shadow-1); overflow: hidden; }
+.state b { color: #f3cd83; font-weight: 600; }
+.state .s { color: #b9d89a; }
+.state .k { color: #9c8f84; }
+.state .hl { background: rgba(185, 216, 154, .2); border-radius: 4px; }
+.state .bad { color: #ffb4a8; }
+
+/* follow the props */
+.drbar { display: flex; align-items: center; gap: 26px; margin-top: 16px; min-height: 52px; }
+.drbar .seg button { font: 700 20px/1 var(--f-mono); padding: 13px 20px; }
+.dr-out { margin: 0; font-size: 23px; line-height: 1.4; color: var(--ink-2); }
+.dr-out b { color: var(--wine); }
+.tree .wires path { stroke: color-mix(in srgb, var(--ink) 18%, transparent); stroke-width: 2; transition: stroke .35s ease, stroke-width .35s ease; }
+.tree .wires .wire-head { fill: color-mix(in srgb, var(--ink) 18%, transparent); transition: fill .35s ease; }
+.tree .wires path.is-lit { stroke: var(--wine); stroke-width: 3.5; }
+.tree .wires .wire-head.is-lit { fill: var(--wine); }
+.tree .node { min-width: 0; font-size: 19px; padding: 10px 16px; }
+.tree.is-picking .node { opacity: .35; }
+.tree.is-picking .node.is-user, .tree.is-picking .node.is-pass, .tree.is-picking #dr-app { opacity: 1; }
+.tree .node.is-user { background: color-mix(in srgb, var(--good) 14%, var(--surface)); box-shadow: var(--shadow-1), 0 0 0 3px var(--good); }
+.tree .node.is-pass { background: #f3e6c9; box-shadow: var(--shadow-1), 0 0 0 3px var(--brass); }
+.tree .node::after { position: absolute; top: -14px; right: -14px; padding: 4px 8px; border-radius: 999px; font: 700 11px/1 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: #fff; white-space: nowrap; }
+.tree .node.is-user::after { content: "reads it"; background: var(--good); }
+.tree .node.is-pass::after { content: "passes it on"; background: var(--brass); }
+
+/* who re-renders */
+.rr { display: grid; grid-template-columns: minmax(0, 1fr) 470px; gap: 48px; margin-top: 22px; align-items: start; }
+.rr__board { display: flex; flex-direction: column; gap: 16px; padding: 20px; border-radius: 16px; border: 2px dashed var(--brass-soft); }
+.rr__provs { display: flex; gap: 14px; }
+.rr__prov { flex: 1; padding: 14px 18px; border-radius: 12px; background: var(--wine); color: #fdfaf2; font: 600 20px/1.2 var(--f-mono); text-align: center; }
+.rr__prov small { display: block; margin-top: 4px; font: 500 14px/1.3 var(--f-body); color: #e3c9bb; }
+.rr__prov[hidden] { display: none; }
+.rr__comps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.rr__comp { position: relative; padding: 16px 18px; border-radius: 12px; background: var(--surface); box-shadow: var(--shadow-1); font: 600 20px/1.2 var(--f-mono); }
+.rr__comp small { display: block; margin-top: 6px; font: 500 15px/1.3 var(--f-body); color: var(--ink-3); }
+.rr__comp .cnt { position: absolute; top: 12px; right: 14px; font: 700 14px/1 var(--f-mono); color: var(--ink-3); }
+.rr__comp.flash { animation: rrflash .8s ease; }
+@keyframes rrflash { 0% { background: #f3cd83; } 100% { background: var(--surface); } }
+.rr__side { display: flex; flex-direction: column; gap: 16px; }
+.rr__side .row { flex-wrap: wrap; }
+
+/* order the usual */
+.usual { display: grid; grid-template-columns: minmax(0, 1fr) 560px; gap: 40px; margin-top: 22px; align-items: start; }
+.mini { background: #f6f1e7; border-radius: 12px; box-shadow: var(--shadow-2); overflow: hidden; min-width: 0; }
+.mini__head { display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; background: #efe7d8; font: 600 24px/1 var(--f-display); color: #5c1a23; }
+.mini__count { font: 700 15px/1 var(--f-body); background: #5c1a23; color: #fdfaf2; padding: 9px 12px; }
+.mini__body { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 14px; }
+.mini .mcard img { aspect-ratio: 16 / 10; }
+.mini .mcard__desc { display: none; }
+.lines { display: flex; flex-direction: column; gap: 8px; min-height: 60px; }
+.lines .empty { margin: 0; color: var(--ink-3); font-style: italic; font-size: 19px; }
+.cline { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 12px; align-items: center; padding: 10px 14px; border-radius: 10px; background: var(--surface); box-shadow: var(--shadow-1); font: 600 19px/1.2 var(--f-body); animation: fadeUp .3s var(--ease-out); }
+.cline .q { font: 700 18px/1 var(--f-mono); }
+.cline .tag { font: 700 12px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; padding: 5px 8px; border-radius: 999px; color: #fff; background: var(--bad); }
+.cline.is-bad { box-shadow: var(--shadow-1), inset 4px 0 0 var(--bad); }
+
+/* the rules map */
+.rules { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; margin-top: 26px; }
+.rules .card { padding: 20px 22px; display: flex; flex-direction: column; gap: 10px; }
+.rules .file-chip { align-self: flex-start; }
+.rules p { margin: 0; font-size: 20px; line-height: 1.4; color: var(--ink-2); }
+.rules .rule { font: 700 15px/1.3 var(--f-mono); color: var(--wine); }
+
+/* the ticket rail */
+.tickets { display: grid; grid-template-columns: 400px minmax(0, 1fr) 500px; gap: 26px; margin-top: 20px; align-items: stretch; }
+.tickets__btns { display: flex; flex-direction: column; gap: 8px; }
+.tickets__btns .btn { height: 46px; justify-content: flex-start; font-size: 15px; padding: 0 16px; }
+.tickets__track { position: relative; height: 560px; padding: 44px 16px 16px; border-radius: 14px; background: #2a2320; display: flex; flex-direction: column; justify-content: flex-end; gap: 10px; overflow: hidden; }
+.tickets__track::before { content: "the rail · tickets wait here"; position: absolute; left: 16px; top: 14px; font: 700 13px/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: #9c8f84; }
+.ticket { position: relative; padding: 10px 14px 10px 18px; border-radius: 6px; background: #fdfaf2; color: #2e2a26; font: 600 16px/1.35 var(--f-mono); box-shadow: 0 6px 14px rgba(0, 0, 0, .25); animation: ticketIn .35s var(--ease-out); transition: opacity .3s ease, box-shadow .3s ease; }
+.ticket::before { content: ""; position: absolute; left: 6px; top: 8px; bottom: 8px; width: 3px; border-radius: 2px; background: var(--brass); }
+.ticket .v { display: block; margin-top: 4px; font: 700 12px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+.ticket.is-now { box-shadow: 0 0 0 3px #f3cd83, 0 6px 14px rgba(0, 0, 0, .25); }
+.ticket.is-done { opacity: .6; }
+.ticket.is-done .v { color: var(--good); }
+.ticket.is-refused .v { color: var(--bad); }
+@keyframes ticketIn { from { transform: translateX(-40px); opacity: 0; } to { transform: none; opacity: 1; } }
+.tickets__right { display: flex; flex-direction: column; gap: 14px; }
+.chef { padding: 14px 18px; border-radius: 12px; background: var(--wine); color: #fdfaf2; font: 600 21px/1.2 var(--f-mono); text-align: center; transition: transform .2s ease, box-shadow .2s ease; }
+.chef small { display: block; margin-top: 4px; font: 500 14px/1.3 var(--f-body); color: #e3c9bb; }
+.chef.is-busy { transform: scale(1.03); box-shadow: 0 0 0 4px #f3cd83; }
+.tickets__right .state { flex: 1; font-size: 17px; }
+
+/* the FAQ accordion demo */
+.faqdemo { display: grid; grid-template-columns: minmax(0, 1fr) 640px; gap: 40px; margin-top: 22px; align-items: start; }
+.acc { display: flex; flex-direction: column; gap: 10px; }
+.acc__item { background: var(--surface); border-radius: 10px; box-shadow: var(--shadow-1); overflow: hidden; }
+.acc__trigger { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 16px 20px; border: 0; background: none; font: 500 26px/1.2 var(--f-display); color: var(--ink); text-align: left; cursor: pointer; }
+.acc__trigger svg { flex: none; width: 22px; height: 22px; color: var(--brass); transition: transform .3s ease; }
+.acc__trigger[aria-expanded="true"] svg { transform: rotate(180deg); }
+.acc__panel { padding: 0 20px 16px; font-size: 19px; line-height: 1.5; color: var(--ink-2); }
+
+/* props vs the pass */
+.vs-schema .node small.use { color: var(--good); font-family: var(--f-mono); font-weight: 700; }
+
+.flips.is-small .flip__face .code { --code-size: 17px; }
+.shots2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.shots2 .shot__body { height: 300px; }
+.shots2 .shot__body img { height: 100%; object-fit: cover; object-position: top; }
+.picture { display: grid; grid-template-columns: 560px minmax(0, 1fr); gap: 44px; margin-top: 24px; align-items: start; }
+.nest { display: flex; flex-direction: column; gap: 0; font: 600 21px/1.2 var(--f-mono); }
+.nest div { padding: 12px 16px 10px; border-radius: 12px; border: 2px solid var(--line); background: color-mix(in srgb, var(--surface) 70%, transparent); }
+.nest div div { margin: 10px 0 0 18px; }
+.nest .is-wine { border-color: color-mix(in srgb, var(--wine) 55%, transparent); }
+.nest small { font: 500 15px/1.3 var(--f-body); color: var(--ink-3); margin-left: 8px; }
+</style>
+</head>
+<body>
+<div class="deck">
+<div class="stage">
+
+<!-- ============================== HELLO ============================== -->
+
+<section class="slide" data-phase="hello" id="cover" data-title="Le passe">
+  <div class="cover">
+    <div class="stack" style="--gap:24px">
+      <p class="cover__hello">Bonjour!</p>
+      <p class="eyebrow"><b>L31</b> React · lecture 6 · Le Bistro track 5 of 5</p>
+      <h1 class="display">Le<br>passe</h1>
+      <p class="lead" style="max-width:930px">The pass is the counter between the kitchen and the room. Plates are put there once, and every waiter picks up what they need. Nobody hands plates from person to person.</p>
+      <dl class="cover__meta">
+        <div><dt>Theme</dt><dd>Context, useReducer, compound components</dd></div>
+        <div><dt>Le Bistro today</dt><dd>One cart, one session, an FAQ</dd></div>
+        <div><dt>Your project</dt><dd>v0.5 · context and a reducer</dd></div>
+        <div><dt>Length</dt><dd>2 hours · one break</dd></div>
+      </dl>
+    </div>
+    <div class="plate">
+      <div class="plate__rim"></div>
+      <div class="plate__food"><img src="../_shared/img/dishes/mousse-au-chocolat.jpg" alt=""></div>
+      <div class="plate__tag"><small>le passe</small>“one place for everyone”</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Bonjour! Last time Le Bistro became a house with rooms and doors. Today we fix the way things travel inside the house. It's the last lecture of the Le Bistro track.</p>
+    <p><b>The title:</b> "le passe" is the counter where the chef puts finished plates and calls the tickets. Context is our pass; the reducer is the chef reading the tickets.</p>
+  </aside>
+</section>
+
+<section class="slide v-center" data-phase="hello" data-title="Today's menu">
+  <div class="menu-card">
+    <div class="menu-card__head"><p class="eyebrow">Le Bistro · L31 · 120 minutes</p><h2>Today's menu</h2></div>
+    <ol class="menu-card__list">
+      <li class="course"><span class="course__k">Accueil</span><span class="course__name">Hello <small>where Le Bistro is today</small></span><span class="course__t">3′</span></li>
+      <li class="course"><span class="course__k">Apéritif</span><span class="course__name">Questions <small>and two homework demos</small></span><span class="course__t">9′</span></li>
+      <li class="course"><span class="course__k">Entrée</span><span class="course__name">Problem 1 <small>passed hand to hand</small></span><span class="course__t">6′</span></li>
+      <li class="course"><span class="course__k">Plat</span><span class="course__name">Context <small>one session for the whole site</small></span><span class="course__t">24′</span></li>
+      <li class="course"><span class="course__k">Atelier</span><span class="course__name">Classwork 1 <small>your session, everywhere</small></span><span class="course__t">15′</span></li>
+      <li class="course is-pause"><span class="course__k">Pause café</span><span class="course__name">Break <small>music on, screens off</small></span><span class="course__t">10′</span></li>
+      <li class="course"><span class="course__k">Second plat</span><span class="course__name">Problem 2, useReducer, compound components <small>too many cooks</small></span><span class="course__t">30′</span></li>
+      <li class="course"><span class="course__k">Atelier</span><span class="course__name">Classwork 2 <small>one cart, one reducer</small></span><span class="course__t">15′</span></li>
+      <li class="course"><span class="course__k">Dessert</span><span class="course__name">Wrap-up <small>recap, homework, what comes next</small></span><span class="course__t">8′</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-phase="hello" data-title="Le Bistro, lecture by lecture">
+  <p class="eyebrow"><b>Route</b> Lecture 5 of 5</p>
+  <h2 class="h2 mt-s">Le Bistro, lecture by lecture</h2>
+  <div class="road">
+    <div class="stop is-done"><div class="stop__shot"><img src="../img/l27-home.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L27 · done</p><p class="stop__t">Components</p><p class="stop__d">Home page and menu from components and a data file.</p></div>
+    <div class="stop is-done"><div class="stop__shot"><img src="../img/l28-cart.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L28 · done</p><p class="stop__t">State</p><p class="stop__d">Add to cart works. Chips filter, search finds.</p></div>
+    <div class="stop is-done"><div class="stop__shot"><img src="../img/l29-search.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L29 · done</p><p class="stop__t">Effects</p><p class="stop__d">The real menu from the API. A cart that survives a refresh.</p></div>
+    <div class="stop is-done"><div class="stop__shot"><img src="../img/l30-dish.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L30 · done</p><p class="stop__t">Routing</p><p class="stop__d">Pages with their own address. Login and staff-only doors.</p></div>
+    <div class="stop is-now"><div class="stop__shot"><img src="../img/l31-menu-cart.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L31 · today</p><p class="stop__t">Context</p><p class="stop__d">One cart and one session for the whole site.</p></div>
+  </div>
+  <div class="lane">
+    <span class="lane__k">Your project</span>
+    <span class="lane__v"><b>v0.1 ✓</b>catalog from a data file</span>
+    <span class="lane__v"><b>v0.2 ✓</b>cart, filters, search</span>
+    <span class="lane__v"><b>v0.3 ✓</b>real API, saved cart</span>
+    <span class="lane__v"><b>v0.4 ✓</b>pages, login, guards</span>
+    <span class="lane__v"><b>v0.5 · today</b>context and a reducer</span>
+  </div>
+</section>
+
+<section class="slide" data-phase="hello" data-title="Before and after today">
+  <div class="split-4-8 fill items-center" style="gap:56px">
+    <div class="stack" style="--gap:22px">
+      <p class="eyebrow"><b>Today's goal</b> Press next to unveil it</p>
+      <h2 class="h2">The same site, with half the wiring</h2>
+      <p class="lead">Under the blind: App.tsx at the end of today. It was 87 lines.</p>
+      <ul class="checks is-done" data-step="1"><li>39 lines, and not a single cart or session prop</li><li>Every component asks for what it needs</li><li>All the cart's rules in one function</li><li>A new FAQ page from a reusable accordion</li></ul>
+    </div>
+    <div data-step="1" data-fx="curtain" data-curtain="src/App.tsx · after today">
+      <script type="text/plain" data-lang="tsx" data-file="src/App.tsx (the routes)" style="--code-size:17px">
+        <Routes>
+          <Route element={<SiteLayout />}>
+            <Route index element={<HomePage />} />
+            <Route path="menu" element={<MenuPage />} />
+            <Route path="menu/:id" element={<DishPage />} />
+            <Route path="faq" element={<FaqPage />} />
+            <Route path="login" element={<LoginPage />} />
+
+            {/* any signed-in guest */}
+            <Route element={<RequireAuth />}>
+              <Route path="account" element={<AccountPage />} />
+            </Route>
+
+            {/* staff only: the roles the API lets into the order queue */}
+            <Route element={<RequireAuth roles={["kitchen", "waiter"]} />}>
+              <Route path="kitchen" element={<KitchenPage />} />
+            </Route>
+
+            <Route path="forbidden" element={<ForbiddenPage />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Route>
+        </Routes>
+      </script>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Press next: the blind rolls up on the routes. Ask: what's missing compared to your App.tsx? (No cart=, no session=, no onAdd=.)</p></aside>
+</section>
+
+<!-- ============================== QUESTIONS ============================== -->
+
+<section class="slide" data-phase="questions" data-title="Questions from last time">
+  <div class="qa">
+    <div class="stack" style="--gap:26px">
+      <p class="eyebrow"><b>Apéritif</b> Before we start</p>
+      <h2 class="display">Questions from last time?</h2>
+      <p class="lead">Routes, layouts, login, guards.</p>
+    </div>
+    <div class="qa-list">
+      <div class="qa-card" data-step="1"><span class="n">01</span><h3>What does <code>&lt;Outlet /&gt;</code> do?</h3>
+        <div class="reveal-box" data-reveal><button class="reveal-box__cover">[ show answer ]</button><p>It marks the place in a layout where the current page appears.</p></div></div>
+      <div class="qa-card" data-step="2"><span class="n">02</span><h3>Why <code>&lt;Navigate to="/login" replace /&gt;</code>?</h3>
+        <div class="reveal-box" data-reveal><button class="reveal-box__cover">[ show answer ]</button><p>So Back doesn't return to the locked page, which would redirect to the login again.</p></div></div>
+      <div class="qa-card" data-step="3"><span class="n">03</span><h3>Does <code>RequireAuth</code> protect the kitchen?</h3>
+        <div class="reveal-box" data-reveal><button class="reveal-box__cover">[ show answer ]</button><p>It's a sign on the door. The lock is the API: 401 without a token, 403 with the wrong role.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-phase="questions" data-title="Homework: show your v0.4">
+  <div class="split-7-5 fill items-center" style="gap:64px">
+    <div class="stack" style="--gap:22px">
+      <p class="eyebrow"><b>Homework check</b> Two volunteers, two minutes each</p>
+      <h2 class="h1">Show us your v0.4</h2>
+      <p class="lead">Open a product, copy its link into a new tab. Log in, press F5. Open /profile as a guest.</p>
+    </div>
+    <div class="done-when">
+      <p class="k">Look for</p>
+      <ul class="checks">
+        <li>A product link opens that product</li>
+        <li>F5 on the Vercel link: no 404</li>
+        <li>Still signed in after F5</li>
+        <li>A guest on /profile goes to the login, then back</li>
+        <li>No password in Local Storage</li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> End each demo by opening their App.tsx and counting the props that carry the cart and the session. That is today's first problem.</p></aside>
+</section>
+
+<!-- ============================== PROBLEM 1 ============================== -->
+
+<section class="slide" data-phase="problem" data-tone="dark" data-title="Passed hand to hand">
+  <div class="problem-cover">
+    <div class="problem-cover__text">
+      <p class="eyebrow"><b>Entrée · Problem 1</b> Before the new tool</p>
+      <h2 class="display">Passed<br>hand<br>to hand.</h2>
+      <p class="lead">43 props in 8 files, only to move one cart and one session to the few components that need them.</p>
+    </div>
+    <div class="problem-cover__photo"><img src="../img/photo-duck-confit.jpg" alt=""></div>
+  </div>
+  <aside class="notes"><p><b>Say:</b> Imagine a restaurant where the cook hands the plate to the dishwasher, who hands it to the cashier, who hands it to the waiter. Everybody touches the plate; only one person needs it. That's our App.tsx.</p></aside>
+</section>
+
+<section class="slide" id="drill" data-phase="problem" data-title="Follow the props">
+  <p class="eyebrow"><b>Problem 1</b> Press next, or click a prop</p>
+  <h2 class="h2 mt-s">Follow the props through Le Bistro</h2>
+  <div class="drbar">
+    <div class="seg" id="dr-props"><button type="button" data-p="cart">cart</button><button type="button" data-p="onAdd">onAdd</button><button type="button" data-p="session">session</button></div>
+    <p class="dr-out" id="dr-out">43 props carry the cart and the session through 8 files. Pick one.</p>
+  </div>
+  <div class="schema tree" id="dr-tree" data-wire-sides="b t" data-wire-route="elbow" style="width:1632px;height:600px;margin-top:22px">
+    <div class="node" id="dr-app" style="left:750px;top:0">App</div>
+    <div class="node" id="dr-sl" style="left:30px;top:140px">SiteLayout</div>
+    <div class="node" id="dr-hp" style="left:360px;top:140px">HomePage</div>
+    <div class="node" id="dr-mp" style="left:700px;top:140px">MenuPage</div>
+    <div class="node" id="dr-dp" style="left:1010px;top:140px">DishPage</div>
+    <div class="node" id="dr-ra" style="left:1240px;top:140px">RequireAuth</div>
+    <div class="node" id="dr-ac" style="left:1450px;top:140px">AccountPage</div>
+    <div class="node" id="dr-hd" style="left:55px;top:280px">Header</div>
+    <div class="node" id="dr-fv" style="left:345px;top:280px">Favourites</div>
+    <div class="node" id="dr-dg2" style="left:705px;top:280px">DishGrid</div>
+    <div class="node" id="dr-dg3" style="left:1015px;top:280px">DishGrid</div>
+    <div class="node" id="dr-cp" style="left:40px;top:420px">CartPanel</div>
+    <div class="node" id="dr-dg1" style="left:365px;top:420px">DishGrid</div>
+    <div class="node" id="dr-dc2" style="left:705px;top:420px">DishCard</div>
+    <div class="node" id="dr-dc3" style="left:1015px;top:420px">DishCard</div>
+    <div class="node" id="dr-dc1" style="left:365px;top:550px">DishCard</div>
+    <b class="wire" data-from="dr-app" data-to="dr-sl"></b><b class="wire" data-from="dr-app" data-to="dr-hp"></b><b class="wire" data-from="dr-app" data-to="dr-mp"></b>
+    <b class="wire" data-from="dr-app" data-to="dr-dp"></b><b class="wire" data-from="dr-app" data-to="dr-ra"></b><b class="wire" data-from="dr-app" data-to="dr-ac"></b>
+    <b class="wire" data-from="dr-sl" data-to="dr-hd"></b><b class="wire" data-from="dr-hd" data-to="dr-cp"></b>
+    <b class="wire" data-from="dr-hp" data-to="dr-fv"></b><b class="wire" data-from="dr-fv" data-to="dr-dg1"></b><b class="wire" data-from="dr-dg1" data-to="dr-dc1"></b>
+    <b class="wire" data-from="dr-mp" data-to="dr-dg2"></b><b class="wire" data-from="dr-dg2" data-to="dr-dc2"></b>
+    <b class="wire" data-from="dr-dp" data-to="dr-dg3"></b><b class="wire" data-from="dr-dg3" data-to="dr-dc3"></b>
+  </div>
+  <i data-step="1" hidden></i><i data-step="2" hidden></i><i data-step="3" hidden></i>
+  <aside class="notes">
+    <p><b>Do:</b> Press next three times: cart, onAdd, session. Green = reads it. Brass = only passes it on. The wine wires are the road the prop travels.</p>
+    <p><b>Ask:</b> What happens when DishCard needs one more thing from the cart, say "is this the last one in stock"? (Every brass component changes too.)</p>
+  </aside>
+</section>
+
+<section class="slide v-center" data-phase="problem" data-title="What would we need?">
+  <p class="eyebrow"><b>Problem 1</b> Your turn</p>
+  <h2 class="display mt-m" style="font-size:112px;max-width:1500px;color:var(--wine)">What would we need?</h2>
+  <div class="need">
+    <span class="chip" data-step="1" data-fx="pop">One place for the session</span>
+    <span class="chip" data-step="2" data-fx="pop">Any component can reach it</span>
+    <span class="chip" data-step="3" data-fx="pop">Nobody in between carries it</span>
+    <span class="chip is-answer" data-step="4" data-fx="pop"><i data-icon="radio"></i>That is Context</span>
+  </div>
+</section>
+
+<!-- ============================== SOLUTION 1 ============================== -->
+
+<section class="slide" data-phase="solution" data-title="Hand to hand, or the pass">
+  <p class="eyebrow"><b>Plat · Solution 1</b> Press next</p>
+  <h2 class="h2 mt-s">Hand to hand, or the pass</h2>
+  <div class="schema vs-schema" data-wire-sides="b t" data-wire-route="elbow" style="width:1632px;height:600px;margin-top:22px">
+    <div class="region" style="left:0;top:20px;width:770px;height:560px" data-step="1"></div>
+    <span class="box-label" style="left:24px;top:40px" data-step="1">Props · hand to hand</span>
+    <div class="node" id="vs-app" style="left:270px;top:90px;width:230px" data-step="1">App<small>owns the session</small></div>
+    <div class="node" id="vs-sl" style="left:70px;top:260px;width:230px" data-step="1">SiteLayout<small>doesn't need it, carries it</small></div>
+    <div class="node" id="vs-ac" style="left:470px;top:260px;width:230px" data-step="1">AccountPage<small>needs it</small></div>
+    <div class="node" id="vs-hd" style="left:70px;top:430px;width:230px" data-step="1">Header<small>needs it</small></div>
+    <b class="wire is-wine" data-from="vs-app" data-to="vs-sl" data-label="session" data-lx="-60" data-step="1"></b>
+    <b class="wire is-wine" data-from="vs-app" data-to="vs-ac" data-label="session" data-lx="60" data-step="1"></b>
+    <b class="wire is-wine" data-from="vs-sl" data-to="vs-hd" data-label="session" data-lx="50" data-step="1"></b>
+
+    <div class="region is-wine" style="left:862px;top:20px;width:770px;height:560px" data-step="2"></div>
+    <span class="box-label" style="left:886px;top:40px;color:var(--wine)" data-step="2">&lt;AuthProvider&gt; · the pass, around everything</span>
+    <div class="node is-ghost" id="vp-app" style="left:1132px;top:90px;width:230px" data-step="2">App<small>no session here</small></div>
+    <div class="node is-ghost" id="vp-sl" style="left:932px;top:260px;width:230px" data-step="2">SiteLayout<small>no props</small></div>
+    <div class="node" id="vp-ac" style="left:1332px;top:260px;width:230px" data-step="2">AccountPage<small class="use" data-step="3">useAuth() → session</small></div>
+    <div class="node" id="vp-hd" style="left:932px;top:430px;width:230px" data-step="2">Header<small class="use" data-step="3">useAuth() → session</small></div>
+    <b class="wire" data-from="vp-app" data-to="vp-sl" data-step="2"></b>
+    <b class="wire" data-from="vp-app" data-to="vp-ac" data-step="2"></b>
+    <b class="wire" data-from="vp-sl" data-to="vp-hd" data-step="2"></b>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Left: today's code. The session goes down the tree, one component at a time, even through components that don't care. Right: a provider wraps the whole tree, like the pass in the middle of the kitchen. Any component inside it can pick up the session directly. The wires on the right carry no props any more.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="Context in three parts">
+  <p class="eyebrow"><b>Solution 1</b> The whole idea in three lines</p>
+  <h2 class="h2 mt-s">Context in three parts</h2>
+  <div class="anatomy" style="margin-top:36px">
+    <div class="anatomy__code" style="display:block;font-size:34px;line-height:1.7"><span class="part" data-on="1:is-on">const AuthContext = createContext&lt;AuthContextValue | null&gt;(null);</span>
+<span class="part" data-on="2:is-on">&lt;AuthContext value={{ session, login, logout }}&gt;{children}&lt;/AuthContext&gt;</span>
+<span class="part" data-on="3:is-on">const auth = useContext(AuthContext);</span></div>
+    <div class="anatomy__notes cols-3">
+      <div class="card" data-step="1"><span class="num">01 · build the pass</span><p><code>createContext</code> makes a place for one kind of value. <code>null</code> is what you get outside any provider.</p></div>
+      <div class="card" data-step="2"><span class="num">02 · put the value on it</span><p>The provider: every component <b>inside</b> it can reach the value. React 19 writes <code>&lt;AuthContext&gt;</code>; older code writes <code>&lt;AuthContext.Provider&gt;</code>.</p></div>
+      <div class="card" data-step="3"><span class="num">03 · pick it up</span><p><code>useContext</code> in any component inside, at any depth. When the value changes, that component re-renders.</p></div>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Say:</b> Three parts, always. Build the pass once. Put a value on it near the top of the app. Pick it up wherever you need it. We wrap step 3 in our own hook, useAuth(), so nobody imports the context directly.</p></aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="Recipe: the auth context">
+  <p class="eyebrow"><b>Solution 1 · Recipe</b> Type it with me</p>
+  <h2 class="h3 mt-s">The pass for the session: <code>AuthContext.ts</code></h2>
+  <div class="recipe">
+    <ol class="steps is-compact">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>What is on the pass</b><span>The session, and the two ways to change it.</span><span class="file-chip"><i data-icon="file-code"></i>src/auth/AuthContext.ts</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Build the pass</b><span><code>null</code> means "no provider above me".</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>A hook to pick it up</b><span>It fails loudly if someone forgot the provider.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="ts" data-file="src/auth/AuthContext.ts" data-copy data-build="1:1,2,4-8;2:10;3:12-17" style="--code-size:18px">
+        import { createContext, useContext } from "react";
+        import type { Session } from "../types";
+
+        export type AuthContextValue = {
+          session: Session | null;
+          login: (session: Session) => void;
+          logout: () => void;
+        };
+
+        export const AuthContext = createContext<AuthContextValue | null>(null);
+
+        // Any component below <AuthProvider> can call useAuth(). No props needed.
+        export function useAuth() {
+          const auth = useContext(AuthContext);
+          if (auth === null) throw new Error("useAuth() must be used inside <AuthProvider>");
+          return auth;
+        }
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Why .ts and not .tsx?</b> This file has no JSX. Keeping the context and the hook apart from the provider component also keeps Vite's fast refresh happy (see the mistakes slide).</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="Recipe: the auth provider">
+  <p class="eyebrow"><b>Solution 1 · Recipe</b> The session moves out of App</p>
+  <h2 class="h3 mt-s">Put the session on the pass: <code>AuthProvider.tsx</code></h2>
+  <div class="recipe">
+    <ol class="steps is-compact">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>The session moves here</b><span>Cut the line from App, paste it here. Same key: nobody gets signed out.</span><span class="file-chip"><i data-icon="file-code"></i>src/auth/AuthProvider.tsx</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>The value</b><span>The session and the two actions.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Wrap the children</b><span>Whatever is inside gets the value.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Wrap the whole app</b><span>Inside BrowserRouter, around App.</span><span class="file-chip"><i data-icon="file-code"></i>src/main.tsx</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/auth/AuthProvider.tsx" data-copy data-build="1:1-4,6-8,17;2:10-14;3:16" style="--code-size:15px">
+        import type { ReactNode } from "react";
+        import { useLocalStorage } from "../hooks/useLocalStorage";
+        import type { Session } from "../types";
+        import { AuthContext, type AuthContextValue } from "./AuthContext";
+
+        export function AuthProvider({ children }: { children: ReactNode }) {
+          // Kept in localStorage for this course. The Next.js module moves sessions into httpOnly cookies.
+          const [session, setSession] = useLocalStorage<Session | null>("bistro.session", null);
+
+          const value: AuthContextValue = {
+            session,
+            login: (next) => setSession(next),
+            logout: () => setSession(null),
+          };
+
+          return <AuthContext value={value}>{children}</AuthContext>;
+        }
+      </script>
+      <script type="text/plain" data-lang="tsx" data-file="src/main.tsx" data-build="4:1-5" style="--code-size:15px">
+        <BrowserRouter>
+          <AuthProvider>
+            <App />
+          </AuthProvider>
+        </BrowserRouter>
+      </script>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Say:</b> <code>children</code> is whatever we put between the tags in main.tsx: the whole app. The provider doesn't know or care which components will read the session.</p></aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="Recipe: read the session anywhere">
+  <p class="eyebrow"><b>Solution 1 · Recipe</b> Now delete props</p>
+  <h2 class="h3 mt-s">Read the session anywhere</h2>
+  <div class="recipe">
+    <ol class="steps is-compact">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>Header</b><span><code>session</code> and <code>onLogout</code> leave its props, and SiteLayout's.</span><span class="file-chip"><i data-icon="file-code"></i>Header.tsx</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>The guard and the login</b><span>Only <code>roles</code> is left on RequireAuth.</span><span class="file-chip"><i data-icon="file-code"></i>RequireAuth.tsx, LoginPage.tsx</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>The pages</b><span>AccountPage and KitchenPage take <code>session</code> and <code>logout</code> from the hook.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>App lets go</b><span>No session state, no session props. TypeScript underlines every leftover.</span><span class="file-chip"><i data-icon="file-code"></i>App.tsx</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="Header.tsx (the cart props stay until after the break) and AccountPage.tsx" data-build="1:1-2;3:4-6" style="--code-size:15px">
+        export function Header({ cart, onChangeQty, onRemove }: HeaderProps) {
+          const { session, logout } = useAuth(); // from context: no props
+
+        export function AccountPage() {
+          const { session, logout } = useAuth();
+          const { data, error, loading } = useApi<UserProfile>("/api/v1/profile", session?.token);
+      </script>
+      <script type="text/plain" data-lang="tsx" data-file="RequireAuth.tsx and LoginPage.tsx" data-build="2:1-2,4-5" style="--code-size:15px">
+        export function RequireAuth({ roles }: RequireAuthProps) {
+          const { session } = useAuth();
+
+        export function LoginPage() {
+          const { login } = useAuth();
+      </script>
+      <script type="text/plain" data-lang="tsx" data-file="src/App.tsx" data-build="4:1-6" style="--code-size:15px">
+        <Route element={<RequireAuth />}>
+          <Route path="account" element={<AccountPage />} />
+        </Route>
+        <Route element={<RequireAuth roles={["kitchen", "waiter"]} />}>
+          <Route path="kitchen" element={<KitchenPage />} />
+        </Route>
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Delete the props in one component, save, and read the red lines. TypeScript lists every place that still passes <code>session=</code>. Follow them until the build is green.</p>
+    <p><b>Why <code>session?.token</code>?</b> For TypeScript the session can still be null. The guard makes sure it isn't when the page shows.</p>
+  </aside>
+</section>
+
+<section class="slide" id="rerender" data-phase="solution" data-title="Who re-renders?">
+  <p class="eyebrow"><b>Solution 1</b> Click the buttons, watch the counters</p>
+  <h2 class="h2 mt-s">Who re-renders when the value changes?</h2>
+  <div class="rr">
+    <div class="rr__board">
+      <div class="rr__provs">
+        <div class="rr__prov" id="rr-one" hidden>&lt;AppContext&gt;<small>session + cart in one value</small></div>
+        <div class="rr__prov" id="rr-auth">&lt;AuthContext&gt;<small>session</small></div>
+        <div class="rr__prov" id="rr-cart">&lt;CartContext&gt;<small>cart</small></div>
+      </div>
+      <div class="rr__comps" id="rr-comps">
+        <div class="rr__comp" data-k="header">Header<small>reads: session, count</small><span class="cnt">0</span></div>
+        <div class="rr__comp" data-k="account">AccountPage<small>reads: session</small><span class="cnt">0</span></div>
+        <div class="rr__comp" data-k="footer">Footer<small>reads: nothing</small><span class="cnt">0</span></div>
+        <div class="rr__comp" data-k="card1">DishCard<small>reads: cart · Coq au Vin</small><span class="cnt">0</span></div>
+        <div class="rr__comp" data-k="card2">DishCard<small>reads: cart · Crème Brûlée</small><span class="cnt">0</span></div>
+        <div class="rr__comp" data-k="card3">DishCard<small>reads: cart · Bordeaux</small><span class="cnt">0</span></div>
+      </div>
+    </div>
+    <div class="rr__side">
+      <div class="seg" id="rr-mode"><button type="button" class="is-on" data-m="two">Two contexts</button><button type="button" data-m="one">One big context</button></div>
+      <div class="row" style="--gap:10px"><button class="btn is-wine" type="button" id="rr-sign"><i data-icon="log-in"></i>Sign in</button><button class="btn is-ghost" type="button" id="rr-add"><i data-icon="plus"></i>Add a dish</button><button class="btn is-ghost" type="button" id="rr-reset"><i data-icon="rotate-ccw"></i></button></div>
+      <div class="takeaway"><p class="k">The rule</p><p>Every component that reads a context re-renders when its value changes. Keep contexts small and split them by topic.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> With "Two contexts": Sign in → Header and AccountPage flash. Add a dish → Header and the cards flash. Switch to "One big context", reset, and do the same: every reader flashes on every change. Footer never does: it reads nothing.</p>
+    <p><b>If asked:</b> Re-rendering is usually cheap. It matters for big lists or values that change many times a second (a text field, a timer). That's when you split, or reach for a store (L32).</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="Is context the right tool?">
+  <p class="eyebrow"><b>Solution 1</b> Ask in this order</p>
+  <h2 class="h2 mt-s">Is context the right tool?</h2>
+  <div class="schema" data-wire-sides="r l" style="width:1632px;height:600px;margin-top:22px">
+    <div class="node lg" id="q1" style="left:0;top:0" data-step="1">Do components far apart need it?</div>
+    <div class="node lg is-ghost" id="a1" style="left:1000px;top:0" data-step="1">Props<small>or lift the state to the closest parent (L28)</small></div>
+    <div class="node lg" id="q2" style="left:0;top:150px" data-step="2">Does it change many times a second?</div>
+    <div class="node lg is-ghost" id="a2" style="left:1000px;top:150px" data-step="2">Keep it local<small>or a store with selectors (L32)</small></div>
+    <div class="node lg" id="q3" style="left:0;top:300px" data-step="3">Is it data from a server?</div>
+    <div class="node lg is-ghost" id="a3" style="left:1000px;top:300px" data-step="3">TanStack Query<small>caching, refetching (L34)</small></div>
+    <div class="node lg is-good" id="a4" style="left:0;top:460px" data-step="4">Context ✓<small>session, cart, theme, language</small></div>
+    <b class="wire is-bad" data-from="q1" data-to="a1" data-label="no" data-step="1"></b>
+    <b class="wire is-good" data-from="q1" data-to="q2" data-sides="b t" data-label="yes" data-lx="34" data-ly="4" data-step="2"></b>
+    <b class="wire is-bad" data-from="q2" data-to="a2" data-label="yes" data-step="2"></b>
+    <b class="wire is-good" data-from="q2" data-to="q3" data-sides="b t" data-label="no" data-lx="30" data-ly="4" data-step="3"></b>
+    <b class="wire is-bad" data-from="q3" data-to="a3" data-label="yes" data-step="3"></b>
+    <b class="wire is-good" data-from="q3" data-to="a4" data-sides="b t" data-label="no" data-lx="30" data-ly="4" data-step="4"></b>
+  </div>
+  <aside class="notes"><p><b>Say:</b> Context is not a place for all state. The open/closed state of the cart panel stays in the Header. The text of the search box stays in MenuPage. The menu from the API will move to TanStack Query in L34. Context is for a few app-wide values that change now and then.</p></aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="When context goes wrong">
+  <p class="eyebrow"><b>Solution 1</b> The errors you will see today</p>
+  <h2 class="h2 mt-s">When context goes wrong</h2>
+  <div class="mistakes">
+    <div class="mistake" data-step="1"><h4>A reader outside the provider</h4><div class="bad">&lt;App /&gt; in main.tsx without &lt;AuthProvider&gt;</div><div class="err">Uncaught Error: useAuth() must be used inside &lt;AuthProvider&gt;</div><div class="good">&lt;AuthProvider&gt;&lt;App /&gt;&lt;/AuthProvider&gt;</div></div>
+    <div class="mistake" data-step="2"><h4>Context and provider in one .tsx file</h4><div class="bad">export const AuthContext = … and export function AuthProvider in one file</div><div class="err">Fast refresh only works when a file only exports components. Move your React context(s) to a separate file.</div><div class="good">AuthContext.ts (context + hook), AuthProvider.tsx (component)</div></div>
+    <div class="mistake" data-step="3"><h4>Everything in one context</h4><div class="bad">&lt;AppContext value={{ session, cart, theme, … }}&gt;</div><div class="err">Every reader re-renders on every change.</div><div class="good">One context per topic: AuthContext, CartContext</div></div>
+    <div class="mistake" data-step="4"><h4>Local state in context</h4><div class="bad">isCartOpen in a context</div><div class="err">Only the Header uses it, but everyone can change it.</div><div class="good">const [isCartOpen, setIsCartOpen] = useState(false); in Header</div></div>
+  </div>
+</section>
+
+<section class="slide" data-phase="solution" data-title="Quick check: context">
+  <div class="split-5-7 fill items-center">
+    <div class="stack" style="--gap:24px">
+      <p class="eyebrow"><b>Quick check</b> The pass</p>
+      <h2 class="h1">Which component can call <code style="font-size:.7em">useAuth()</code>?</h2>
+    </div>
+    <div class="quiz" data-quiz>
+      <div class="quiz__opts">
+        <button class="quiz__opt">Only the direct children of AuthProvider</button>
+        <button class="quiz__opt" data-correct>Any component inside AuthProvider, at any depth</button>
+        <button class="quiz__opt">Any component that imports AuthContext</button>
+        <button class="quiz__opt">Only components that receive a session prop</button>
+      </div>
+      <p class="quiz__explain">The provider covers everything rendered inside it, however deep. Importing the context is not enough: outside the provider you get <code>null</code>, and our hook throws.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== CLASSWORK 1 ============================== -->
+
+<section class="slide" data-phase="classwork" data-title="Classwork 1: your session, everywhere">
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Atelier · Classwork 1</b> 15 minutes, on your own project</p><h2 class="h1">Your session, everywhere</h2></div>
+    <div class="timer" data-timer="900"></div>
+  </div>
+  <div class="cw">
+    <div class="tiers">
+      <div class="tier base"><div class="tier__k"><span>Base</span><span>everyone</span></div><h3>An auth context</h3>
+        <ul><li><code>auth/AuthContext.ts</code>: the type, <code>createContext</code>, <code>useAuth()</code>.</li><li><code>auth/AuthProvider.tsx</code>: the session from <code>useLocalStorage</code>, <code>login</code>, <code>logout</code>. Wrap the app in main.tsx.</li><li>Header, LoginPage, ProfilePage and RequireAuth call <code>useAuth()</code>. Delete the session props.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Plus</span><span>most of you</span></div><h3>A theme</h3>
+        <ul><li>A <code>ThemeContext</code> with <code>"light" | "dark"</code> and a toggle in the Header.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Pro</span><span>fast finishers</span></div><h3>A theme that remembers</h3>
+        <ul><li>It survives F5 and starts from the system setting (<code>prefers-color-scheme</code>).</li></ul></div>
+    </div>
+    <div class="cw__side">
+      <div class="done-when"><p class="k">Done when</p><ul class="checks"><li>Searching the project for <code>session=</code> finds nothing</li><li>Login, F5: still signed in</li><li>Sign out from the Header works</li><li>The guard still sends guests to /login</li></ul></div>
+      <div class="hint" data-peek="click for a hint"><div><p class="k">Stuck?</p><pre>export function AuthProvider({ children }: { children: ReactNode }) {
+  const [session, setSession] = useLocalStorage&lt;Session | null&gt;("shop.session", null);
+  const value = { session, login: setSession, logout: () =&gt; setSession(null) };
+  return &lt;AuthContext value={value}&gt;{children}&lt;/AuthContext&gt;;
+}</pre></div></div>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Watch for:</b> the provider placed inside App instead of around it, <code>useContext(AuthContext)</code> returning null (no provider above), and a context file that also exports the provider (the fast refresh warning).</p></aside>
+</section>
+
+<!-- ============================== BREAK ============================== -->
+
+<section class="slide" data-phase="break" data-tone="dark" data-title="Pause café">
+  <div class="pause">
+    <div class="stack" style="--gap:28px">
+      <p class="eyebrow"><b>Pause café</b> 10 minutes</p>
+      <h2 class="display">Pause café</h2>
+      <p class="lead">After the break: too many cooks in the cart.</p>
+      <button class="pause__btn" type="button" data-start-break><i data-icon="coffee"></i>Start the break</button>
+    </div>
+    <div class="cup" aria-hidden="true"><span class="cup__steam"></span><span class="cup__steam"></span><span class="cup__steam"></span><div class="cup__plate"></div><div class="cup__body"></div><div class="cup__coffee"></div><div class="cup__handle"></div></div>
+  </div>
+</section>
+
+<!-- ============================== PROBLEM 2 ============================== -->
+
+<section class="slide" data-phase="problem2" data-tone="dark" data-title="Too many cooks">
+  <div class="problem-cover">
+    <div class="problem-cover__text">
+      <p class="eyebrow"><b>Second plat · Problem 2</b> A new wish from the chef</p>
+      <h2 class="display">Too many<br>cooks.</h2>
+      <p class="lead">"Add a button that orders the usual: three dishes at once." Simple? The cart's rules are spread over four files, and the new button knows none of them.</p>
+    </div>
+    <div class="problem-cover__photo"><img src="../img/photo-boeuf-bourguignon.jpg" alt=""></div>
+  </div>
+</section>
+
+<section class="slide" id="usual" data-phase="problem2" data-title="Order the usual">
+  <p class="eyebrow"><b>Problem 2</b> Add Coq au Vin, then press "Order the usual"</p>
+  <h2 class="h2 mt-s">The new button breaks the cart</h2>
+  <div class="usual">
+    <div class="mini">
+      <div class="mini__head"><span>Le Bistro</span><span class="mini__count" id="us-count">Your order · 0</span></div>
+      <div class="mini__body">
+        <div class="mgrid" id="us-grid"></div>
+        <div class="row" style="--gap:10px"><button class="btn is-wine no-caps" type="button" id="us-usual"><i data-icon="shopping-bag"></i>Order the usual</button><button class="btn is-ghost no-caps" type="button" id="us-reset"><i data-icon="rotate-ccw"></i>Reset</button></div>
+      </div>
+    </div>
+    <div class="stack" style="--gap:14px">
+      <p class="eyebrow"><b>Your order</b></p>
+      <div class="lines" id="us-lines"></div>
+      <script type="text/plain" data-lang="tsx" data-file="App.tsx (L30): the new button calls this" style="--code-size:15px">
+        function addToCart(dish: Dish) {
+          setCart((current) => [...current, { dish, qty: 1 }]);
+        }
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Add Coq au Vin with its card: one line, the card shows a stepper. Press "Order the usual" (Coq au Vin, Bouillabaisse, Bordeaux). Coq au Vin is now on the order twice, and Bouillabaisse is on it although it's off the menu today. Press it a few more times: the lines pile up.</p>
+    <p><b>Ask:</b> Why did the card never do this? (It hides "Add" once the dish is in the cart, and disables it for dishes off the menu. The rules live in the card, not in the cart.)</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="problem2" data-title="Where do the cart's rules live?">
+  <p class="eyebrow"><b>Problem 2</b> Every cook has a different recipe</p>
+  <h2 class="h2 mt-s">Where do the cart's rules live?</h2>
+  <div class="rules">
+    <div class="card" data-step="1"><span class="file-chip"><i data-icon="file-code"></i>App.tsx</span><p class="rule">"remove a line at 0"</p><p><code>changeQty</code> filters out lines with 0. <code>addToCart</code> just appends.</p></div>
+    <div class="card" data-step="2"><span class="file-chip"><i data-icon="file-code"></i>DishCard.tsx</span><p class="rule">"no duplicate lines"</p><p>Only because the card hides "Add to cart" once the dish is in the cart.</p></div>
+    <div class="card" data-step="3"><span class="file-chip"><i data-icon="file-code"></i>QuantityStepper.tsx</span><p class="rule">"never more than 10"</p><p>Only because the stepper disables its + button.</p></div>
+    <div class="card" data-step="4"><span class="file-chip"><i data-icon="file-code"></i>DishCard.tsx</span><p class="rule">"nothing off the menu"</p><p>Only because the card disables the button.</p></div>
+  </div>
+  <div class="need" style="margin-top:40px">
+    <span class="chip" data-step="5" data-fx="pop">All the rules in one place</span>
+    <span class="chip" data-step="6" data-fx="pop">Buttons say what happened, not how to change the cart</span>
+    <span class="chip" data-step="7" data-fx="pop">Rules you can test without a screen</span>
+    <span class="chip is-answer" data-step="8" data-fx="pop"><i data-icon="ticket"></i>useReducer</span>
+  </div>
+</section>
+
+<!-- ============================== SOLUTION 2 ============================== -->
+
+<section class="slide" data-phase="solution2" data-title="The ticket rail">
+  <p class="eyebrow"><b>Solution 2</b> How a kitchen takes orders</p>
+  <h2 class="h2 mt-s">The ticket rail: <code style="font-size:.7em">useReducer</code></h2>
+  <div class="schema" data-wire-sides="r l" style="width:1632px;height:560px;margin-top:26px">
+    <div class="node" id="tr-card" style="left:0;top:20px" data-step="1">DishCard<small>"Add to cart"</small></div>
+    <div class="node" id="tr-step" style="left:0;top:150px" data-step="1">QuantityStepper<small>"+"</small></div>
+    <div class="node" id="tr-usual" style="left:0;top:280px" data-step="1">Favourites<small>"Order all three"</small></div>
+    <div class="node lg is-brass" id="tr-rail" style="left:380px;top:120px" data-step="2">dispatch(ticket)<small>{ type: "added", dish }</small></div>
+    <div class="node lg is-wine" id="tr-chef" style="left:900px;top:120px" data-step="3">cartReducer(cart, ticket)<small>all the rules, one function</small></div>
+    <div class="node lg is-good" id="tr-new" style="left:1400px;top:120px" data-step="4">the new cart<small>every reader re-renders</small></div>
+    <b class="wire" data-from="tr-card" data-to="tr-rail" data-step="2"></b>
+    <b class="wire" data-from="tr-step" data-to="tr-rail" data-step="2"></b>
+    <b class="wire" data-from="tr-usual" data-to="tr-rail" data-step="2"></b>
+    <b class="wire is-wine" data-from="tr-rail" data-to="tr-chef" data-id="tr-w1" data-step="3"></b>
+    <b class="wire is-good" data-from="tr-chef" data-to="tr-new" data-id="tr-w2" data-step="4"></b>
+    <b class="packet" data-wire="tr-w1" data-on="3:loop">ticket</b>
+    <div class="takeaway" style="position:absolute;left:380px;top:380px;width:1250px" data-step="5"><p class="k">The deal</p><p>Components only describe what happened. One pure function decides what the new cart is. That function is the only cook.</p></div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> In a kitchen, waiters don't cook. They write a ticket ("table 4: one coq au vin") and put it on the rail. The chef reads the tickets one by one and follows the house rules. In React: <code>dispatch</code> puts a ticket (an <b>action</b>) on the rail; the <b>reducer</b> is the chef.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="A reducer in four parts">
+  <p class="eyebrow"><b>Solution 2</b> A pure function</p>
+  <h2 class="h2 mt-s">A reducer in four parts</h2>
+  <div class="anatomy" style="margin-top:36px">
+    <div class="anatomy__code" style="display:block;font-size:32px;line-height:1.6">function cartReducer(<span class="part" data-on="1:is-on">cart</span>, <span class="part" data-on="2:is-on">action</span>) {
+  <span class="part" data-on="3:is-on">switch (action.type) { case "added": … case "removed": … }</span>
+  <span class="part" data-on="4:is-on">return newCart;</span>
+}
+<span class="part" data-on="5:is-on">const [cart, dispatch] = useReducer(cartReducer, []);</span></div>
+    <div class="anatomy__notes">
+      <div class="card" data-step="1"><span class="num">01 · the state now</span><p>The cart as it is before this ticket.</p></div>
+      <div class="card" data-step="2"><span class="num">02 · what happened</span><p>An object with a <code>type</code>: <code>{ type: "added", dish }</code>.</p></div>
+      <div class="card" data-step="3"><span class="num">03 · one case per ticket</span><p>The rules of each kind of change.</p></div>
+      <div class="card" data-step="4"><span class="num">04 · a new state</span><p>A new array, never a changed old one. No fetch, no localStorage inside.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Step 5:</b> <code>useReducer</code> is useState's big sibling: it gives the state and <code>dispatch</code>. Calling <code>dispatch(action)</code> makes React run the reducer and re-render with what it returns.</p>
+    <p><b>Pure</b> means: same cart + same action → always the same new cart, and nothing else happens. That's why StrictMode may call it twice in development without harm.</p>
+  </aside>
+</section>
+
+<section class="slide" id="tix" data-phase="solution2" data-title="Run the tickets">
+  <p class="eyebrow"><b>Solution 2</b> Send tickets, watch the chef</p>
+  <h2 class="h2 mt-s">Run the tickets through the reducer</h2>
+  <div class="tickets">
+    <div class="tickets__btns" id="rl-btns">
+      <button class="btn is-ghost no-caps" type="button" data-t="add-5"><i data-icon="plus"></i>added · Coq au Vin</button>
+      <button class="btn is-ghost no-caps" type="button" data-t="add-15"><i data-icon="plus"></i>added · Crème Brûlée</button>
+      <button class="btn is-ghost no-caps" type="button" data-t="add-9"><i data-icon="plus"></i>added · Bouillabaisse</button>
+      <button class="btn is-ghost no-caps" type="button" data-t="inc-5"><i data-icon="plus"></i>qtyChanged · Coq au Vin +1</button>
+      <button class="btn is-ghost no-caps" type="button" data-t="dec-5"><i data-icon="minus"></i>qtyChanged · Coq au Vin −1</button>
+      <button class="btn is-ghost no-caps" type="button" data-t="rem-15"><i data-icon="x"></i>removed · Crème Brûlée</button>
+      <button class="btn is-ghost no-caps" type="button" data-t="clear"><i data-icon="trash-2"></i>cleared</button>
+      <button class="btn is-wine no-caps" type="button" data-t="usual"><i data-icon="shopping-bag"></i>Order the usual (3 tickets)</button>
+    </div>
+    <div class="tickets__track" id="rl-track"></div>
+    <div class="tickets__right">
+      <div class="chef" id="rl-chef">cartReducer(cart, ticket)<small>Bouillabaisse is off the menu today</small></div>
+      <div class="state" id="rl-state"></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> "added · Coq au Vin" twice: one line, qty 2 (no duplicates). "Bouillabaisse": refused, off the menu. "Order the usual": three tickets, handled one by one. Press "+1" until 10: it stops. "−1" down to 0: the line disappears.</p>
+    <p><b>Say:</b> The buttons don't know any rule. They only describe what happened. Every rule lives in one place.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Recipe: the tickets">
+  <p class="eyebrow"><b>Solution 2 · Recipe</b> Type it with me, part 1 of 2</p>
+  <h2 class="h3 mt-s">The tickets and the first rule: <code>cartReducer.ts</code></h2>
+  <div class="recipe">
+    <ol class="steps is-compact">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>Name every change</b><span>One type per ticket. TypeScript rejects a typo like <code>"add"</code>.</span><span class="file-chip"><i data-icon="file-code"></i>src/cart/cartReducer.ts</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>One rule, one place</b><span>The stepper imports <code>MAX_QTY</code> from here.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>The chef</b><span>Cart and ticket in, new cart out. A <code>switch</code> on the type.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>"added"</b><span>Off the menu? Nothing changes. Already there? One more, up to 10. Otherwise a new line.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="ts" data-file="src/cart/cartReducer.ts (part 1)" data-copy data-build="1:1-8;2:10;3:12-15;4:16-27" style="--code-size:15px">
+        import type { CartItem, Dish } from "../types";
+
+        // Every change the cart can go through, as a named action ("a ticket for the kitchen")
+        export type CartAction =
+          | { type: "added"; dish: Dish }
+          | { type: "qtyChanged"; dishId: number; delta: number }
+          | { type: "removed"; dishId: number }
+          | { type: "cleared" };
+
+        export const MAX_QTY = 10; // the stepper imports it too: one rule, one place
+
+        // All the cart's rules in one pure function: same cart + same action = same new cart.
+        // No fetch, no localStorage, no Date.now() in here.
+        export function cartReducer(cart: CartItem[], action: CartAction): CartItem[] {
+          switch (action.type) {
+            case "added": {
+              if (!action.dish.isAvailable) return cart; // off the menu today: nothing changes
+              const inCart = cart.some((item) => item.dish.id === action.dish.id);
+              if (inCart) {
+                return cart.map((item) =>
+                  item.dish.id === action.dish.id
+                    ? { ...item, qty: Math.min(MAX_QTY, item.qty + 1) }
+                    : item,
+                );
+              }
+              return [...cart, { dish: action.dish, qty: 1 }];
+            }
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Copy:</b> this slide's Copy button, then the next slide's: together they are the whole file (also in <code>code/after-L31/src/cart/cartReducer.ts</code>).</p>
+    <p><b>Step 2:</b> in <code>QuantityStepper.tsx</code>, replace <code>const MAX_QTY = 10;</code> with <code>import { MAX_QTY } from "../cart/cartReducer";</code>.</p>
+    <p><b>Returning the same <code>cart</code></b> means "nothing changed": React skips the re-render.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Recipe: the other tickets">
+  <p class="eyebrow"><b>Solution 2 · Recipe</b> Part 2 of 2</p>
+  <h2 class="h3 mt-s">The other three tickets</h2>
+  <div class="recipe">
+    <ol class="steps is-compact">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>"qtyChanged"</b><span>+1 or −1, never above 10, and gone at 0.</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>"removed" and "cleared"</b><span>The ✕ on a line, "Empty the order".</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Try it without a screen</b><span>It's a plain function: call it in the console or a test.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="ts" data-file="src/cart/cartReducer.ts (part 2)" data-copy data-build="1:1-8;2:9-14" style="--code-size:16px">
+            case "qtyChanged":
+              return cart
+                .map((item) =>
+                  item.dish.id === action.dishId
+                    ? { ...item, qty: Math.min(MAX_QTY, item.qty + action.delta) }
+                    : item,
+                )
+                .filter((item) => item.qty > 0);
+            case "removed":
+              return cart.filter((item) => item.dish.id !== action.dishId);
+            case "cleared":
+              return [];
+          }
+        }
+      </script>
+      <script type="text/plain" data-lang="ts" data-file="the reducer, without React" data-build="3:1-4" style="--code-size:16px">
+        const one = cartReducer([], { type: "added", dish: coqAuVin }); // [{ dish: coqAuVin, qty: 1 }]
+        const two = cartReducer(one, { type: "added", dish: coqAuVin }); // [{ dish: coqAuVin, qty: 2 }]
+        cartReducer(two, { type: "qtyChanged", dishId: 5, delta: -2 }); // []
+        cartReducer(two, { type: "added", dish: bouillabaisse }); // the same `two`: off the menu
+      </script>
+    </div>
+  </div>
+  <aside class="notes"><p><b>If asked "where is default?":</b> TypeScript knows these four cases are all the tickets there are. Add a new ticket type and forget its case, and the build fails: "Function lacks ending return statement".</p></aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Recipe: the cart context">
+  <p class="eyebrow"><b>Solution 2 · Recipe</b> The same three parts as before the break</p>
+  <h2 class="h3 mt-s">The pass for the cart: <code>CartContext.ts</code></h2>
+  <div class="recipe">
+    <ol class="steps is-compact">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>What the pass offers</b><span>The lines, what we calculate from them, and named actions. Components never see <code>dispatch</code>.</span><span class="file-chip"><i data-icon="file-code"></i>src/cart/CartContext.ts</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Build the pass</b><span>Exactly like AuthContext.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>The hook</b><span><code>useCart()</code>, loud when the provider is missing.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="ts" data-file="src/cart/CartContext.ts" data-copy data-build="1:1,2,4-14;2:16;3:18-23" style="--code-size:17px">
+        import { createContext, useContext } from "react";
+        import type { CartItem, Dish } from "../types";
+
+        // What every component can read from the cart, and what it can ask the cart to do
+        export type CartContextValue = {
+          items: CartItem[];
+          count: number;
+          total: number;
+          qtyOf: (dishId: number) => number;
+          add: (dish: Dish) => void;
+          changeQty: (dishId: number, delta: number) => void;
+          remove: (dishId: number) => void;
+          clear: () => void;
+        };
+
+        export const CartContext = createContext<CartContextValue | null>(null);
+
+        // Any component below <CartProvider> can call useCart(). No props needed.
+        export function useCart() {
+          const cart = useContext(CartContext);
+          if (cart === null) throw new Error("useCart() must be used inside <CartProvider>");
+          return cart;
+        }
+      </script>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Recipe: the cart provider, 1 of 2">
+  <p class="eyebrow"><b>Solution 2 · Recipe</b> The reducer moves in, part 1 of 2</p>
+  <h2 class="h3 mt-s">The cart provider: state and saving</h2>
+  <div class="recipe">
+    <ol class="steps is-compact">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>Read the saved cart once</b><span>A plain function for the first state.</span><span class="file-chip"><i data-icon="file-code"></i>src/cart/CartProvider.tsx</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>useReducer</b><span>The reducer, a start value, and <code>loadCart</code> to compute it lazily, only on the first render.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Save after every change</b><span>localStorage is the outside world: an effect, never inside the reducer.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/cart/CartProvider.tsx (part 1)" data-copy data-build="1:1-4,6-14;2:16,17;3:19-25" style="--code-size:15px">
+        import { useEffect, useReducer, type ReactNode } from "react";
+        import type { CartItem } from "../types";
+        import { CartContext, type CartContextValue } from "./CartContext";
+        import { cartReducer } from "./cartReducer";
+
+        // Read the saved cart once, when the app starts
+        function loadCart(): CartItem[] {
+          try {
+            const saved = localStorage.getItem("bistro.cart");
+            return saved === null ? [] : (JSON.parse(saved) as CartItem[]);
+          } catch {
+            return [];
+          }
+        }
+
+        export function CartProvider({ children }: { children: ReactNode }) {
+          const [items, dispatch] = useReducer(cartReducer, [], loadCart);
+
+          useEffect(() => {
+            try {
+              localStorage.setItem("bistro.cart", JSON.stringify(items));
+            } catch {
+              // storage blocked: the cart still works, it just forgets on refresh
+            }
+          }, [items]);
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> The key is still "bistro.cart", so carts saved before today are still there. <code>useLocalStorage</code> did the same job for <code>useState</code>; for a reducer we read once and save in an effect.</p>
+    <p><b>If asked "why not <code>useReducer(cartReducer, loadCart())</code>?"</b> That would read localStorage on every render. The third argument runs only once.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Recipe: the cart provider, 2 of 2">
+  <p class="eyebrow"><b>Solution 2 · Recipe</b> Part 2 of 2</p>
+  <h2 class="h3 mt-s">The cart provider: what goes on the pass</h2>
+  <div class="recipe">
+    <ol class="steps is-compact">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>The data, and what we calculate from it</b><span>count, total and qtyOf are derived on every render: never stored.</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Named actions</b><span>Each one writes a ticket.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>On the pass</b><span>Same as the auth provider.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Wrap the app</b><span>Both providers around App.</span><span class="file-chip"><i data-icon="file-code"></i>src/main.tsx</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/cart/CartProvider.tsx (part 2)" data-copy data-build="1:1-5,10;2:6-9;3:12-13" style="--code-size:15px">
+          const value: CartContextValue = {
+            items,
+            count: items.reduce((sum, item) => sum + item.qty, 0),
+            total: items.reduce((sum, item) => sum + item.dish.price * item.qty, 0),
+            qtyOf: (dishId) => items.find((item) => item.dish.id === dishId)?.qty ?? 0,
+            add: (dish) => dispatch({ type: "added", dish }),
+            changeQty: (dishId, delta) => dispatch({ type: "qtyChanged", dishId, delta }),
+            remove: (dishId) => dispatch({ type: "removed", dishId }),
+            clear: () => dispatch({ type: "cleared" }),
+          };
+
+          return <CartContext value={value}>{children}</CartContext>;
+        }
+      </script>
+      <script type="text/plain" data-lang="tsx" data-file="src/main.tsx" data-build="4:1-9" style="--code-size:15px">
+        <StrictMode>
+          <BrowserRouter>
+            <AuthProvider>
+              <CartProvider>
+                <App />
+              </CartProvider>
+            </AuthProvider>
+          </BrowserRouter>
+        </StrictMode>,
+      </script>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Recipe: read the cart anywhere">
+  <p class="eyebrow"><b>Solution 2 · Recipe</b> The great prop deletion</p>
+  <h2 class="h3 mt-s">Read the cart anywhere</h2>
+  <div class="recipe">
+    <ol class="steps is-compact">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>DishCard asks the cart itself</b><span>Its props shrink to <code>dish</code>.</span><span class="file-chip"><i data-icon="file-code"></i>DishCard.tsx</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Header and CartPanel</b><span>The count, the lines, the total, and a new "Empty the order".</span><span class="file-chip"><i data-icon="file-code"></i>Header.tsx, CartPanel.tsx</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>The new button</b><span>"Order all three" sends three tickets. No duplicates.</span><span class="file-chip"><i data-icon="file-code"></i>Favourites.tsx</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Delete, delete, delete</b><span>DishGrid, Favourites, the pages, SiteLayout, App: no cart props left. App: 87 → 39 lines.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/components/DishCard.tsx" data-build="1:1-3" style="--code-size:16px">
+        export function DishCard({ dish }: DishCardProps) {
+          const { qtyOf, add, changeQty } = useCart(); // straight from context: no cart props
+          const qty = qtyOf(dish.id);
+      </script>
+      <script type="text/plain" data-lang="tsx" data-file="Header.tsx and CartPanel.tsx" data-build="2:1-2,4" style="--code-size:16px">
+        const { session, logout } = useAuth(); // from context: no props
+        const { count } = useCart();
+
+        const { items, total, changeQty, remove, clear } = useCart();
+      </script>
+      <script type="text/plain" data-lang="tsx" data-file="src/components/Favourites.tsx" data-build="3:1,3-6" style="--code-size:16px">
+        const { add } = useCart();
+
+        <button type="button" className="btn" onClick={() => favourites.forEach((dish) => add(dish))}>
+          Order all three
+        </button>
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Copy the final DishCard, Header, CartPanel and Favourites from <code>code/after-L31</code>. Then remove the cart props from DishGrid, Favourites, HomePage, MenuPage, DishPage, SiteLayout and App, following TypeScript's red lines. Delete <code>addToCart</code>, <code>changeQty</code>, <code>removeFromCart</code> and the cart state from App.</p>
+    <p><b>Test:</b> press "Order all three" twice on the home page: three lines, each with 2.</p>
+  </aside>
+</section>
+
+<section class="slide" id="faq" data-phase="solution2" data-title="Compound components">
+  <p class="eyebrow"><b>Solution 2</b> Context in the small: click the questions</p>
+  <h2 class="h2 mt-s">Parts that work together: the FAQ</h2>
+  <div class="faqdemo">
+    <div class="acc" id="fq-acc"></div>
+    <div class="stack" style="--gap:14px">
+      <script type="text/plain" data-lang="tsx" data-file="src/pages/FaqPage.tsx" style="--code-size:16px">
+        <Accordion defaultValue={faq[0].id}>
+          {faq.map((item) => (
+            <AccordionItem key={item.id} value={item.id}>
+              <AccordionTrigger>{item.question}</AccordionTrigger>
+              <AccordionPanel>{item.answer}</AccordionPanel>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </script>
+      <div class="state" id="fq-state"></div>
+      <p class="small muted">Like <code>&lt;select&gt;</code> and <code>&lt;option&gt;</code>: parts that only make sense together, sharing state through a small private context.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Context isn't only for the whole app. Here a tiny context lives inside one component family. Accordion owns "which question is open" and puts it on its own small pass. Each AccordionItem adds "who am I, am I open". Trigger and Panel just read. No props between the parts.</p>
+    <p><b>Compare:</b> the alternative is one component with a dozen props: <code>items</code>, <code>openId</code>, <code>onToggle</code>, <code>renderTitle</code>, <code>renderBody</code>… and still no way to put a picture in one answer.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Recipe: the accordion">
+  <p class="eyebrow"><b>Solution 2 · Recipe</b> Copy the file, read these parts</p>
+  <h2 class="h3 mt-s">Inside <code>Accordion.tsx</code></h2>
+  <div class="recipe">
+    <ol class="steps is-compact">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>Two small contexts</b><span>Not exported: only the parts can use them.</span><span class="file-chip"><i data-icon="file-code"></i>src/components/Accordion.tsx</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Accordion owns the state</b><span>Which item is open. Click the open one again to close it.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>AccordionItem tells its parts who they are</b><span><code>&lt;ItemContext value={{ value, isOpen, panelId }}&gt;</code> around its children; <code>panelId</code> comes from <code>useId()</code>.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Trigger and Panel only read</b><span>The panel hides itself when its item is closed.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="Accordion.tsx (excerpt)" data-build="1:1-2;2:4-14" style="--code-size:15px">
+        const AccordionContext = createContext<AccordionContextValue | null>(null);
+        const ItemContext = createContext<ItemContextValue | null>(null);
+
+        export function Accordion({ defaultValue = null, children }: AccordionProps) {
+          const [openValue, setOpenValue] = useState<string | null>(defaultValue);
+          const toggle = (value: string) =>
+            setOpenValue((current) => (current === value ? null : value));
+
+          return (
+            <AccordionContext value={{ openValue, toggle }}>
+              <div className="accordion">{children}</div>
+            </AccordionContext>
+          );
+        }
+      </script>
+      <script type="text/plain" data-lang="tsx" data-file="Accordion.tsx (excerpt)" data-build="4:1-9" style="--code-size:15px">
+        export function AccordionPanel({ children }: { children: ReactNode }) {
+          const { isOpen, panelId } = useItem();
+
+          return (
+            <div id={panelId} hidden={!isOpen} className="accordion__panel">
+              {children}
+            </div>
+          );
+        }
+      </script>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Copy <code>components/Accordion.tsx</code>, <code>pages/FaqPage.tsx</code> and <code>data/faq.ts</code> from <code>code/after-L31</code>, add <code>&lt;Route path="faq" element={&lt;FaqPage /&gt;} /&gt;</code> and an FAQ NavLink in the Header. The FAQ texts are the real ones from srms.stepacademy.ge/faq.</p></aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="When a reducer goes wrong">
+  <p class="eyebrow"><b>Solution 2</b> The bugs of the second half</p>
+  <h2 class="h2 mt-s">When a reducer goes wrong</h2>
+  <div class="mistakes">
+    <div class="mistake" data-step="1"><h4>Changing the old cart</h4><div class="bad">cart.push({ dish, qty: 1 }); return cart;</div><div class="err">Nothing re-renders: it's the same array, so React sees no change.</div><div class="good">return [...cart, { dish, qty: 1 }];</div></div>
+    <div class="mistake" data-step="2"><h4>A forgotten return</h4><div class="bad">case "removed": cart.filter((item) =&gt; …);</div><div class="err">error TS7029: Fallthrough case in switch. (Without the check: "removed" runs into "cleared" and empties the cart.)</div><div class="good">case "removed": return cart.filter((item) =&gt; …);</div></div>
+    <div class="mistake" data-step="3"><h4>A typo in the ticket</h4><div class="bad">dispatch({ type: "add", dish })</div><div class="err">Type '"add"' is not assignable to type '"added" | "qtyChanged" | "removed" | "cleared"'.</div><div class="good">dispatch({ type: "added", dish })</div></div>
+    <div class="mistake" data-step="4"><h4>Side effects in the reducer</h4><div class="bad">localStorage.setItem("bistro.cart", …) inside the reducer</div><div class="err">StrictMode runs reducers twice in development. A reducer must only calculate.</div><div class="good">useEffect(() =&gt; save(items), [items]) in the provider</div></div>
+  </div>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="The whole picture">
+  <p class="eyebrow"><b>Solution 2</b> Le Bistro, version 0.5</p>
+  <h2 class="h2 mt-s">The whole picture</h2>
+  <div class="picture">
+    <div class="nest" data-step="1">
+      <div>&lt;StrictMode&gt;
+        <div>&lt;BrowserRouter&gt;<small>the address</small>
+          <div class="is-wine">&lt;AuthProvider&gt;<small>the session</small>
+            <div class="is-wine">&lt;CartProvider&gt;<small>the cart + reducer</small>
+              <div>&lt;App /&gt;<small>routes only</small></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="shots2">
+      <figure class="shot" data-step="2"><div class="shot__bar"><i></i><i></i><i></i><span class="shot__url">…/<b>menu</b></span></div><div class="shot__body"><img src="../img/l31-menu-cart.jpg" alt="The menu with the cart panel open"></div></figure>
+      <figure class="shot" data-step="3"><div class="shot__bar"><i></i><i></i><i></i><span class="shot__url">…/<b>faq</b></span></div><div class="shot__body"><img src="../img/l31-faq.jpg" alt="The FAQ page"></div></figure>
+      <p class="small muted" data-step="4" style="grid-column:1 / -1">Full code: <code>bistro-track/code/after-L31</code>. The Le Bistro track is complete; from L32 on, the course builds on this shape.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Quick check: reducers">
+  <div class="split-5-7 fill items-center">
+    <div class="stack" style="--gap:24px">
+      <p class="eyebrow"><b>Quick check</b> The chef's rules</p>
+      <h2 class="h1">Which line may go inside a reducer?</h2>
+    </div>
+    <div class="quiz" data-quiz>
+      <div class="quiz__opts">
+        <button class="quiz__opt"><code>localStorage.setItem("bistro.cart", JSON.stringify(cart));</code></button>
+        <button class="quiz__opt" data-correct><code>return [...cart, { dish: action.dish, qty: 1 }];</code></button>
+        <button class="quiz__opt"><code>cart.push({ dish: action.dish, qty: 1 }); return cart;</code></button>
+        <button class="quiz__opt"><code>fetch("/api/v1/orders", { method: "POST" });</code></button>
+      </div>
+      <p class="quiz__explain">A reducer only calculates a new state from the old state and the action. Saving and fetching are side effects (an effect or an event handler). Pushing changes the old array, so React sees no change.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== CLASSWORK 2 ============================== -->
+
+<section class="slide" data-phase="classwork2" data-title="Classwork 2: one cart, one reducer">
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Atelier · Classwork 2</b> 15 minutes, on your own project</p><h2 class="h1">One cart, one reducer</h2></div>
+    <div class="timer" data-timer="900"></div>
+  </div>
+  <div class="cw">
+    <div class="tiers">
+      <div class="tier base"><div class="tier__k"><span>Base</span><span>everyone</span></div><h3>A cart reducer</h3>
+        <ul><li><code>cart/cartReducer.ts</code>: <code>added</code>, <code>qtyChanged</code>, <code>removed</code>, <code>cleared</code>. No duplicate lines, never more than the product's <code>stock</code>, gone at 0.</li><li>Use it in your App first: <code>const [cart, dispatch] = useReducer(cartReducer, [])</code>.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Plus</span><span>most of you</span></div><h3>A cart provider</h3>
+        <ul><li><code>CartContext.ts</code> + <code>CartProvider.tsx</code> + <code>useCart()</code>. Saved in localStorage. No cart props left.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Pro</span><span>fast finishers</span></div><h3>An accordion</h3>
+        <ul><li>A compound <code>Accordion</code> on the product page: description, shipping, returns, reviews.</li></ul></div>
+    </div>
+    <div class="cw__side">
+      <div class="done-when"><p class="k">Done when</p><ul class="checks"><li>The same product twice: one line, qty 2</li><li>Never more than in stock</li><li>No <code>push</code>, <code>splice</code> or <code>localStorage</code> in the reducer</li><li>F5 keeps the cart</li></ul></div>
+      <div class="hint" data-peek="click for a hint"><div><p class="k">Stuck?</p><pre>switch (action.type) {
+  case "added": { /* in cart? +1 : new line */ }
+  case "qtyChanged": return cart.map(…).filter(…);
+  case "removed": return cart.filter(…);
+  case "cleared": return [];
+}</pre></div></div>
+    </div>
+  </div>
+  <aside class="notes"><p><b>DummyJSON:</b> every product has <code>stock</code>, and <code>shippingInformation</code>, <code>returnPolicy</code>, <code>warrantyInformation</code> and <code>reviews</code> for the Pro accordion.</p></aside>
+</section>
+
+<!-- ============================== WRAP-UP ============================== -->
+
+<section class="slide" data-phase="wrap" data-title="Two problems, two tools">
+  <p class="eyebrow"><b>Dessert</b> What we solved today</p>
+  <h2 class="h2 mt-s">Two problems, two tools, one pattern</h2>
+  <div class="recap">
+    <div class="recap__row" data-step="1">
+      <div class="recap__p"><p class="k">Problem 1</p><p>The cart and the session passed hand to hand: 43 props in 8 files.</p></div>
+      <div class="recap__arrow"><i data-icon="arrow-right"></i></div>
+      <div class="recap__s"><p class="k">Context</p><p><code>createContext</code>, a provider around the app, <code>useAuth()</code> / <code>useCart()</code> anywhere inside.</p></div>
+    </div>
+    <div class="recap__row" data-step="2">
+      <div class="recap__p"><p class="k">Problem 2</p><p>The cart's rules spread over four files; a new button broke them.</p></div>
+      <div class="recap__arrow"><i data-icon="arrow-right"></i></div>
+      <div class="recap__s"><p class="k">useReducer</p><p>Tickets describe what happened; one pure function holds every rule.</p></div>
+    </div>
+    <div class="recap__row" data-step="3">
+      <div class="recap__p"><p class="k">Bonus</p><p>A component made of parts: the FAQ accordion.</p></div>
+      <div class="recap__arrow"><i data-icon="arrow-right"></i></div>
+      <div class="recap__s"><p class="k">Compound components</p><p>The parts share state through a small private context.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-phase="wrap" data-title="What does this do?">
+  <p class="eyebrow"><b>Dessert</b> Click a card to check yourself</p>
+  <h2 class="h2 mt-s">What does this do?</h2>
+  <div class="flips is-small">
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">01 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">createContext<CartContextValue | null>(null)</script></div><div class="flip__face flip__back"><span class="flip__k">01</span><p>Builds the pass. Outside any provider, readers get null.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">02 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx"><CartContext value={value}></script></div><div class="flip__face flip__back"><span class="flip__k">02</span><p>The provider: everything inside it can read value.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">03 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">const { count } = useCart();</script></div><div class="flip__face flip__back"><span class="flip__k">03</span><p>Reads the cart from context. Re-renders when it changes.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">04 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">useReducer(cartReducer, [], loadCart)</script></div><div class="flip__face flip__back"><span class="flip__k">04</span><p>State managed by a reducer. loadCart computes the first state once.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">05 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">dispatch({ type: "removed", dishId: 5 })</script></div><div class="flip__face flip__back"><span class="flip__k">05</span><p>Puts a ticket on the rail. The reducer decides the new cart.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">06 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx"><AccordionItem value="pay"></script></div><div class="flip__face flip__back"><span class="flip__k">06</span><p>One part of a compound component. Its Trigger and Panel know it.</p></div></div></div>
+  </div>
+</section>
+
+<section class="slide" data-phase="wrap" data-title="Homework: v0.5">
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Homework</b> Before L32</p><h2 class="h1">Your shop, version 0.5</h2></div>
+    <span class="sticker">Live link required</span>
+  </div>
+  <div class="hw">
+    <div class="tiers">
+      <div class="tier base"><div class="tier__k"><span>Base</span><span>required</span></div><h3>Context and a reducer</h3>
+        <ul><li><code>AuthProvider</code> + <code>useAuth()</code>: no session props anywhere.</li><li><code>CartProvider</code> with <code>useReducer</code> + <code>useCart()</code>: no cart props anywhere.</li><li>The reducer holds every rule: no duplicates, never more than <code>stock</code>, gone at 0, cleared.</li><li>The cart survives F5; "Empty the cart" works.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Plus</span><span>recommended</span></div><h3>A compound component</h3>
+        <ul><li>An <code>Accordion</code> (or <code>Tabs</code>) built from parts with a small context. Use it on the product page or an FAQ page.</li></ul></div>
+    </div>
+    <div class="cw__side">
+      <div class="done-when"><p class="k">Before you submit</p><ul class="checks"><li>Search for <code>cart=</code> and <code>session=</code>: nothing</li><li>The same product twice: one line</li><li>The reducer has no side effects</li><li><code>npm run build</code> passes</li></ul></div>
+      <p class="small muted">Full brief and grading: <code>homework.md</code>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-phase="wrap" data-title="Five lectures, one restaurant">
+  <p class="eyebrow"><b>Le Bistro track</b> Complete</p>
+  <h2 class="h2 mt-s">Five lectures, one restaurant</h2>
+  <div class="road">
+    <div class="stop is-done"><div class="stop__shot"><img src="../img/l27-home.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L27</p><p class="stop__t">Components</p><p class="stop__d">JSX, props, lists and keys.</p></div>
+    <div class="stop is-done"><div class="stop__shot"><img src="../img/l28-cart.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L28</p><p class="stop__t">State</p><p class="stop__d">useState, events, lifting state, derived values.</p></div>
+    <div class="stop is-done"><div class="stop__shot"><img src="../img/l29-search.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L29</p><p class="stop__t">Effects</p><p class="stop__d">useEffect, fetching, custom hooks, useRef.</p></div>
+    <div class="stop is-done"><div class="stop__shot"><img src="../img/l30-dish.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L30</p><p class="stop__t">Routing</p><p class="stop__d">Pages, params, login, guards.</p></div>
+    <div class="stop is-done"><div class="stop__shot"><img src="../img/l31-faq.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L31</p><p class="stop__t">Context</p><p class="stop__d">Context, useReducer, compound components.</p></div>
+  </div>
+  <div class="lane">
+    <span class="lane__k">Your project</span>
+    <span class="lane__v"><b>v0.1 – v0.5 ✓</b>a real shop, deployed</span>
+    <span class="lane__v"><b>L32 – L41</b>Zustand, forms, TanStack Query, tests, Next.js</span>
+    <span class="lane__v"><b>L42 · Demo Day</b>present it to the class</span>
+  </div>
+  <aside class="notes"><p><b>Say:</b> Take a moment. Five lectures ago this was a static page. Your shop went the same way, on a different API. Keep committing every week: Demo Day is L42.</p></aside>
+</section>
+
+<section class="slide" data-phase="wrap" data-tone="dark" data-title="Merci">
+  <div class="merci">
+    <div class="stack" style="--gap:22px">
+      <p class="eyebrow"><b>L31</b> Le passe</p>
+      <h2 class="display">Merci!</h2>
+      <p class="lead">Questions now, or in the class chat. See you at L32.</p>
+    </div>
+    <div class="teaser" data-step="1">
+      <p class="k">Next time · L32</p>
+      <h3>A store without a provider.</h3>
+      <p>Our CartProvider is 40 lines, and every reader re-renders on every change. Zustand does the same in a few lines, and lets a component subscribe to just the part it needs. Plus the big question: where should each piece of state live?</p>
+    </div>
+  </div>
+</section>
+
+</div>
+</div>
+
+<script src="../_shared/vendor/icons.js"></script>
+<script src="../_shared/vendor/prism/prism.min.js" data-manual></script>
+<script src="../_shared/vendor/prism/prism-jsx.min.js"></script>
+<script src="../_shared/vendor/prism/prism-typescript.min.js"></script>
+<script src="../_shared/vendor/prism/prism-tsx.min.js"></script>
+<script src="../_shared/vendor/prism/prism-bash.min.js"></script>
+<script src="../_shared/vendor/prism/prism-json.min.js"></script>
+<script src="../_shared/music/tracks.js"></script>
+<script src="../_shared/bistro-data.js"></script>
+<script src="../_shared/deck.js"></script>
+<script src="../track.js"></script>
+<script>
+(function () {
+  'use strict';
+  Track.init();
+  Deck.init({
+    code: 'L31',
+    lecture: 31,
+    title: 'Le passe',
+    footer: 'Le Bistro track · L31 · Context, useReducer, compound components',
+    shared: '../_shared/',
+    breakMinutes: 10,
+    breakLine: 'Pause café. Stand up, refill, rest your eyes. Back in',
+    phases: [
+      { id: 'hello', label: 'Hello' }, { id: 'questions', label: 'Questions' },
+      { id: 'problem', label: 'Problem 1' }, { id: 'solution', label: 'Solution 1' }, { id: 'classwork', label: 'Classwork 1' },
+      { id: 'break', label: 'Break' },
+      { id: 'problem2', label: 'Problem 2' }, { id: 'solution2', label: 'Solution 2' }, { id: 'classwork2', label: 'Classwork 2' },
+      { id: 'wrap', label: 'Wrap-up' }
+    ]
+  });
+
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = Track.esc;
+  document.querySelectorAll('[data-start-break]').forEach(function (b) { b.addEventListener('click', function () { Deck.openBreak(); }); });
+
+  var COQ = Track.byId(5), CREME = Track.byId(15), BORD = Track.byId(21);
+  // Bouillabaisse plays "off the menu today" in these demos
+  var BOUIL = Object.assign({}, Track.byId(9), { isAvailable: false });
+  var BY = { 5: COQ, 9: BOUIL, 15: CREME, 21: BORD };
+  var MAX = 10;
+
+  /* ---------- follow the props ---------- */
+  var DRILL = {
+    cart: {
+      users: ['dr-hd', 'dr-cp', 'dr-dg1', 'dr-dg2', 'dr-dg3', 'dr-dp'], passes: ['dr-sl', 'dr-hp', 'dr-fv', 'dr-mp'],
+      wires: ['app>sl', 'sl>hd', 'hd>cp', 'app>hp', 'hp>fv', 'fv>dg1', 'app>mp', 'mp>dg2', 'app>dp', 'dp>dg3'],
+      text: '<b>cart</b> travels through <b>4 components that never read it</b>: SiteLayout, HomePage, Favourites, MenuPage.'
+    },
+    onAdd: {
+      users: ['dr-dc1', 'dr-dc2', 'dr-dc3', 'dr-dp'], passes: ['dr-hp', 'dr-fv', 'dr-dg1', 'dr-mp', 'dr-dg2', 'dr-dg3'],
+      wires: ['app>hp', 'hp>fv', 'fv>dg1', 'dg1>dc1', 'app>mp', 'mp>dg2', 'dg2>dc2', 'app>dp', 'dp>dg3', 'dg3>dc3'],
+      text: '<b>onAdd</b> is handed down <b>up to four levels</b> before a button finally calls it.'
+    },
+    session: {
+      users: ['dr-hd', 'dr-ra', 'dr-ac'], passes: ['dr-sl'], wires: ['app>sl', 'sl>hd', 'app>ra', 'app>ac'],
+      text: '<b>session</b>: SiteLayout carries it to the Header <b>without ever reading it</b>.'
+    }
+  };
+  var tree = $('dr-tree');
+  function drill(prop) {
+    var d = DRILL[prop];
+    tree.classList.toggle('is-picking', !!d);
+    Array.prototype.forEach.call($('dr-props').children, function (b) { b.classList.toggle('is-on', b.getAttribute('data-p') === prop); });
+    tree.querySelectorAll('.node').forEach(function (n) {
+      n.classList.toggle('is-user', !!d && d.users.indexOf(n.id) >= 0);
+      n.classList.toggle('is-pass', !!d && d.passes.indexOf(n.id) >= 0);
+    });
+    (tree._wires || []).forEach(function (w) {
+      var key = w.from.replace('dr-', '') + '>' + w.to.replace('dr-', '');
+      var on = !!d && d.wires.indexOf(key) >= 0;
+      w.path.classList.toggle('is-lit', on);
+      w.head.classList.toggle('is-lit', on);
+    });
+    $('dr-out').innerHTML = d ? d.text : '43 props carry the cart and the session through 8 files. Pick one.';
+  }
+  $('dr-props').addEventListener('click', function (e) { var b = e.target.closest('[data-p]'); if (b) drill(b.getAttribute('data-p')); });
+  Deck.onSlide('drill', { step: function (slide, n) { drill([null, 'cart', 'onAdd', 'session'][n] || null); } });
+
+  /* ---------- who re-renders ---------- */
+  var rr = { mode: 'two', signedIn: false, counts: {} };
+  var READS = { header: ['auth', 'cart'], account: ['auth'], footer: [], card1: ['cart'], card2: ['cart'], card3: ['cart'] };
+  function rrBump(kind) {
+    Object.keys(READS).forEach(function (k) {
+      var reads = READS[k];
+      var hit = rr.mode === 'one' ? reads.length > 0 : reads.indexOf(kind) >= 0;
+      if (!hit) return;
+      rr.counts[k] = (rr.counts[k] || 0) + 1;
+      var el = document.querySelector('#rr-comps [data-k="' + k + '"]');
+      el.querySelector('.cnt').textContent = rr.counts[k];
+      Track.replay(el, 'flash');
+    });
+  }
+  function rrReset() {
+    rr.counts = {};
+    document.querySelectorAll('#rr-comps .cnt').forEach(function (c) { c.textContent = '0'; });
+  }
+  function rrMode(m) {
+    rr.mode = m;
+    $('rr-one').hidden = m !== 'one'; $('rr-auth').hidden = m === 'one'; $('rr-cart').hidden = m === 'one';
+    Array.prototype.forEach.call($('rr-mode').children, function (b) { b.classList.toggle('is-on', b.getAttribute('data-m') === m); });
+    rrReset();
+  }
+  $('rr-mode').addEventListener('click', function (e) { var b = e.target.closest('[data-m]'); if (b) rrMode(b.getAttribute('data-m')); });
+  $('rr-sign').addEventListener('click', function () {
+    rr.signedIn = !rr.signedIn;
+    this.innerHTML = Deck.icon(rr.signedIn ? 'log-out' : 'log-in') + (rr.signedIn ? 'Sign out' : 'Sign in');
+    rrBump('auth');
+  });
+  $('rr-add').addEventListener('click', function () { rrBump('cart'); });
+  $('rr-reset').addEventListener('click', rrReset);
+
+  /* ---------- order the usual: the L30 rules, spread over components ---------- */
+  var us = [];
+  function usQty(id) { var line = us.filter(function (l) { return l.dish.id === id; })[0]; return line ? line.qty : 0; }
+  function usAdd(dish) { us = us.concat([{ dish: dish, qty: 1 }]); } // addToCart from L30: just appends
+  function usChange(id, delta) {
+    us = us.map(function (l) { return l.dish.id === id ? { dish: l.dish, qty: l.qty + delta } : l; }).filter(function (l) { return l.qty > 0; });
+  }
+  function usRender() {
+    $('us-grid').innerHTML = [COQ, BOUIL, BORD].map(function (d) {
+      var qty = usQty(d.id), foot;
+      if (!d.isAvailable) foot = '<button type="button" class="mbtn" disabled>Add to cart</button>';
+      else if (qty === 0) foot = '<button type="button" class="mbtn" data-act="add" data-id="' + d.id + '">Add to cart</button>';
+      else foot = '<span class="mstep"><button type="button" data-act="dec" data-id="' + d.id + '">−</button><output>' + qty + '</output><button type="button" data-act="inc" data-id="' + d.id + '"' + (qty >= MAX ? ' disabled' : '') + '>+</button></span>';
+      return Track.card(d, { desc: false, foot: foot });
+    }).join('');
+    var seen = {};
+    $('us-lines').innerHTML = us.length ? us.map(function (l) {
+      var tags = [];
+      if (seen[l.dish.id]) tags.push('twice!');
+      if (!l.dish.isAvailable) tags.push('off the menu!');
+      seen[l.dish.id] = true;
+      return '<div class="cline' + (tags.length ? ' is-bad' : '') + '"><span>' + esc(l.dish.name) + '</span>' + (tags.length ? '<span class="tag">' + tags.join(' ') + '</span>' : '<span></span>') + '<span class="q">× ' + l.qty + '</span></div>';
+    }).join('') : '<p class="empty">Nothing yet. Add Coq au Vin with its card.</p>';
+    var count = us.reduce(function (s, l) { return s + l.qty; }, 0);
+    $('us-count').textContent = 'Your order · ' + count;
+  }
+  $('us-grid').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-act]'); if (!b) return;
+    var id = Number(b.getAttribute('data-id')), act = b.getAttribute('data-act');
+    if (act === 'add') usAdd(BY[id]); else usChange(id, act === 'inc' ? 1 : -1);
+    usRender();
+  });
+  $('us-usual').addEventListener('click', function () { [COQ, BOUIL, BORD].forEach(usAdd); usRender(); });
+  $('us-reset').addEventListener('click', function () { us = []; usRender(); });
+  usRender();
+
+  /* ---------- the ticket rail: the real reducer ---------- */
+  function reduce(cart, a) {
+    switch (a.type) {
+      case 'added':
+        if (!a.dish.isAvailable) return { cart: cart, v: 'refused: off the menu', bad: true };
+        if (cart.some(function (l) { return l.dish.id === a.dish.id; })) {
+          var capped = false;
+          var next = cart.map(function (l) {
+            if (l.dish.id !== a.dish.id) return l;
+            if (l.qty + 1 > MAX) capped = true;
+            return { dish: l.dish, qty: Math.min(MAX, l.qty + 1) };
+          });
+          var q = next.filter(function (l) { return l.dish.id === a.dish.id; })[0].qty;
+          return { cart: capped ? cart : next, v: capped ? 'stays at 10: the maximum' : 'already there: qty ' + q, bad: capped, id: a.dish.id };
+        }
+        return { cart: cart.concat([{ dish: a.dish, qty: 1 }]), v: 'a new line', id: a.dish.id };
+      case 'qtyChanged': {
+        var line = cart.filter(function (l) { return l.dish.id === a.dishId; })[0];
+        if (!line) return { cart: cart, v: 'not in the order: nothing changes', bad: true };
+        var nq = Math.min(MAX, line.qty + a.delta);
+        if (nq === line.qty) return { cart: cart, v: 'stays at 10: the maximum', bad: true, id: a.dishId };
+        var res = cart.map(function (l) { return l.dish.id === a.dishId ? { dish: l.dish, qty: nq } : l; }).filter(function (l) { return l.qty > 0; });
+        return { cart: res, v: nq <= 0 ? 'qty 0: the line is gone' : 'qty ' + nq, id: a.dishId };
+      }
+      case 'removed':
+        if (!cart.some(function (l) { return l.dish.id === a.dishId; })) return { cart: cart, v: 'not in the order: nothing changes', bad: true };
+        return { cart: cart.filter(function (l) { return l.dish.id !== a.dishId; }), v: 'line removed' };
+      case 'cleared':
+        return { cart: [], v: 'empty' };
+    }
+  }
+  var rl = { cart: [], queue: [], busy: false };
+  function ticketText(a) {
+    if (a.type === 'added') return '{ type: "added", dish: ' + a.dish.name + ' }';
+    if (a.type === 'qtyChanged') return '{ type: "qtyChanged", dishId: ' + a.dishId + ', delta: ' + (a.delta > 0 ? '+' : '') + a.delta + ' }';
+    if (a.type === 'removed') return '{ type: "removed", dishId: ' + a.dishId + ' }';
+    return '{ type: "cleared" }';
+  }
+  function rlState(hl) {
+    var total = rl.cart.reduce(function (s, l) { return s + l.qty * l.dish.price; }, 0);
+    var count = rl.cart.reduce(function (s, l) { return s + l.qty; }, 0);
+    var rows = rl.cart.map(function (l) {
+      var row = '  { dish: <span class="s">"' + esc(l.dish.name) + '"</span>, qty: <b>' + l.qty + '</b> },';
+      return l.dish.id === hl ? '<span class="hl">' + row + '</span>' : row;
+    });
+    $('rl-state').innerHTML = '<span class="k">// the cart (state)</span>\n[' + (rows.length ? '\n' + rows.join('\n') + '\n' : '') + ']\n\n<span class="k">// derived, never stored</span>\ncount: <b>' + count + '</b>   total: <b>' + Track.price(total) + '</b>';
+  }
+  function rlPump() {
+    if (rl.busy || !rl.queue.length) return;
+    rl.busy = true;
+    var job = rl.queue.shift();
+    job.el.classList.add('is-now');
+    $('rl-chef').classList.add('is-busy');
+    setTimeout(function () {
+      var r = reduce(rl.cart, job.a);
+      rl.cart = r.cart;
+      rlState(r.id);
+      job.el.classList.remove('is-now');
+      job.el.classList.add('is-done');
+      if (r.bad) job.el.classList.add('is-refused');
+      job.el.querySelector('.v').textContent = r.v;
+      $('rl-chef').classList.remove('is-busy');
+      rl.busy = false;
+      setTimeout(rlPump, 160);
+    }, 520);
+  }
+  function rlSend(a) {
+    var el = document.createElement('div');
+    el.className = 'ticket';
+    el.innerHTML = esc(ticketText(a)) + '<span class="v">waiting…</span>';
+    var track = $('rl-track');
+    track.appendChild(el);
+    while (track.children.length > 9) track.removeChild(track.firstChild);
+    rl.queue.push({ a: a, el: el });
+    rlPump();
+  }
+  var TICKETS = {
+    'add-5': function () { return [{ type: 'added', dish: COQ }]; },
+    'add-15': function () { return [{ type: 'added', dish: CREME }]; },
+    'add-9': function () { return [{ type: 'added', dish: BOUIL }]; },
+    'inc-5': function () { return [{ type: 'qtyChanged', dishId: 5, delta: 1 }]; },
+    'dec-5': function () { return [{ type: 'qtyChanged', dishId: 5, delta: -1 }]; },
+    'rem-15': function () { return [{ type: 'removed', dishId: 15 }]; },
+    'clear': function () { return [{ type: 'cleared' }]; },
+    'usual': function () { return [{ type: 'added', dish: COQ }, { type: 'added', dish: BOUIL }, { type: 'added', dish: BORD }]; }
+  };
+  $('rl-btns').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-t]'); if (!b) return;
+    TICKETS[b.getAttribute('data-t')]().forEach(rlSend);
+  });
+  rlState();
+
+  /* ---------- the FAQ accordion ---------- */
+  var FAQ = [
+    { id: 'reservation', q: 'Do I need a reservation?', a: 'Walk-ins are most of our evenings. For groups of five or more, or for Friday and Saturday nights, call ahead and we\'ll hold a table.' },
+    { id: 'kitchen', q: 'When does the kitchen close?', a: 'The room is open 12:00–23:00 every day; the kitchen sends its last plates at 22:30. Dessert and wine carry on until closing.' },
+    { id: 'allergy', q: 'I have an allergy — can you cook around it?', a: 'Yes. Tell your waiter, or leave a note for the kitchen when you order online. The kitchen knows every plate down to the butter.' },
+    { id: 'pay', q: 'How do I pay?', a: 'Cards and cash, in lari. Service is on the house; tipping is yours to decide.' }
+  ];
+  var openValue = 'reservation';
+  function fqRender() {
+    $('fq-acc').innerHTML = FAQ.map(function (f) {
+      var open = f.id === openValue;
+      return '<div class="acc__item"><button type="button" class="acc__trigger" aria-expanded="' + open + '" data-v="' + f.id + '">' + esc(f.q) + Deck.icon('chevron-down') + '</button>' +
+        '<div class="acc__panel"' + (open ? '' : ' hidden') + '>' + esc(f.a) + '</div></div>';
+    }).join('');
+    $('fq-state').innerHTML = '<span class="k">&lt;AccordionContext&gt;</span>  openValue: ' + (openValue ? '<span class="s">"' + openValue + '"</span>' : '<b>null</b>') + '\n' +
+      FAQ.map(function (f) {
+        var open = f.id === openValue, pad = '"' + f.id + '",' + '            '.slice(f.id.length);
+        return '  <span class="k">&lt;ItemContext&gt;</span> value: <span class="s">' + pad + '</span> isOpen: ' + (open ? '<b>true</b>' : 'false');
+      }).join('\n');
+  }
+  $('fq-acc').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-v]'); if (!b) return;
+    var v = b.getAttribute('data-v');
+    openValue = openValue === v ? null : v;
+    fqRender();
+  });
+  fqRender();
+})();
+</script>
+</body>
+</html>

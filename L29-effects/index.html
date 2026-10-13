@@ -1,0 +1,1246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Le Marché · L29</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Karla:ital,wght@0,400..800;1,400..800&family=JetBrains+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="../_shared/deck.css">
+<link rel="stylesheet" href="../track.css">
+<style>
+/* ---------- L29 only ---------- */
+.ba { position: relative; height: 640px; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-2); }
+.ba img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.ba__tag { position: absolute; top: 18px; z-index: 3; padding: 9px 14px; border-radius: 8px; font: 700 15px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; background: rgba(46, 42, 38, .85); color: #fdfaf2; }
+.ba__tag.l { left: 18px; } .ba__tag.r { right: 18px; background: var(--wine); }
+.ba__after { position: absolute; inset: 0; z-index: 2; }
+
+.versus { display: grid; grid-template-columns: 1fr 120px 1fr; gap: 0; margin-top: 30px; align-items: stretch; }
+.versus .card { padding: 24px 26px; display: flex; flex-direction: column; gap: 14px; }
+.versus .mid { display: grid; place-items: center; font: 600 54px/1 var(--f-display); color: var(--brass); }
+.versus h3 { font: 700 24px/1.2 var(--f-body); margin: 0; display: flex; align-items: center; gap: 10px; }
+.versus h3 svg { width: 26px; height: 26px; color: var(--wine); }
+.versus ul { margin: 0; padding-left: 22px; font-size: 20px; line-height: 1.5; color: var(--ink-2); }
+
+.loopbox { display: grid; grid-template-columns: 640px minmax(0, 1fr); gap: 48px; margin-top: 28px; align-items: start; }
+.bigcount { display: flex; align-items: baseline; gap: 14px; font: 600 18px/1 var(--f-mono); color: var(--ink-2); }
+.bigcount b { font: 700 72px/1 var(--f-mono); color: var(--bad); }
+
+.timeline { width: 1632px; height: 560px; margin-top: 20px; }
+.lane-row { position: absolute; left: 0; right: 0; height: 2px; background: var(--line); }
+.tick { position: absolute; font: 700 14px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+.evt { position: absolute; padding: 12px 16px; border-radius: 10px; background: var(--surface); box-shadow: var(--shadow-1); font: 600 19px/1.25 var(--f-mono); z-index: 2; }
+.evt small { display: block; font: 500 15px/1.3 var(--f-body); color: var(--ink-2); margin-top: 4px; }
+.evt.is-render { background: #e6eef7; }
+.evt.is-effect { background: #f3e6c9; }
+.evt.is-clean { background: #f6dcd6; }
+.evt.is-commit { background: #dfeedf; }
+
+.deps { width: 100%; border-collapse: collapse; margin-top: 30px; font-size: 24px; }
+.deps th { text-align: left; font: 700 14px/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--brass); padding: 0 20px 14px 0; }
+.deps td { padding: 18px 20px 18px 0; border-top: 1px solid var(--line); vertical-align: middle; }
+.deps td:first-child { font: 600 24px/1.3 var(--f-mono); white-space: nowrap; }
+.deps .when { font-size: 22px; }
+.deps .use { color: var(--ink-2); font-size: 20px; }
+.deps tr.is-bad td:first-child { color: var(--bad); }
+
+.cors { display: grid; grid-template-columns: minmax(0, 1fr) 560px; gap: 48px; margin-top: 22px; align-items: start; }
+
+.states { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; margin-top: 28px; }
+.state-card { background: var(--surface); border-radius: 14px; box-shadow: var(--shadow-1); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.state-card .k { font: 700 14px/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; }
+.state-card .k.wait { color: var(--warn); } .state-card .k.ok { color: var(--good); } .state-card .k.bad { color: var(--bad); } .state-card .k.empty { color: var(--ink-3); }
+.state-card .view { height: 210px; border-radius: 8px; overflow: hidden; background: #f6f1e7; border: 1px solid var(--line); display: grid; place-items: center; text-align: center; padding: 10px; }
+.state-card .view img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.skel { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; height: 100%; padding: 8px; }
+.skel i { background: #ece4d3; border-radius: 6px; animation: pulse-bg 1.4s ease-in-out infinite; }
+@keyframes pulse-bg { 50% { opacity: .45; } }
+.state-card code { font-size: 15px; }
+.state-card p { margin: 0; font-size: 18px; line-height: 1.4; color: var(--ink-2); }
+
+/* race demo */
+.race { display: grid; grid-template-columns: minmax(0, 1fr) 520px; gap: 40px; margin-top: 24px; align-items: start; }
+.race .mini { background: #f6f1e7; border-radius: 12px; box-shadow: var(--shadow-2); overflow: hidden; }
+.race .mini__body { padding: 16px 18px 20px; display: flex; flex-direction: column; gap: 14px; }
+.race .mgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; min-height: 250px; }
+.race .mcard img { aspect-ratio: 16 / 10; }
+.race .mcard__desc { display: none; }
+.race .mcard__foot { display: none; }
+.race .mcard__title { font-size: 17px; }
+.race .skel { height: 250px; padding: 0; }
+.verdict-line { font: 700 18px/1.3 var(--f-mono); padding: 12px 16px; border-radius: 10px; }
+.verdict-line.bad { background: color-mix(in srgb, var(--bad) 12%, transparent); color: #7d2a1f; }
+.verdict-line.good { background: color-mix(in srgb, var(--good) 14%, transparent); color: #2f4a33; }
+.switch { display: inline-flex; gap: 4px; background: var(--surface-2); padding: 4px; border-radius: 999px; }
+.switch button { border: 0; background: transparent; padding: 10px 16px; border-radius: 999px; font: 700 14px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+.switch button.is-on { background: var(--ink); color: var(--bg); }
+.bars { display: flex; flex-direction: column; gap: 10px; }
+.bar { position: relative; height: 34px; border-radius: 8px; background: var(--surface-2); overflow: hidden; }
+.bar i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 8px; background: var(--brass); }
+.bar span { position: relative; z-index: 1; display: flex; align-items: center; height: 100%; padding: 0 12px; font: 600 15px/1 var(--f-mono); color: var(--ink); }
+.bar.is-abort i { background: #c9b6ad; }
+.bar.is-abort span { text-decoration: line-through; color: var(--ink-3); }
+
+/* refresh demo */
+.refresh { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 26px; }
+.refresh .card { padding: 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+.refresh h3 { font: 700 24px/1.2 var(--f-body); margin: 0; }
+.refresh .pill { align-self: flex-start; }
+.cartline { font: 600 22px/1.4 var(--f-mono); min-height: 40px; }
+
+/* debounce timeline */
+.deb { width: 1632px; height: 380px; margin-top: 24px; }
+.key { position: absolute; top: 40px; width: 52px; height: 52px; border-radius: 10px; display: grid; place-items: center; background: var(--surface); box-shadow: var(--shadow-1); font: 700 22px/1 var(--f-mono); z-index: 2; }
+.timerbar { position: absolute; top: 130px; height: 14px; border-radius: 7px; background: var(--brass-soft); transform-origin: left center; z-index: 1; }
+.timerbar.is-cut { background: #d9c4bd; }
+.timerbar.is-cut::after { content: "✕"; position: absolute; right: -24px; top: -6px; font: 700 18px/1 var(--f-mono); color: var(--bad); }
+.reqdot { position: absolute; top: 230px; padding: 12px 16px; border-radius: 10px; font: 600 18px/1.3 var(--f-mono); }
+
+.rate { display: grid; grid-template-columns: 560px minmax(0, 1fr); gap: 40px; margin-top: 22px; align-items: start; }
+.rate input { width: 100%; font: 500 26px/1 var(--f-body); padding: 16px 22px; border: 2px solid var(--line); border-radius: 999px; background: #fff; color: var(--ink); }
+
+.notneed { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 28px; }
+.notneed .card { padding: 22px 24px; display: flex; flex-direction: column; gap: 12px; }
+.notneed h3 { margin: 0; font: 700 24px/1.2 var(--f-body); display: flex; gap: 10px; align-items: center; }
+.notneed h3 svg { width: 28px; height: 28px; }
+</style>
+</head>
+<body>
+<div class="deck">
+<div class="stage">
+
+<!-- ============================== HELLO ============================== -->
+
+<section class="slide" data-phase="hello" id="cover" data-title="Le Marché">
+  <div class="cover">
+    <div class="stack" style="--gap:24px">
+      <p class="cover__hello">Bonjour!</p>
+      <p class="eyebrow"><b>L29</b> React · lecture 4 · Le Bistro track 3 of 5</p>
+      <h1 class="display">Le<br>marché</h1>
+      <p class="lead" style="max-width:930px">Effects and real data. Le Bistro's motto is "market first": the menu bends to what the morning market has. Today our menu comes from the real kitchen server.</p>
+      <dl class="cover__meta">
+        <div><dt>Theme</dt><dd>useEffect, useRef, custom hooks</dd></div>
+        <div><dt>Le Bistro today</dt><dd>The real menu from the API</dd></div>
+        <div><dt>Your project</dt><dd>v0.3 · DummyJSON, saved cart</dd></div>
+        <div><dt>Length</dt><dd>2 hours · one break</dd></div>
+      </dl>
+    </div>
+    <div class="plate">
+      <div class="plate__rim"></div>
+      <div class="plate__food"><img src="../img/photo-espresso.jpg" alt=""></div>
+      <div class="plate__tag"><small>le marché</small>“market first”</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Bonjour! Until today our menu was a file we typed. The real menu lives on a server: prices change, dishes come and go. Today React talks to the outside world.</p>
+    <p><b>The title:</b> the real Le Bistro's About page says "market first: the menu bends to what the morning market has". Our app will bend to what the server has.</p>
+  </aside>
+</section>
+
+<section class="slide v-center" data-phase="hello" data-title="Today's menu">
+  <div class="menu-card">
+    <div class="menu-card__head"><p class="eyebrow">Le Bistro · L29 · 120 minutes</p><h2>Today's menu</h2></div>
+    <ol class="menu-card__list">
+      <li class="course"><span class="course__k">Accueil</span><span class="course__name">Hello <small>where Le Bistro is today</small></span><span class="course__t">3′</span></li>
+      <li class="course"><span class="course__k">Apéritif</span><span class="course__name">Questions <small>and two homework demos</small></span><span class="course__t">9′</span></li>
+      <li class="course"><span class="course__k">Entrée</span><span class="course__name">Problem 1 <small>the menu is a file</small></span><span class="course__t">6′</span></li>
+      <li class="course"><span class="course__k">Plat</span><span class="course__name">useEffect and fetch <small>loading, errors, CORS</small></span><span class="course__t">24′</span></li>
+      <li class="course"><span class="course__k">Atelier</span><span class="course__name">Classwork 1 <small>products from DummyJSON</small></span><span class="course__t">15′</span></li>
+      <li class="course is-pause"><span class="course__k">Pause café</span><span class="course__name">Break <small>music on, screens off</small></span><span class="course__t">10′</span></li>
+      <li class="course"><span class="course__k">Second plat</span><span class="course__name">Problem 2 and custom hooks <small>faster than the kitchen</small></span><span class="course__t">30′</span></li>
+      <li class="course"><span class="course__k">Atelier</span><span class="course__name">Classwork 2 <small>search and a saved cart</small></span><span class="course__t">15′</span></li>
+      <li class="course"><span class="course__k">Dessert</span><span class="course__name">Wrap-up <small>recap, homework, next time</small></span><span class="course__t">8′</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-phase="hello" data-title="Le Bistro, lecture by lecture">
+  <p class="eyebrow"><b>Route</b> Lecture 3 of 5</p>
+  <h2 class="h2 mt-s">Le Bistro, lecture by lecture</h2>
+  <div class="road">
+    <div class="stop is-done"><div class="stop__shot"><img src="../img/l27-home.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L27 · done</p><p class="stop__t">Components</p><p class="stop__d">Home page and menu from components and a data file.</p></div>
+    <div class="stop is-done"><div class="stop__shot"><img src="../img/l28-cart.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L28 · done</p><p class="stop__t">State</p><p class="stop__d">Add to cart works. Chips filter, search finds.</p></div>
+    <div class="stop is-now"><div class="stop__shot"><img src="../img/l29-search.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L29 · today</p><p class="stop__t">Effects</p><p class="stop__d">The real menu from the API. A cart that survives a refresh.</p></div>
+    <div class="stop"><div class="stop__shot"><img src="../img/l30-dish.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L30</p><p class="stop__t">Routing</p><p class="stop__d">Pages with their own address. Login and staff-only doors.</p></div>
+    <div class="stop"><div class="stop__shot"><img src="../img/l31-faq.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L31</p><p class="stop__t">Context</p><p class="stop__d">One cart and one session for the whole site.</p></div>
+  </div>
+  <div class="lane">
+    <span class="lane__k">Your project</span>
+    <span class="lane__v"><b>v0.1 ✓</b>catalog from a data file</span>
+    <span class="lane__v"><b>v0.2 ✓</b>cart, filters, search</span>
+    <span class="lane__v"><b>v0.3 · today</b>real API, saved cart</span>
+    <span class="lane__v"><b>v0.4</b>pages, login, guards</span>
+    <span class="lane__v"><b>v0.5</b>context and reducer</span>
+  </div>
+</section>
+
+<section class="slide" data-phase="hello" data-title="Before and after today">
+  <div class="split-4-8 fill items-center" style="gap:56px">
+    <div class="stack" style="--gap:22px">
+      <p class="eyebrow"><b>Today's goal</b> Press next to unveil it</p>
+      <h2 class="h2">From a file to the kitchen's server</h2>
+      <p class="lead">Left: 12 dishes we typed. Under the curtain: the real menu, a search that asks the server, and grey cards while the kitchen answers.</p>
+      <ul class="checks is-done" data-step="1"><li>25 real dishes, live from the API</li><li>Loading, error and empty states</li><li>A search with a delay, and a cart that survives F5</li></ul>
+    </div>
+    <div class="ba">
+      <img src="../img/l28-filter.jpg" alt="Le Bistro after L28"><span class="ba__tag l">After L28</span>
+      <div class="ba__after" data-step="1" data-fx="stage"><img src="../img/l29-search.jpg" alt="Le Bistro after L29"><span class="ba__tag r">After today</span></div>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Press next: the theatre curtains open on today's result.</p></aside>
+</section>
+
+<!-- ============================== QUESTIONS ============================== -->
+
+<section class="slide" data-phase="questions" data-title="Questions from last time">
+  <div class="qa">
+    <div class="stack" style="--gap:26px">
+      <p class="eyebrow"><b>Apéritif</b> Before we start</p>
+      <h2 class="display">Questions from last time?</h2>
+      <p class="lead">useState, lifting state, new arrays, derived values.</p>
+    </div>
+    <div class="qa-list">
+      <div class="qa-card" data-step="1"><span class="n">01</span><h3>Why <code>[...cart, item]</code> and not <code>cart.push(item)</code>?</h3>
+        <div class="reveal-box" data-reveal><button class="reveal-box__cover">[ show answer ]</button><p>React compares old and new state with <code>===</code>. A pushed array is the same array, so React sees no change.</p></div></div>
+      <div class="qa-card" data-step="2"><span class="n">02</span><h3>Where does state live when two components need it?</h3>
+        <div class="reveal-box" data-reveal><button class="reveal-box__cover">[ show answer ]</button><p>In their closest common parent. Data goes down as props, events come up as functions.</p></div></div>
+      <div class="qa-card" data-step="3"><span class="n">03</span><h3>Should the cart total be state?</h3>
+        <div class="reveal-box" data-reveal><button class="reveal-box__cover">[ show answer ]</button><p>No. It is derived from the cart: calculate it during render.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-phase="questions" data-title="Homework: show your v0.2">
+  <div class="split-7-5 fill items-center" style="gap:64px">
+    <div class="stack" style="--gap:22px">
+      <p class="eyebrow"><b>Homework check</b> Two volunteers, two minutes each</p>
+      <h2 class="h1">Show us your v0.2</h2>
+      <p class="lead">Add two products, change a quantity in the cart panel, filter by a category. Then refresh the page.</p>
+    </div>
+    <div class="done-when">
+      <p class="k">Look for</p>
+      <ul class="checks">
+        <li>The cart lives in App</li>
+        <li>New arrays: no <code>push</code> on state</li>
+        <li>Count and total are calculated</li>
+        <li>The filtered list is calculated</li>
+        <li>The same product shows the same quantity everywhere</li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> After each demo, ask the student to refresh. The cart is empty. Ask the room why. That's the bridge to today: state lives in memory, and memory is wiped by F5.</p></aside>
+</section>
+
+<!-- ============================== PROBLEM 1 ============================== -->
+
+<section class="slide" data-phase="problem" data-tone="dark" data-title="The menu is a file">
+  <div class="problem-cover">
+    <div class="problem-cover__text">
+      <p class="eyebrow"><b>Entrée · Problem 1</b> Before the new tool</p>
+      <h2 class="display">The menu is a file.<br>The kitchen is a server.</h2>
+      <p class="lead">The chef changes a price at 11:00. Our site still shows yesterday's, because we typed it.</p>
+    </div>
+    <div class="problem-cover__photo"><img src="../img/photo-espresso.jpg" alt=""></div>
+  </div>
+</section>
+
+<section class="slide" data-phase="problem" data-title="Our file and the real menu">
+  <p class="eyebrow"><b>Problem 1</b> What we have, what is real</p>
+  <h2 class="h2 mt-s">Our file and the real menu</h2>
+  <div class="versus">
+    <div class="card" data-step="1"><h3><i data-icon="file-text"></i>src/data/dishes.ts</h3>
+      <ul><li>12 dishes, typed by hand</li><li>Prices from the day we copied them</li><li>Bouillabaisse "off the menu" forever</li><li>Changes need a new deploy</li></ul></div>
+    <div class="mid" data-step="2">vs</div>
+    <div class="card" data-step="2"><h3><i data-icon="server"></i>GET /api/v1/enterprise/dishes</h3>
+      <ul><li>Every dish the kitchen serves today</li><li>Today's prices, today's availability</li><li>Filters on the server: <code>?category=drinks</code></li><li>A search: <code>/api/v1/enterprise/search?q=</code></li></ul></div>
+  </div>
+  <div class="callout mt-l" data-step="3"><i data-icon="globe"></i><div><p class="h4">Open it in the browser: srmsapi.stepacademy.ge/swagger</p><p class="small muted mt-s">It's the same JSON shape as our <code>Dish</code> type. Only the source changes.</p></div></div>
+  <aside class="notes"><p><b>Do:</b> Open the Swagger page and run GET /api/v1/enterprise/categories ("Try it out"). Then open https://srmsapi.stepacademy.ge/api/v1/enterprise/dishes directly in a tab: real JSON.</p></aside>
+</section>
+
+<section class="slide" data-phase="problem" id="loop" data-title="Fetch in the component body">
+  <p class="eyebrow"><b>Problem 1</b> The first idea, and why it explodes</p>
+  <h2 class="h2 mt-s">Fetch right inside the component?</h2>
+  <div class="loopbox">
+    <div class="stack" style="--gap:16px">
+      <script type="text/plain" data-lang="tsx" data-file="Favourites.tsx (don't do this)" style="--code-size:19px">
+        export function Favourites() {
+          const [dishes, setDishes] = useState<Dish[]>([]);
+
+          fetch("/api/v1/enterprise/dishes")
+            .then((res) => res.json())
+            .then((data) => setDishes(data));
+
+          return <DishGrid dishes={dishes} />;
+        }
+      </script>
+      <div class="row" style="--gap:12px"><button class="btn is-wine" type="button" id="loop-run"><i data-icon="play"></i>Run it</button><button class="btn is-ghost" type="button" id="loop-stop"><i data-icon="power"></i>Stop</button></div>
+    </div>
+    <div class="stack" style="--gap:16px">
+      <div class="bigcount"><b id="loop-n">0</b> requests</div>
+      <div class="devtools" style="min-height:380px"><div class="devtools__head"><span>Console</span><b>Network</b></div><div class="devtools__body" style="max-height:330px"><div class="netlist" id="loop-net"></div></div></div>
+      <div class="callout is-bad" data-step="1"><i data-icon="infinity"></i><div><p class="h4">render → fetch → setDishes → render → fetch …</p><p class="small muted mt-s">Every render starts a request. Every answer triggers a render. It never stops.</p></div></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Click "Run it": requests pile up until you press Stop (it stops by itself at 60). In a real app the tab freezes and the API starts answering 429.</p>
+    <p><b>Ask:</b> what is the loop? <b>Expect:</b> the answer calls setDishes, setDishes renders, the render fetches again.</p>
+  </aside>
+</section>
+
+<section class="slide v-center" data-phase="problem" data-title="What would we need?">
+  <p class="eyebrow"><b>Problem 1</b> Your turn</p>
+  <h2 class="display mt-m" style="font-size:112px;max-width:1500px;color:var(--wine)">What would we need?</h2>
+  <div class="need">
+    <span class="chip" data-step="1" data-fx="pop">Run code after the render, not during it</span>
+    <span class="chip" data-step="2" data-fx="pop">Only once, or when something changes</span>
+    <span class="chip" data-step="3" data-fx="pop">Clean up when we leave</span>
+    <span class="chip is-answer" data-step="4" data-fx="pop"><i data-icon="zap"></i>That is an effect</span>
+  </div>
+</section>
+
+<!-- ============================== SOLUTION 1 ============================== -->
+
+<section class="slide" data-phase="solution" data-title="useEffect in one picture">
+  <p class="eyebrow"><b>Plat · Solution 1</b> The tool</p>
+  <h2 class="h2 mt-s">useEffect: code that runs after the render</h2>
+  <div class="anatomy">
+    <div class="anatomy__code" style="display:block;font-size:44px;line-height:1.45">useEffect(<span class="part" data-on="1:is-on">() =&gt; {
+  // talk to the outside world
+  </span><span class="part" data-on="2:is-on">return () =&gt; { /* clean up */ };</span>
+}, <span class="part" data-on="3:is-on">[dependencies]</span>);</div>
+    <div class="anatomy__notes cols-3">
+      <div class="card" data-step="1"><span class="num">01 · the effect</span><p>Runs <b>after</b> React has put the render on the screen. Fetch, timers, listeners, localStorage live here.</p></div>
+      <div class="card" data-step="2"><span class="num">02 · the cleanup</span><p>Optional. Runs before the effect runs again, and when the component leaves the page.</p></div>
+      <div class="card" data-step="3"><span class="num">03 · the dependencies</span><p>When to run it again: after any render in which one of these values changed.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> React's job is to turn data into UI. Everything else (the network, timers, the browser's storage, keyboard listeners) is "the outside world". useEffect is the door to it.</p>
+    <p><b>Remember:</b> effects run after the screen is updated, so the user sees something (a skeleton) while we wait.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="The life of an effect">
+  <p class="eyebrow"><b>Solution 1</b> Press next, one moment at a time</p>
+  <h2 class="h2 mt-s">The life of an effect</h2>
+  <div class="schema timeline">
+    <div class="lane-row" style="top:120px"></div>
+    <span class="tick" style="left:0;top:80px">Appears (mount)</span>
+    <span class="tick" style="left:700px;top:80px">category changes</span>
+    <span class="tick" style="left:1330px;top:80px">Leaves (unmount)</span>
+    <div class="evt is-render" style="left:0;top:160px" data-step="1">render<small>React calls MenuSection()</small></div>
+    <div class="evt is-commit" style="left:0;top:270px" data-step="2">commit<small>skeleton on screen</small></div>
+    <div class="evt is-effect" style="left:0;top:380px" data-step="3">effect runs<small>fetch drinks…</small></div>
+    <div class="evt is-render" style="left:700px;top:160px" data-step="4">render + commit<small>new category on screen</small></div>
+    <div class="evt is-clean" style="left:700px;top:270px" data-step="5">cleanup (old)<small>cancel the drinks request</small></div>
+    <div class="evt is-effect" style="left:700px;top:380px" data-step="6">effect (new)<small>fetch desserts…</small></div>
+    <div class="evt is-clean" style="left:1330px;top:270px" data-step="7">cleanup<small>cancel what's left</small></div>
+    <div class="callout" style="position:absolute;left:0;top:480px;width:1632px" data-step="8"><i data-icon="history"></i><div><p class="h4">Cleanup always runs before the next effect, and once at the end.</p></div></div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> One press per box. Read them as a story: the component appears, renders, the screen updates, then the effect fetches. When the category changes, the old effect is cleaned up before the new one starts. When the component leaves, the last cleanup runs.</p></aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="The dependency array">
+  <p class="eyebrow"><b>Solution 1</b> When does the effect run again?</p>
+  <h2 class="h2 mt-s">The dependency array decides</h2>
+  <table class="deps">
+    <thead><tr><th>You write</th><th>It runs</th><th>Use it for</th></tr></thead>
+    <tbody>
+      <tr data-step="1"><td>useEffect(fn, [])</td><td class="when">once, after the first render</td><td class="use">a keyboard listener, a page view</td></tr>
+      <tr data-step="2"><td>useEffect(fn, [category])</td><td class="when">after the first render, and whenever <code>category</code> changes</td><td class="use">fetching the dishes of a category</td></tr>
+      <tr data-step="3" class="is-bad"><td>useEffect(fn)</td><td class="when">after <b>every</b> render</td><td class="use">almost never. With a setState inside: an endless loop</td></tr>
+    </tbody>
+  </table>
+  <div class="callout is-warn mt-l" data-step="4"><i data-icon="badge-check"></i><div><p class="h4">The rule: list every value from the component that the effect uses.</p><p class="small muted mt-s">The linter (eslint-plugin-react-hooks) checks it for you: "React Hook useEffect has a missing dependency".</p></div></div>
+</section>
+
+<section class="slide" data-phase="solution" data-title="CORS and the proxy">
+  <p class="eyebrow"><b>Solution 1</b> The first real request fails</p>
+  <h2 class="h2 mt-s">CORS: the server only talks to friends</h2>
+  <div class="cors">
+    <div class="schema" style="width:1020px;height:560px">
+      <div class="node lg" id="c-browser" style="left:0;top:40px">Browser<small>localhost:5173</small></div>
+      <div class="node lg is-wine" id="c-api" style="left:720px;top:40px">Le Bistro API<small>srmsapi.stepacademy.ge</small></div>
+      <div class="node lg" id="c-vite" style="left:330px;top:330px" data-step="2">Vite dev server<small>the same address as the page</small></div>
+      <b class="wire is-bad is-dash" data-from="c-browser" data-to="c-api" data-sides="r l" data-step="1" data-label="✗ blocked: not on the list" data-ly="-16"></b>
+      <b class="wire is-good" data-from="c-browser" data-to="c-vite" data-sides="b l" data-step="3" data-label="/api/v1/…" data-lx="-60"></b>
+      <b class="wire is-good" data-from="c-vite" data-to="c-api" data-sides="r b" data-step="4" data-label="server to server: no CORS" data-lx="80"></b>
+    </div>
+    <div class="stack" style="--gap:16px">
+      <div class="devtools" data-step="1"><div class="devtools__head"><b>Console</b></div><div class="devtools__body" style="min-height:0"><div class="devtools__line is-err">Access to fetch at 'https://srmsapi.stepacademy.ge/api/v1/…' from origin 'http://localhost:5173' has been blocked by CORS policy</div></div></div>
+      <script type="text/plain" data-lang="tsx" data-file="vite.config.ts" data-copy data-build="3:3-9" style="--code-size:17px">
+        export default defineConfig({
+          plugins: [react(), tailwindcss()],
+          server: {
+            proxy: {
+              "/api": {
+                target: "https://srmsapi.stepacademy.ge",
+                changeOrigin: true,
+              },
+            },
+          },
+        });
+      </script>
+      <p class="small muted" data-step="4">Now fetch the relative path: <code>fetch("/api/v1/enterprise/dishes")</code>. Restart <code>npm run dev</code> after editing the config.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> The browser asks the server: "may this page read your answer?" The Le Bistro API answers yes only for its own site (and localhost:4200). Our localhost:5173 is not on its list, so the browser blocks the answer. That's CORS: a browser rule, not a React rule.</p>
+    <p><b>The fix:</b> Vite's proxy. The page asks its own server for /api/…, Vite forwards it to the real API. Servers don't have CORS. In production, vercel.json does the same (lecture L30).</p>
+    <p><b>Students' DummyJSON</b> allows every origin, so they won't hit this. Le Bistro does, on purpose.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="Recipe: the favourites come from the API">
+  <p class="eyebrow"><b>Solution 1 · Recipe</b> Type it with me</p>
+  <h2 class="h3 mt-s">The favourites come from the API</h2>
+  <div class="recipe">
+    <ol class="steps is-compact">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>State for the answer</b><span><code>null</code> means "no answer yet". A second state for failure.</span><span class="file-chip"><i data-icon="file-code"></i>Favourites.tsx</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>The effect fetches once</b><span>Empty dependency array: after the first render.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Check <code>res.ok</code></b><span>fetch does not fail on 404 or 500. We throw ourselves.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Save the data or the failure</b><span>setState inside <code>then</code> and <code>catch</code>: after the answer, never during render.</span></li>
+      <li data-step="5" data-on="5-5:is-now;6:is-done"><b>Three endings in the JSX</b><span>Error, loading (skeleton), data.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/components/Favourites.tsx (first version)" data-copy data-build="1:1-3,24;2:5,6,14;3:7-10;4:11-13;5:16-23" style="--code-size:15px">
+        export function Favourites({ cart, onAdd, onChangeQty }: FavouritesProps) {
+          const [dishes, setDishes] = useState<Dish[] | null>(null);
+          const [failed, setFailed] = useState(false);
+
+          useEffect(() => {
+            fetch("/api/v1/enterprise/dishes")
+              .then((res) => {
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return res.json();
+              })
+              .then((data: Dish[]) => setDishes(data))
+              .catch(() => setFailed(true));
+          }, []);
+          const favourites = (dishes ?? []).filter((d) => favouriteIds.includes(d.id));
+          return (
+            <Section id="favourites" eyebrow="From the kitchen" title="Today's favourites">
+              {failed && <p className="error">We couldn't load the menu.</p>}
+              {!failed && dishes === null && <DishGridSkeleton count={3} />}
+              {dishes && (
+                <DishGrid dishes={favourites} cart={cart} onAdd={onAdd} onChangeQty={onChangeQty} />
+              )}
+            </Section>
+          );
+        }
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Create <code>components/Favourites.tsx</code> (move the favourites Section out of App into it). Add <code>DishGridSkeleton</code> to DishGrid.tsx: copy it from <code>code/after-L29</code>. Delete <code>data/dishes.ts</code> when both sections use the API.</p>
+    <p><b>Show:</b> DevTools → Network → the request to /api/v1/enterprise/dishes, its JSON, and its timing. The grey cards appear first, then the real dishes.</p>
+    <p><b>Note:</b> after the break this code is replaced by a reusable hook, <code>useApi</code>. This first version shows every moving part.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="Every request has more than one ending">
+  <p class="eyebrow"><b>Solution 1</b> Design all of them, not only the happy one</p>
+  <h2 class="h2 mt-s">Every request has four endings</h2>
+  <div class="states">
+    <div class="state-card" data-step="1"><span class="k wait">Loading</span><div class="view"><div class="skel"><i></i><i></i><i></i><i></i><i></i><i></i></div></div><code>dishes === null</code><p>Grey cards: the page keeps its shape while we wait.</p></div>
+    <div class="state-card" data-step="2"><span class="k ok">Data</span><div class="view"><img src="../img/l29-menu.jpg" alt=""></div><code>dishes.length &gt; 0</code><p>The real menu.</p></div>
+    <div class="state-card" data-step="3"><span class="k empty">Empty</span><div class="view"><p style="font:italic 500 22px var(--f-display)">Nothing on the menu matches “pizza”.</p></div><code>dishes.length === 0</code><p>Not an error: a valid answer with nothing in it.</p></div>
+    <div class="state-card" data-step="4"><span class="k bad">Error</span><div class="view"><p style="color:var(--bad);font-size:20px">We couldn't load the menu — please try again.</p></div><code>failed === true</code><p>No internet, a 500, a typo in the URL.</p></div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Show the error state live: DevTools → Network → "Offline", refresh. Then back to "No throttling". Show "Slow 4G" for the loading state.</p></aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="Why two requests?">
+  <div class="split-7-5 fill items-center" style="gap:56px">
+    <div class="stack" style="--gap:18px">
+      <div class="devtools"><div class="devtools__head"><span>Console</span><b>Network</b></div><div class="devtools__body" style="min-height:0">
+        <div class="netlist">
+          <div class="netrow"><span>GET</span><span>/api/v1/enterprise/dishes</span><span class="st cx">(canceled)</span><span>2 ms</span></div>
+          <div class="netrow"><span>GET</span><span>/api/v1/enterprise/dishes</span><span class="st">200</span><span>512 ms</span></div>
+        </div></div></div>
+      <div class="evt is-effect" style="position:static" data-step="1">1 · effect runs<small>React mounts the component</small></div>
+      <div class="evt is-clean" style="position:static" data-step="2">2 · cleanup<small>React pretends the component left</small></div>
+      <div class="evt is-effect" style="position:static" data-step="3">3 · effect runs again<small>and mounts it back</small></div>
+    </div>
+    <div class="stack" style="--gap:20px">
+      <p class="eyebrow"><b>Solution 1</b> Don't panic</p>
+      <h2 class="h2">"Why do I see two requests?"</h2>
+      <p class="lead">In development, <code>&lt;StrictMode&gt;</code> runs every effect twice on purpose: effect, cleanup, effect.</p>
+      <div class="takeaway" data-step="4"><p class="k">It's a test, not a bug</p><p>If your effect has a correct cleanup, the user can't tell the difference. In production (<code>npm run build</code>) it runs once.</p></div>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Say:</b> students WILL ask this. StrictMode (in main.tsx) double-runs effects in development to catch effects that forget to clean up. Never remove StrictMode to "fix" it.</p></aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="When effects go wrong">
+  <p class="eyebrow"><b>Solution 1</b> The errors you will see today</p>
+  <h2 class="h2 mt-s">When effects go wrong</h2>
+  <div class="mistakes">
+    <div class="mistake" data-step="1"><h4>An async effect function</h4><div class="bad">useEffect(async () =&gt; { … }, []);</div><div class="err">Effect callbacks are synchronous to prevent race conditions. Put the async function inside.</div><div class="good">useEffect(() =&gt; { fetch(…).then(…); }, []);</div></div>
+    <div class="mistake" data-step="2"><h4>A missing dependency</h4><div class="bad">useEffect(() =&gt; { load(category); }, []);</div><div class="err">React Hook useEffect has a missing dependency: 'category'.</div><div class="good">useEffect(() =&gt; { load(category); }, [category]);</div></div>
+    <div class="mistake" data-step="3"><h4>An object created during render as a dependency</h4><div class="bad">const filter = { category };
+useEffect(…, [filter]);  // new object every render</div><div class="err">The effect runs after every render: a loop of requests.</div><div class="good">useEffect(…, [category]);  // a string compares by value</div></div>
+    <div class="mistake" data-step="4"><h4>Trusting fetch with errors</h4><div class="bad">fetch(url).then((res) =&gt; res.json())</div><div class="err">A 404 or 500 still "succeeds": res.json() then fails with an unclear error.</div><div class="good">if (!res.ok) throw new Error(`HTTP ${res.status}`);</div></div>
+  </div>
+</section>
+
+<section class="slide" data-phase="solution" data-title="Which dependencies?">
+  <div class="split-5-7 fill items-center">
+    <div class="stack" style="--gap:22px">
+      <p class="eyebrow"><b>Quick check</b> The dependency array</p>
+      <h2 class="h2">This effect loads the dishes of the selected category. Which array?</h2>
+      <script type="text/plain" data-lang="tsx" style="--code-size:21px">
+        useEffect(() => {
+          fetch(`/api/v1/enterprise/dishes?category=${category}`)
+            .then((res) => res.json())
+            .then(setDishes);
+        }, ???);
+      </script>
+    </div>
+    <div class="quiz" data-quiz>
+      <div class="quiz__opts">
+        <button class="quiz__opt"><code>[]</code></button>
+        <button class="quiz__opt" data-correct><code>[category]</code></button>
+        <button class="quiz__opt"><code>[dishes]</code></button>
+        <button class="quiz__opt">nothing: leave it out</button>
+      </div>
+      <p class="quiz__explain">The effect uses <code>category</code>, so it must run again when category changes. <code>[]</code> loads only the first category. <code>[dishes]</code> loops (the effect changes dishes). No array runs after every render: a loop too.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== CLASSWORK 1 ============================== -->
+
+<section class="slide" data-phase="classwork" data-title="Classwork 1: products from DummyJSON">
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Atelier · Classwork 1</b> 15 minutes, on your own project</p><h2 class="h1">Real products</h2></div>
+    <div class="timer" data-timer="900"></div>
+  </div>
+  <div class="cw">
+    <div class="tiers">
+      <div class="tier base"><div class="tier__k"><span>Base</span><span>everyone</span></div><h3>Fetch your category</h3>
+        <ul><li><code>fetch("https://dummyjson.com/products/category/your-category")</code> in a <code>useEffect</code> with <code>[]</code>.</li><li>The answer is <code>{ products: Product[] }</code>: save <code>data.products</code>.</li><li>A loading text while <code>products === null</code>, an error message in <code>catch</code>.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Plus</span><span>most of you</span></div><h3>A skeleton</h3>
+        <ul><li>Grey placeholder cards instead of the loading text (<code>animate-pulse</code>).</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Pro</span><span>fast finishers</span></div><h3>Categories from the API</h3>
+        <ul><li>Your chips come from <code>https://dummyjson.com/products/categories</code>, filtered to your theme.</li></ul></div>
+    </div>
+    <div class="cw__side">
+      <div class="done-when"><p class="k">Done when</p><ul class="checks"><li>Your data file is no longer imported</li><li>DevTools → Network shows the request</li><li>Offline mode shows your error message</li><li>No endless requests</li></ul></div>
+      <div class="hint" data-peek="click for a hint"><div><p class="k">Stuck?</p><pre>useEffect(() =&gt; {
+  fetch(URL)
+    .then((res) =&gt; res.json())
+    .then((data) =&gt; setProducts(data.products))
+    .catch(() =&gt; setFailed(true));
+}, []);</pre></div></div>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Watch for:</b> the effect without a dependency array (endless requests), <code>setProducts(data)</code> instead of <code>data.products</code>, an async effect function. DummyJSON has no CORS problem: no proxy needed.</p></aside>
+</section>
+
+<!-- ============================== BREAK ============================== -->
+
+<section class="slide" data-phase="break" data-tone="dark" data-title="Pause café">
+  <div class="pause">
+    <div class="stack" style="--gap:28px">
+      <p class="eyebrow"><b>Pause café</b> 10 minutes</p>
+      <h2 class="display">Pause café</h2>
+      <p class="lead">After the break: we click faster than the kitchen cooks.</p>
+      <button class="pause__btn" type="button" data-start-break><i data-icon="coffee"></i>Start the break</button>
+    </div>
+    <div class="cup" aria-hidden="true"><span class="cup__steam"></span><span class="cup__steam"></span><span class="cup__steam"></span><div class="cup__plate"></div><div class="cup__body"></div><div class="cup__coffee"></div><div class="cup__handle"></div></div>
+  </div>
+</section>
+
+<!-- ============================== PROBLEM 2 ============================== -->
+
+<section class="slide" data-phase="problem2" data-tone="dark" data-title="Faster than the kitchen">
+  <div class="problem-cover">
+    <div class="problem-cover__text">
+      <p class="eyebrow"><b>Second plat · Problem 2</b> The real world is slow and busy</p>
+      <h2 class="display">Faster than<br>the kitchen.</h2>
+      <p class="lead">Main courses take the API 3 seconds, drinks 0.2 seconds. Guests click faster than that.</p>
+    </div>
+    <div class="problem-cover__photo"><img src="../img/photo-steak-frites.jpg" alt=""></div>
+  </div>
+</section>
+
+<section class="slide" data-phase="problem2" id="race" data-title="The race condition">
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Problem 2</b> Try it: click "Main Courses", then quickly "Drinks"</p><h2 class="h2">The slow answer wins</h2></div>
+    <div class="switch" id="race-mode"><button type="button" class="is-on" data-mode="bug">No cleanup</button><button type="button" data-mode="fix">With cleanup</button></div>
+  </div>
+  <div class="race">
+    <div class="mini">
+      <div class="mini__body">
+        <div class="mchips" id="race-chips"></div>
+        <div id="race-grid"></div>
+      </div>
+    </div>
+    <div class="stack" style="--gap:14px">
+      <div class="bars" id="race-bars"></div>
+      <div class="verdict-line" id="race-verdict">Click a chip.</div>
+      <p class="small muted">Delays are the real API's: main courses 3 s, drinks 0.2 s, others 0.5 s.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> In "No cleanup" mode click Main Courses, then Drinks right away. Drinks arrive first and show. Three seconds later the main courses arrive and overwrite them: the Drinks chip is selected, the grid shows steaks.</p>
+    <p><b>Then:</b> switch to "With cleanup" and repeat. The old request is cancelled (struck through), the grid stays on drinks.</p>
+    <p><b>This is a real bug</b> in many production apps. The Le Bistro API slows main courses down on purpose so you can see it.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="problem2" id="rate" data-title="Ten letters, ten requests">
+  <p class="eyebrow"><b>Problem 2</b> Two more pains</p>
+  <h2 class="h2 mt-s">Ten letters, ten requests. Then 429.</h2>
+  <div class="rate">
+    <div class="stack" style="--gap:14px">
+      <input type="search" id="rate-input" placeholder="Type “coq au vin” …" data-keys-local>
+      <div class="bigcount"><b id="rate-n" style="color:var(--wine)">0</b> requests this minute <span class="muted">(the API allows 10)</span></div>
+      <button class="btn is-ghost" type="button" id="rate-reset" style="align-self:flex-start"><i data-icon="rotate-ccw"></i>Reset</button>
+      <div class="callout is-warn" data-step="1"><i data-icon="refresh-cw"></i><div><p class="h4">And refresh the page…</p><p class="small muted mt-s">…the cart is empty. State lives in memory. F5 wipes the memory.</p></div></div>
+    </div>
+    <div class="devtools" style="min-height:420px"><div class="devtools__head"><span>Console</span><b>Network</b></div><div class="devtools__body" style="max-height:380px"><div class="netlist" id="rate-net"></div></div></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Type "coq au vin" in the box. Each keystroke sends a search. The eleventh answer is 429 Too Many Requests, with "Retry-After: 60": the real API does exactly that.</p>
+    <p><b>Step 1:</b> the cart problem from last lecture. Three problems, one family of solutions.</p>
+  </aside>
+</section>
+
+<section class="slide v-center" data-phase="problem2" data-title="What would we need now?">
+  <p class="eyebrow"><b>Problem 2</b> Your turn</p>
+  <h2 class="display mt-m" style="font-size:112px;max-width:1500px;color:var(--wine)">What would we need now?</h2>
+  <div class="need">
+    <span class="chip" data-step="1" data-fx="pop">Cancel the old request</span>
+    <span class="chip" data-step="2" data-fx="pop">Wait until typing stops</span>
+    <span class="chip" data-step="3" data-fx="pop">Save the cart somewhere that survives F5</span>
+    <span class="chip" data-step="4" data-fx="pop">Write it once, reuse it</span>
+    <span class="chip is-answer" data-step="5" data-fx="pop"><i data-icon="wrench"></i>Cleanup and custom hooks</span>
+  </div>
+</section>
+
+<!-- ============================== SOLUTION 2 ============================== -->
+
+<section class="slide" data-phase="solution2" data-title="Recipe: cancel the old request">
+  <p class="eyebrow"><b>Solution 2 · Recipe</b> The cleanup cancels, the tag protects</p>
+  <h2 class="h3 mt-s">Cancel the old request</h2>
+  <div class="recipe">
+    <ol class="steps is-compact">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>One AbortController per run</b><span>A remote control for one fetch.</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Give fetch its signal</b><span>So the controller can stop it.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>The cleanup aborts</b><span>Runs before the next effect: the old request dies.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Ignore our own cancel</b><span>An aborted fetch rejects. That's not an error to show.</span></li>
+      <li data-step="5" data-on="5-5:is-now;6:is-done"><b>Tag the answer with its request</b><span>Show data only if it belongs to the current path. <code>loading</code> is derived.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="the effect inside the menu (next: moved into a hook)" data-copy data-build="1:2;2:4;3:12;4:7-10;5:5,6,14,15" style="--code-size:16px">
+        useEffect(() => {
+          const controller = new AbortController();
+
+          api<Dish[]>(path, { signal: controller.signal })
+            .then((data) => setResult({ path, data, error: null }))
+            .catch((error: unknown) => {
+              if (controller.signal.aborted) return; // we cancelled it
+              setResult({ path, data: null, error: toApiError(error) });
+            });
+
+          return () => controller.abort(); // cleanup
+        }, [path]);
+
+        const current = result?.path === path ? result : null;
+        const loading = current === null; // derived, never stored
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> two protections. The AbortController stops the old request (saves the network). The tag makes sure an old answer that slipped through can never be shown under a new chip.</p>
+    <p><b>Note:</b> <code>api()</code> is a small fetch wrapper in <code>lib/api.ts</code> (copy it from <code>code/after-L29</code>): it throws an <code>ApiError</code> with the status code when <code>res.ok</code> is false.</p>
+    <p><b>Don't type this in the component.</b> Next slide: it moves into a hook we can reuse everywhere.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="A custom hook">
+  <div class="idea">
+    <div class="schema" style="width:1040px;height:640px">
+      <div class="region is-wine" style="left:0;top:40px;width:470px;height:560px"></div>
+      <span class="box-label" style="left:20px;top:10px">MenuSection.tsx</span>
+      <div class="region" style="left:570px;top:40px;width:470px;height:560px"></div>
+      <span class="box-label" style="left:590px;top:10px">hooks/useApi.ts</span>
+      <div class="node sm" style="left:30px;top:80px;width:410px">useState(category) · useState(query)</div>
+      <div class="node is-brass" style="left:30px;top:180px;width:410px;transition:transform 1.2s var(--ease-out),opacity .6s" data-on="1:is-moved">useState(result)<br>useEffect(fetch, abort)<br>loading / error / data</div>
+      <div class="node sm" style="left:30px;top:520px;width:410px">return ( … JSX … )</div>
+      <div class="node is-wine" style="left:600px;top:120px;width:410px" data-step="2">export function useApi(path)<small>a function that uses hooks</small></div>
+      <div class="node is-good" style="left:30px;top:340px;width:410px" data-step="3">const menu = useApi(menuPath)<small>one line instead of twenty</small></div>
+      <div class="node is-good" style="left:600px;top:400px;width:410px" data-step="4">Favourites, DishPage, Account…<small>every component can reuse it</small></div>
+    </div>
+    <div class="idea__side">
+      <p class="eyebrow"><b>Solution 2</b> Custom hooks</p>
+      <h2 class="h2">Move the logic into a hook</h2>
+      <div class="takeaway" data-step="1"><p class="k">1 · Move</p><p>The state, the effect and the derived values move out of the component.</p></div>
+      <div class="takeaway" data-step="3"><p class="k">2 · Call it</p><p>A custom hook is a function whose name starts with <code>use</code> and that calls other hooks.</p></div>
+      <div class="takeaway" data-step="4"><p class="k">3 · Reuse it</p><p>Each component that calls it gets its own state. Hooks share logic, not data.</p></div>
+    </div>
+  </div>
+  <style>.node.is-moved { transform: translate(570px, -60px); opacity: .25; }</style>
+  <aside class="notes"><p><b>Do:</b> Step 1: the brass block flies from the component to the hook file. Step 3: what is left in the component is one line. Say: "hooks share logic, not data": two components calling useApi each have their own result.</p></aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Recipe: the useApi hook">
+  <p class="eyebrow"><b>Solution 2 · Recipe</b> Copy or type: this file is the heart of today</p>
+  <h2 class="h3 mt-s">The <code>useApi</code> hook</h2>
+  <div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);--gap:26px;margin-top:26px;align-items:start">
+    <script type="text/plain" data-lang="tsx" data-file="src/hooks/useApi.ts (1 of 2)" data-copy data-build="1:1-2,4,6,7;2:8;3:10-22" style="--code-size:16px">
+      import { useEffect, useState } from "react";
+      import { api, ApiError } from "../lib/api";
+
+      type Result<T> = { path: string; data: T | null; error: ApiError | null };
+
+      // Loads a path from the API. Pass null to load nothing.
+      export function useApi<T>(path: string | null) {
+        const [result, setResult] = useState<Result<T> | null>(null);
+
+        useEffect(() => {
+          if (path === null) return;
+          const controller = new AbortController();
+          api<T>(path, { signal: controller.signal })
+            .then((data) => setResult({ path, data, error: null }))
+            .catch((error: unknown) => {
+              if (controller.signal.aborted) return; // we cancelled it
+              const apiError =
+                error instanceof ApiError ? error : new ApiError(0, "No connection");
+              setResult({ path, data: null, error: apiError });
+            });
+          return () => controller.abort(); // cleanup
+        }, [path]);
+    </script>
+    <div class="stack" style="--gap:18px">
+      <script type="text/plain" data-lang="tsx" data-file="src/hooks/useApi.ts (2 of 2)" data-copy data-build="1:8;4:1-7" style="--code-size:15px">
+          const current = result !== null && result.path === path ? result : null;
+
+          return {
+            data: current?.data ?? null,
+            error: current?.error ?? null,
+            loading: path !== null && current === null, // derived
+          };
+        }
+      </script>
+      <script type="text/plain" data-lang="tsx" data-file="Favourites.tsx: twenty lines become one" data-build="5:1" style="--code-size:15px">
+        const { data, error, loading } = useApi<Dish[]>("/api/v1/enterprise/dishes");
+      </script>
+      <ol class="steps is-compact">
+        <li data-step="1" data-on="1-1:is-now;2:is-done"><b>A function named use…</b></li>
+        <li data-step="2" data-on="2-2:is-now;3:is-done"><b>One state: the last answer</b></li>
+        <li data-step="3" data-on="3-3:is-now;4:is-done"><b>The effect from the last slide</b></li>
+        <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Return derived values</b></li>
+        <li data-step="5" data-on="5-5:is-now;6:is-done"><b>Use it</b></li>
+      </ol>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Create <code>src/hooks/useApi.ts</code>. If time is short, copy it from <code>code/after-L29</code> and walk through it with the steps: it is the code of the last slide, inside a function.</p>
+    <p><b>Then:</b> Favourites becomes one line (step 5). Delete its useState/useEffect version.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Recipe: the menu uses the hook">
+  <p class="eyebrow"><b>Solution 2 · Recipe</b> One line per request</p>
+  <h2 class="h3 mt-s">MenuSection asks the API</h2>
+  <div class="recipe">
+    <ol class="steps is-compact">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>The path depends on the chip</b><span>"all" → every dish, otherwise <code>?category=</code>.</span><span class="file-chip"><i data-icon="file-code"></i>MenuSection.tsx</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Two requests, two lines</b><span>Categories for the chips, dishes for the grid.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>The four endings</b><span>Skeleton, error, empty, grid.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Delete the data files</b><span>No more <code>data/dishes.ts</code>, <code>data/categories.ts</code>.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/components/MenuSection.tsx (excerpt)" data-copy data-build="1:1-4;2:6-7;3:9-14" style="--code-size:16px">
+        const menuPath =
+          category === "all"
+            ? "/api/v1/enterprise/dishes"
+            : `/api/v1/enterprise/dishes?category=${category}`;
+
+        const categories = useApi<Category[]>("/api/v1/enterprise/categories");
+        const menu = useApi<Dish[]>(menuPath);
+
+        {menu.loading && <DishGridSkeleton />}
+        {menu.error && <p className="error">We couldn't load the menu.</p>}
+        {menu.data?.length === 0 && <p className="note">Nothing here today.</p>}
+        {menu.data && menu.data.length > 0 && (
+          <DishGrid dishes={menu.data} cart={cart} onAdd={onAdd} onChangeQty={onChangeQty} />
+        )}
+      </script>
+      <div class="callout is-good" data-step="4"><i data-icon="circle-check"></i><div><p class="h4">Try the race again: Main Courses, then Drinks.</p><p class="small muted mt-s">The grid stays on drinks. The cancelled request shows as "(canceled)" in DevTools.</p></div></div>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Category type: the API sends <code>{ id, slug, nameEn, nameKa, sortOrder, dishCount }</code>, update <code>types.ts</code> (copy it from <code>code/after-L29</code>). The search part comes in three slides.</p></aside>
+</section>
+
+<section class="slide" data-phase="solution2" id="persist" data-title="Recipe: a cart that survives F5">
+  <p class="eyebrow"><b>Solution 2 · Recipe</b> A second custom hook</p>
+  <h2 class="h3 mt-s">A cart that survives F5: <code>useLocalStorage</code></h2>
+  <div class="split" style="grid-template-columns:minmax(0,1fr) 560px;gap:40px;margin-top:26px">
+    <div class="stack" style="--gap:16px">
+      <script type="text/plain" data-lang="tsx" data-file="src/hooks/useLocalStorage.ts" data-copy data-build="1:1,4,5,13,23,24;2:6-12;3:15-21" style="--code-size:15px;padding:22px 0">
+        import { useEffect, useState } from "react";
+
+        // Like useState, but the value survives a page refresh.
+        export function useLocalStorage<T>(key: string, initial: T) {
+          const [value, setValue] = useState<T>(() => {
+            // runs once, on the first render only
+            try {
+              const saved = localStorage.getItem(key);
+              return saved === null ? initial : (JSON.parse(saved) as T);
+            } catch {
+              return initial; // storage blocked or broken JSON
+            }
+          });
+
+          useEffect(() => {
+            try {
+              localStorage.setItem(key, JSON.stringify(value));
+            } catch {
+              // storage full or blocked: the app still works, it just forgets
+            }
+          }, [key, value]);
+
+          return [value, setValue] as const;
+        }
+      </script>
+    </div>
+    <div class="refresh" style="grid-template-columns:1fr;margin-top:0">
+      <script type="text/plain" data-lang="tsx" data-file="src/App.tsx (one line changes)" data-build="4:1" style="--code-size:15px">
+        const [cart, setCart] = useLocalStorage<CartItem[]>("bistro.cart", []);
+      </script>
+      <div class="card"><h3>useState</h3><div class="cartline" id="ps-a">cart: []</div><div class="row" style="--gap:10px"><button class="btn is-ghost" type="button" data-ps="add-a"><i data-icon="plus"></i>Add a dish</button></div></div>
+      <div class="card"><h3>useLocalStorage</h3><div class="cartline" id="ps-b">cart: []</div><div class="row" style="--gap:10px"><button class="btn is-ghost" type="button" data-ps="add-b"><i data-icon="plus"></i>Add a dish</button></div></div>
+      <button class="btn is-wine" type="button" data-ps="refresh" style="align-self:flex-start"><i data-icon="refresh-cw"></i>Refresh the page (F5)</button>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Right side: add a dish in both boxes, then "Refresh". The first forgets, the second reads it back from localStorage.</p>
+    <p><b>Step 1:</b> <code>useState(() =&gt; …)</code> with a function: the "lazy initializer" runs only on the first render, so we read localStorage once, not on every render.</p>
+    <p><b>Step 3:</b> the effect writes the cart whenever it changes.</p>
+    <p><b>Step 4:</b> in App only one line changes. The hook has the same shape as useState.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Debounce: wait until typing stops">
+  <p class="eyebrow"><b>Solution 2</b> One request instead of ten</p>
+  <h2 class="h2 mt-s">Debounce: wait until typing stops</h2>
+  <div class="schema deb">
+    <div class="key" style="left:0" data-step="1">c</div>
+    <div class="key" style="left:100px" data-step="1">o</div>
+    <div class="key" style="left:200px" data-step="1">q</div>
+    <div class="timerbar" style="left:0;width:400px" data-step="1" data-on="2:is-cut"></div>
+    <div class="timerbar" style="left:100px;width:400px;top:150px" data-step="1" data-on="2:is-cut"></div>
+    <div class="timerbar" style="left:200px;width:400px;top:170px" data-step="2"></div>
+    <span class="tick" style="left:0;top:110px" data-step="1">each key starts a 400 ms timer and cancels the previous one</span>
+    <div class="reqdot" style="left:600px;background:var(--surface);box-shadow:var(--shadow-1)" data-step="3" data-fx="pop">⏱ 400 ms of silence → GET /search?q=coq</div>
+    <div class="callout" style="position:absolute;left:0;top:300px;width:1100px" data-step="4"><i data-icon="timer"></i><div><p class="h4">Same idea as the race: a cleanup cancels the old timer.</p></div></div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Step 1: three keys, three timers. Step 2: the first two timers are cut (✕) because a new key came. Step 3: after the last key, 400 ms pass in silence, and only then one request goes out.</p></aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Recipe: useDebounce and the search">
+  <p class="eyebrow"><b>Solution 2 · Recipe</b> A third, tiny hook</p>
+  <h2 class="h3 mt-s"><code>useDebounce</code> and the search</h2>
+  <div class="recipe">
+    <ol class="steps is-compact">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>The hook</b><span>A timer in an effect. The cleanup clears it.</span><span class="file-chip"><i data-icon="file-code"></i>src/hooks/useDebounce.ts</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Debounce the query</b><span>The input stays instant. The request waits.</span><span class="file-chip"><i data-icon="file-code"></i>MenuSection.tsx</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Search or menu, never both</b><span>Pass <code>null</code> to the request we don't need.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>The 429 message</b><span>The API says when to try again: <code>retryAfter</code>.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/hooks/useDebounce.ts" data-copy data-build="1:1-10" style="--code-size:16px">
+        export function useDebounce<T>(value: T, delay = 400) {
+          const [debounced, setDebounced] = useState(value);
+
+          useEffect(() => {
+            const timer = setTimeout(() => setDebounced(value), delay);
+            return () => clearTimeout(timer); // a new keystroke cancels the old timer
+          }, [value, delay]);
+
+          return debounced;
+        }
+      </script>
+      <script type="text/plain" data-lang="tsx" data-file="MenuSection.tsx (excerpt)" data-build="2:1-2;3:4-6;4:8-10" style="--code-size:15px">
+        const search = useDebounce(query.trim(), 400);
+        const searching = search !== "" && query.trim() !== "";
+
+        const menu = useApi<Dish[]>(searching ? null : menuPath);
+        const results = useApi<SearchResponse>(searching ? searchPath : null);
+        const dishes = searching ? (results.data?.items ?? null) : menu.data;
+
+        {error?.status === 429 && (
+          <p className="error">One moment — search again in {error.retryAfter ?? 60} s.</p>
+        )}
+      </script>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Copy the full MenuSection from <code>code/after-L29</code> rather than typing every line; walk through the four steps on it. Type "chocolat" in the live app and watch Network: one request after you stop typing.</p></aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="useRef: a box React doesn't watch">
+  <p class="eyebrow"><b>Solution 2</b> The last hook of the day</p>
+  <h2 class="h3 mt-s"><code>useRef</code>: press "/" to search</h2>
+  <div class="recipe">
+    <ol class="steps is-compact">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>A ref is a box React doesn't watch</b><span>Change <code>ref.current</code> and nothing re-renders. Here it holds the real <code>&lt;input&gt;</code>.</span><span class="file-chip"><i data-icon="file-code"></i>SearchBox.tsx</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Attach it</b><span><code>ref={inputRef}</code>: React puts the DOM element in the box.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Listen to the keyboard</b><span>A listener on <code>window</code> is the outside world: an effect.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Remove it in the cleanup</b><span>Or every StrictMode remount adds a second listener.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/components/SearchBox.tsx" data-copy data-build="1:1,10;2:18-19,24;3:13-20;4:21-22" style="--code-size:15px">
+        import { useEffect, useRef } from "react";
+        // … SearchBoxProps as before
+
+        export function SearchBox({ value, onChange }: SearchBoxProps) {
+          // a box that holds the real <input> element
+          const inputRef = useRef<HTMLInputElement>(null);
+
+          // Press "/" anywhere on the page to jump into the search box
+          useEffect(() => {
+            function handleKeyDown(e: KeyboardEvent) {
+              if (e.key === "/" && document.activeElement !== inputRef.current) {
+                e.preventDefault();
+                inputRef.current?.focus();
+              }
+            }
+            window.addEventListener("keydown", handleKeyDown);
+            return () => window.removeEventListener("keydown", handleKeyDown);
+          }, []);
+
+          return (
+            <input ref={inputRef} type="search" value={value}
+              onChange={(e) => onChange(e.target.value)} className="search" />
+          );
+        }
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> useState is a box React watches: change it and the component renders. useRef is a box React ignores: perfect for DOM elements, timers, anything the screen doesn't show.</p>
+    <p><b>Rule:</b> read refs in event handlers and effects, not while rendering.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="You might not need an effect">
+  <p class="eyebrow"><b>Solution 2</b> The most important warning of today</p>
+  <h2 class="h2 mt-s">You might not need an effect</h2>
+  <div class="notneed">
+    <div class="card" data-step="1"><h3 style="color:var(--bad)"><i data-icon="circle-x"></i>An effect to calculate</h3>
+      <script type="text/plain" data-lang="tsx" style="--code-size:18px">
+        const [visible, setVisible] = useState<Dish[]>([]);
+
+        useEffect(() => {
+          setVisible(dishes.filter((d) => d.categorySlug === category));
+        }, [dishes, category]);
+      </script>
+      <p class="small muted">Two renders instead of one, a second copy of the data, and a lint error: "set-state-in-effect".</p></div>
+    <div class="card" data-step="2"><h3 style="color:var(--good)"><i data-icon="circle-check"></i>Just calculate it</h3>
+      <script type="text/plain" data-lang="tsx" style="--code-size:18px">
+        const visible = dishes.filter((d) => d.categorySlug === category);
+      </script>
+      <p class="small muted">Derived value, from L28. One render, one truth.</p></div>
+  </div>
+  <div class="callout mt-l" data-step="3"><i data-icon="lightbulb"></i><div><p class="h4">Effects are for the outside world: the network, timers, the browser, the keyboard.</p><p class="small muted mt-s">If you only transform props or state, you don't need one.</p></div></div>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="The page at the end of today">
+  <div class="split-7-5 fill items-center" style="gap:64px">
+    <figure class="shot"><div class="shot__bar"><i></i><i></i><i></i><span class="shot__url"><i data-icon="globe"></i>localhost:5173/#menu</span></div><div class="shot__body" style="height:600px"><img src="../img/l29-search.jpg" alt="Le Bistro search results from the API"></div></figure>
+    <div class="stack" style="--gap:20px">
+      <p class="eyebrow"><b>Solution 2</b> Le Bistro, version 0.3</p>
+      <h2 class="h2">The page at the end of today</h2>
+      <ul class="checks is-done">
+        <li data-step="1">The menu and the chips come from the API</li>
+        <li data-step="2">Skeleton, error, empty and data states</li>
+        <li data-step="3">Old requests are cancelled</li>
+        <li data-step="4">The search waits 400 ms</li>
+        <li data-step="5">The cart survives F5</li>
+      </ul>
+      <p class="small muted" data-step="6">Full code: <code>bistro-track/code/after-L29</code>.</p>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Show it live: search "chocolat", press "/" to focus the box, add dishes and refresh. Then ask someone for "the link to Coq au Vin". There isn't one. That's L30.</p></aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Hook mistakes">
+  <p class="eyebrow"><b>Solution 2</b> The bugs of the second half</p>
+  <h2 class="h2 mt-s">When hooks go wrong</h2>
+  <div class="mistakes">
+    <div class="mistake" data-step="1"><h4>A listener without cleanup</h4><div class="bad">useEffect(() =&gt; { window.addEventListener("keydown", f); }, []);</div><div class="err">Two listeners after StrictMode, more after every remount. "/" focuses twice.</div><div class="good">return () =&gt; window.removeEventListener("keydown", f);</div></div>
+    <div class="mistake" data-step="2"><h4>A hook inside an if or a loop</h4><div class="bad">if (searching) { const results = useApi(path); }</div><div class="err">React Hook "useApi" is called conditionally.</div><div class="good">const results = useApi(searching ? path : null);</div></div>
+    <div class="mistake" data-step="3"><h4>A timer that is never cleared</h4><div class="bad">useEffect(() =&gt; { setTimeout(…, 400); }, [value]);</div><div class="err">Every keystroke still fires: no debounce at all.</div><div class="good">const t = setTimeout(…); return () =&gt; clearTimeout(t);</div></div>
+    <div class="mistake" data-step="4"><h4>Reading a ref while rendering</h4><div class="bad">return &lt;p&gt;{inputRef.current?.value}&lt;/p&gt;;</div><div class="err">Shows stale values: refs don't trigger renders.</div><div class="good">Use state for anything the screen shows.</div></div>
+  </div>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Which one needs an effect?">
+  <div class="split-5-7 fill items-center">
+    <div class="stack" style="--gap:24px">
+      <p class="eyebrow"><b>Quick check</b> Effect or not?</p>
+      <h2 class="h1">Which one needs <code style="font-size:.7em">useEffect</code>?</h2>
+    </div>
+    <div class="quiz" data-quiz>
+      <div class="quiz__opts">
+        <button class="quiz__opt">The total price of the cart</button>
+        <button class="quiz__opt">The dishes of the selected category, from a list we already have</button>
+        <button class="quiz__opt" data-correct>Saving the cart to localStorage when it changes</button>
+        <button class="quiz__opt">Formatting a price as ₾32</button>
+      </div>
+      <p class="quiz__explain">A, B and D are calculations: derive them during render. localStorage is outside React: writing to it is a side effect.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== CLASSWORK 2 ============================== -->
+
+<section class="slide" data-phase="classwork2" data-title="Classwork 2: search and a saved cart">
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Atelier · Classwork 2</b> 15 minutes, on your own project</p><h2 class="h1">Search and a saved cart</h2></div>
+    <div class="timer" data-timer="900"></div>
+  </div>
+  <div class="cw">
+    <div class="tiers">
+      <div class="tier base"><div class="tier__k"><span>Base</span><span>everyone</span></div><h3>A cart that survives F5</h3>
+        <ul><li>Copy <code>useLocalStorage</code> into <code>src/hooks/</code>.</li><li>Replace the cart's <code>useState</code> in App with it.</li><li>Add products, refresh: the cart is still there.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Plus</span><span>most of you</span></div><h3>A debounced search</h3>
+        <ul><li><code>useDebounce(query, 400)</code>, then fetch <code>https://dummyjson.com/products/search?q=…</code>.</li><li>DevTools shows one request after you stop typing.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Pro</span><span>fast finishers</span></div><h3>Your own useApi</h3>
+        <ul><li>Move your fetch effect into a <code>useApi(url)</code> hook with an AbortController. Use it twice.</li></ul></div>
+    </div>
+    <div class="cw__side">
+      <div class="done-when"><p class="k">Done when</p><ul class="checks"><li>F5 keeps the cart</li><li>Typing 6 letters sends 1 request</li><li>Every effect with a listener or timer has a cleanup</li><li>No "missing dependency" warning</li></ul></div>
+      <div class="hint" data-peek="click for a hint"><div><p class="k">Stuck?</p><pre>const search = useDebounce(query, 400);
+useEffect(() =&gt; {
+  if (!search) return;
+  fetch(`…/search?q=${search}`) …
+}, [search]);</pre></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== WRAP-UP ============================== -->
+
+<section class="slide" data-phase="wrap" data-title="Two problems, two tools">
+  <p class="eyebrow"><b>Dessert</b> What we solved today</p>
+  <h2 class="h2 mt-s">Two problems, two tools</h2>
+  <div class="recap">
+    <div class="recap__row" data-step="1">
+      <div class="recap__p"><p class="k">Problem 1</p><p>Our menu was a file. Fetching during render looped forever.</p></div>
+      <div class="recap__arrow"><i data-icon="arrow-right"></i></div>
+      <div class="recap__s"><p class="k">useEffect</p><p>Talk to the outside world after the render. Dependencies say when to run again. Design loading, error and empty.</p></div>
+    </div>
+    <div class="recap__row" data-step="2">
+      <div class="recap__p"><p class="k">Problem 2</p><p>Slow answers won the race, every keystroke was a request, F5 emptied the cart.</p></div>
+      <div class="recap__arrow"><i data-icon="arrow-right"></i></div>
+      <div class="recap__s"><p class="k">Cleanup and custom hooks</p><p>Cleanups cancel old work. <code>useApi</code>, <code>useDebounce</code>, <code>useLocalStorage</code> package it for reuse. <code>useRef</code> holds what React doesn't watch.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-phase="wrap" data-title="What does this do?">
+  <p class="eyebrow"><b>Dessert</b> Click a card to check yourself</p>
+  <h2 class="h2 mt-s">What does this do?</h2>
+  <div class="flips">
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">01 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">useEffect(fn, [])</script></div><div class="flip__face flip__back"><span class="flip__k">01</span><p>Runs fn once, after the first render.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">02 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">return () => controller.abort();</script></div><div class="flip__face flip__back"><span class="flip__k">02</span><p>A cleanup: cancels the old request before the next effect.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">03 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">if (!res.ok) throw …</script></div><div class="flip__face flip__back"><span class="flip__k">03</span><p>Turns a 404 or 500 into an error we can show.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">04 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">useDebounce(query, 400)</script></div><div class="flip__face flip__back"><span class="flip__k">04</span><p>The query, but only after 400 ms without typing.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">05 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">useRef(null)</script></div><div class="flip__face flip__back"><span class="flip__k">05</span><p>A box that survives renders and doesn't cause them. Often holds a DOM element.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">06 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">function useApi(path) {…}</script></div><div class="flip__face flip__back"><span class="flip__k">06</span><p>A custom hook: reusable logic. Each caller gets its own state.</p></div></div></div>
+  </div>
+</section>
+
+<section class="slide" data-phase="wrap" data-title="Homework: v0.3">
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Homework</b> Before L30</p><h2 class="h1">Your shop, version 0.3</h2></div>
+    <span class="sticker">Live link required</span>
+  </div>
+  <div class="hw">
+    <div class="tiers">
+      <div class="tier base"><div class="tier__k"><span>Base</span><span>required</span></div><h3>Real data</h3>
+        <ul><li>Products come from DummyJSON. The data file is gone.</li><li>Loading (skeleton), error and empty states.</li><li>The cart is saved with <code>useLocalStorage</code>.</li><li>Category chips load products with <code>?category</code> or the category endpoint, with a cleanup.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Plus</span><span>recommended</span></div><h3>Search</h3>
+        <ul><li>A debounced search with <code>/products/search?q=</code>.</li><li>"/" focuses the search box (<code>useRef</code>).</li></ul></div>
+    </div>
+    <div class="cw__side">
+      <div class="done-when"><p class="k">Before you submit</p><ul class="checks"><li>No missing-dependency warnings</li><li>Every listener and timer has a cleanup</li><li>One request per search, not per letter</li><li>Live on Vercel</li></ul></div>
+      <p class="small muted">Full brief and grading: <code>homework.md</code>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-phase="wrap" data-tone="dark" data-title="Merci">
+  <div class="merci">
+    <div class="stack" style="--gap:22px">
+      <p class="eyebrow"><b>L29</b> Le marché</p>
+      <h2 class="display">Merci!</h2>
+      <p class="lead">Questions now, or in the class chat. See you at L30.</p>
+    </div>
+    <div class="teaser" data-step="1">
+      <p class="k">Next time · L30</p>
+      <h3>“Send me the link to Coq au Vin.”</h3>
+      <p>You can't: everything lives on one page, and the address never changes. Next lecture Le Bistro gets pages, addresses, a login and doors only staff can open.</p>
+    </div>
+  </div>
+</section>
+
+</div>
+</div>
+
+<script src="../_shared/vendor/icons.js"></script>
+<script src="../_shared/vendor/prism/prism.min.js" data-manual></script>
+<script src="../_shared/vendor/prism/prism-jsx.min.js"></script>
+<script src="../_shared/vendor/prism/prism-typescript.min.js"></script>
+<script src="../_shared/vendor/prism/prism-tsx.min.js"></script>
+<script src="../_shared/vendor/prism/prism-bash.min.js"></script>
+<script src="../_shared/music/tracks.js"></script>
+<script src="../_shared/bistro-data.js"></script>
+<script src="../_shared/deck.js"></script>
+<script src="../track.js"></script>
+<script>
+(function () {
+  'use strict';
+  Track.init();
+  Deck.init({
+    code: 'L29',
+    lecture: 29,
+    title: 'Le marché',
+    footer: 'Le Bistro track · L29 · Effects and real data',
+    shared: '../_shared/',
+    breakMinutes: 10,
+    breakLine: 'Pause café. Stand up, refill, rest your eyes. Back in',
+    phases: [
+      { id: 'hello', label: 'Hello' }, { id: 'questions', label: 'Questions' },
+      { id: 'problem', label: 'Problem 1' }, { id: 'solution', label: 'Solution 1' }, { id: 'classwork', label: 'Classwork 1' },
+      { id: 'break', label: 'Break' },
+      { id: 'problem2', label: 'Problem 2' }, { id: 'solution2', label: 'Solution 2' }, { id: 'classwork2', label: 'Classwork 2' },
+      { id: 'wrap', label: 'Wrap-up' }
+    ]
+  });
+
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = Track.esc;
+  document.querySelectorAll('[data-start-break]').forEach(function (b) { b.addEventListener('click', function () { Deck.openBreak(); }); });
+  function netRow(list, method, path, status, ms, cls) {
+    var row = document.createElement('div');
+    row.className = 'netrow';
+    row.innerHTML = '<span>' + method + '</span><span>' + esc(path) + '</span><span class="st ' + (cls || '') + '">' + status + '</span><span>' + ms + '</span>';
+    list.appendChild(row);
+    while (list.children.length > 60) list.removeChild(list.firstChild);
+    return row;
+  }
+
+  /* ---------- the endless fetch loop ---------- */
+  var loopTimer = null, loopN = 0;
+  function loopStop() { clearInterval(loopTimer); loopTimer = null; }
+  $('loop-run').addEventListener('click', function () {
+    loopStop(); loopN = 0; $('loop-net').innerHTML = ''; $('loop-n').textContent = '0';
+    loopTimer = setInterval(function () {
+      loopN++;
+      $('loop-n').textContent = loopN;
+      netRow($('loop-net'), 'GET', '/api/v1/enterprise/dishes', loopN > 40 ? '429' : '200', (180 + Math.round(Math.random() * 120)) + ' ms', loopN > 40 ? 'bad' : '');
+      if (loopN >= 60) { loopStop(); Deck.toast('Stopped at 60. A real tab would keep going until it freezes.'); }
+    }, 140);
+  });
+  $('loop-stop').addEventListener('click', loopStop);
+  Deck.onSlide('loop', { leave: loopStop });
+
+  /* ---------- the race condition ---------- */
+  var DELAY = { 'main-courses': 3000, drinks: 200 };
+  var raceMode = 'bug', raceSelected = null, raceShown = null, raceSeq = 0, raceLive = {};
+  var raceChips = Track.categories.map(function (c) { return { slug: c.slug, name: c.nameEn }; });
+  function raceRender() {
+    $('race-chips').innerHTML = raceChips.map(function (c) { return '<button type="button" class="mchip' + (c.slug === raceSelected ? ' is-on' : '') + '" data-slug="' + c.slug + '">' + esc(c.name) + '</button>'; }).join('');
+    var grid = $('race-grid');
+    if (raceShown === null) { grid.innerHTML = raceSelected ? '<div class="skel"><i></i><i></i><i></i></div>' : '<p class="note" style="font:italic 500 22px var(--f-display);color:var(--ink-2)">Pick a category.</p>'; }
+    else {
+      var dishes = Track.dishes.filter(function (d) { return d.categorySlug === raceShown; }).slice(0, 3);
+      grid.innerHTML = '<div class="mgrid">' + dishes.map(function (d) { return Track.card(d, { desc: false }); }).join('') + '</div>';
+    }
+    var v = $('race-verdict');
+    if (raceSelected && raceShown && raceSelected !== raceShown) { v.className = 'verdict-line bad'; v.textContent = 'Chip: ' + raceSelected + ' · grid: ' + raceShown + '. Wrong!'; }
+    else if (raceSelected && raceShown) { v.className = 'verdict-line good'; v.textContent = 'Chip and grid agree: ' + raceShown + '.'; }
+    else { v.className = 'verdict-line'; v.textContent = raceSelected ? 'Waiting for the kitchen…' : 'Click a chip.'; }
+  }
+  function raceSelect(slug) {
+    var seq = ++raceSeq, delay = DELAY[slug] || 500;
+    if (raceMode === 'fix') {
+      Object.keys(raceLive).forEach(function (k) {
+        var r = raceLive[k]; clearTimeout(r.timer); r.bar.classList.add('is-abort'); r.bar.querySelector('i').style.transition = 'none';
+        r.bar.querySelector('span').textContent = r.slug + ' · aborted by the cleanup'; delete raceLive[k];
+      });
+      raceShown = null;
+    }
+    raceSelected = slug;
+    var bar = document.createElement('div');
+    bar.className = 'bar';
+    bar.innerHTML = '<i></i><span>GET ?category=' + slug + ' · ' + (delay / 1000) + ' s</span>';
+    $('race-bars').appendChild(bar);
+    while ($('race-bars').children.length > 5) $('race-bars').removeChild($('race-bars').firstChild);
+    var fill = bar.querySelector('i');
+    requestAnimationFrame(function () { fill.style.transition = 'width ' + delay + 'ms linear'; fill.style.width = '100%'; });
+    var timer = setTimeout(function () {
+      delete raceLive[seq];
+      bar.querySelector('span').textContent = '200 · ' + slug + ' arrived';
+      raceShown = slug;   // "no cleanup": whoever arrives last wins
+      raceRender();
+    }, delay);
+    raceLive[seq] = { timer: timer, bar: bar, slug: slug };
+    raceRender();
+  }
+  $('race-chips').addEventListener('click', function (e) { var b = e.target.closest('[data-slug]'); if (b) raceSelect(b.getAttribute('data-slug')); });
+  $('race-mode').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-mode]'); if (!b) return;
+    raceMode = b.getAttribute('data-mode');
+    Array.prototype.forEach.call(this.children, function (x) { x.classList.toggle('is-on', x === b); });
+    Object.keys(raceLive).forEach(function (k) { clearTimeout(raceLive[k].timer); });
+    raceLive = {}; raceSelected = null; raceShown = null; $('race-bars').innerHTML = ''; raceRender();
+  });
+  raceRender();
+
+  /* ---------- 429: one request per letter ---------- */
+  var rateN = 0;
+  $('rate-input').addEventListener('input', function () {
+    rateN++;
+    $('rate-n').textContent = rateN;
+    var q = this.value;
+    if (rateN > 10) netRow($('rate-net'), 'GET', '/search?q=' + q, '429', 'Retry-After: 60', 'bad');
+    else netRow($('rate-net'), 'GET', '/search?q=' + q, '200', (140 + Math.round(Math.random() * 90)) + ' ms');
+  });
+  $('rate-reset').addEventListener('click', function () { rateN = 0; $('rate-n').textContent = '0'; $('rate-net').innerHTML = ''; $('rate-input').value = ''; });
+
+  /* ---------- useState vs useLocalStorage ---------- */
+  var KEY = 'bistro-track.demo.cart';
+  var psA = [], psB = (function () { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { return []; } })();
+  var pick = [5, 15, 21, 24, 17];
+  function psRender() {
+    $('ps-a').textContent = 'cart: [' + psA.map(function (n) { return '"' + n + '"'; }).join(', ') + ']';
+    $('ps-b').textContent = 'cart: [' + psB.map(function (n) { return '"' + n + '"'; }).join(', ') + ']';
+  }
+  function psSave() { try { localStorage.setItem(KEY, JSON.stringify(psB)); } catch (e) { /* storage blocked */ } }
+  $('persist').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-ps]'); if (!b) return;
+    var a = b.getAttribute('data-ps');
+    if (a === 'add-a') psA = psA.concat([Track.byId(pick[psA.length % pick.length]).name]);
+    if (a === 'add-b') { psB = psB.concat([Track.byId(pick[psB.length % pick.length]).name]); psSave(); }
+    if (a === 'refresh') {
+      psA = [];
+      try { psB = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (err) { psB = []; }
+      Deck.toast('Page refreshed: memory wiped, localStorage read back.');
+    }
+    psRender();
+  });
+  psRender();
+})();
+</script>
+</body>
+</html>

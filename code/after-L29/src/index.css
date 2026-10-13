@@ -1,0 +1,198 @@
+@import "tailwindcss";
+
+/* Le Bistro's colours and fonts, copied from srms.stepacademy.ge.
+   Tailwind turns every token into classes: bg-paper, text-wine, font-display, ... */
+@theme {
+  --color-paper: #f6f1e7;
+  --color-paper-raised: #fdfaf2;
+  --color-paper-deep: #ece4d3;
+  --color-line: #ddd2bf;
+  --color-ink: #2e2a26;
+  --color-ink-soft: #6e645a;
+  --color-wine: #5c1a23;
+  --color-wine-deep: #421219;
+  --color-brass: #a98545;
+  --color-tomato: #a93b2c;
+
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-body: "Karla", system-ui, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-paper font-body text-ink antialiased;
+  }
+}
+
+/* Named styles built from Tailwind utilities with @apply.
+   They keep the JSX short, so every component fits on one slide. */
+@layer components {
+  .page {
+    @apply mx-auto w-full max-w-6xl px-6;
+  }
+  .eyebrow {
+    @apply text-xs font-bold tracking-[0.25em] text-brass uppercase;
+  }
+  .title {
+    @apply font-display text-5xl text-wine;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 bg-wine px-6 py-3 font-semibold text-paper transition hover:bg-wine-deep disabled:opacity-40;
+  }
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 border border-wine px-4 py-2 text-sm font-semibold text-wine transition hover:bg-wine hover:text-paper disabled:pointer-events-none disabled:opacity-40;
+  }
+
+  /* Header and Footer */
+  .site-header {
+    @apply relative border-b border-line;
+  }
+  .site-header__bar {
+    @apply mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4;
+  }
+  .logo {
+    @apply leading-none;
+  }
+  .logo__name {
+    @apply block font-display text-3xl text-wine;
+  }
+  .nav {
+    @apply flex items-center gap-6 text-sm font-medium;
+  }
+  .site-footer {
+    @apply bg-wine-deep text-paper;
+  }
+  .site-footer__grid {
+    @apply mx-auto grid w-full max-w-6xl gap-8 px-6 py-12 sm:grid-cols-3;
+  }
+
+  /* Hero */
+  .hero {
+    @apply relative isolate overflow-hidden bg-wine-deep text-paper;
+  }
+  .hero__img {
+    @apply absolute inset-0 -z-10 h-full w-full object-cover opacity-35;
+  }
+  .hero__body {
+    @apply mx-auto flex w-full max-w-6xl flex-col items-start gap-6 px-6 py-28;
+  }
+  .hero__title {
+    @apply max-w-xl font-display text-6xl leading-tight;
+  }
+  .hero__lede {
+    @apply max-w-lg text-lg text-paper/80;
+  }
+
+  /* Section */
+  .section {
+    @apply mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-16;
+  }
+  .section__head {
+    @apply text-center;
+  }
+  .section__rule {
+    @apply mx-auto mt-4 h-px w-14 bg-brass;
+  }
+
+  /* DishGrid and DishCard */
+  .grid-3 {
+    @apply grid gap-6 sm:grid-cols-2 lg:grid-cols-3;
+  }
+  .card {
+    @apply flex flex-col overflow-hidden rounded-md border border-line bg-paper-raised shadow-sm;
+  }
+  .card__img {
+    @apply aspect-4/3 w-full object-cover;
+  }
+  .card__body {
+    @apply flex flex-1 flex-col gap-2 p-5;
+  }
+  .card__title {
+    @apply flex items-baseline gap-2 font-display text-2xl;
+  }
+  .card__leader {
+    @apply flex-1 border-b border-dotted border-line;
+  }
+  .card__price {
+    @apply text-wine;
+  }
+  .card__desc {
+    @apply font-display text-lg text-ink-soft italic;
+  }
+  .card__actions {
+    @apply mt-auto self-end;
+  }
+  .badge {
+    @apply text-sm font-semibold text-tomato;
+  }
+
+  /* CategoryChips */
+  .chips {
+    @apply flex flex-wrap gap-2;
+  }
+  .chip {
+    @apply rounded-full border border-line bg-paper-raised px-4 py-2 text-sm font-medium transition hover:border-wine;
+  }
+  .chip-on {
+    @apply rounded-full border border-wine bg-wine px-4 py-2 text-sm font-semibold text-paper;
+  }
+
+  /* MenuSection: chips + search box in one row, and the "nothing found" note */
+  .toolbar {
+    @apply flex flex-wrap items-center justify-between gap-4;
+  }
+  .search {
+    @apply w-full max-w-xs rounded-full border border-line bg-paper-raised px-5 py-2.5;
+  }
+  .note {
+    @apply text-center font-display text-xl text-ink-soft italic;
+  }
+
+  /* QuantityStepper */
+  .stepper {
+    @apply inline-flex items-center border border-line bg-paper;
+  }
+  .stepper__btn {
+    @apply px-3 py-2 disabled:opacity-30;
+  }
+  .stepper__qty {
+    @apply w-8 text-center font-semibold;
+  }
+
+  /* CartPanel */
+  .cart-panel {
+    @apply absolute top-full right-6 z-10 w-md border border-line bg-paper-raised p-6 shadow-xl;
+  }
+  .cart-panel__head {
+    @apply flex items-baseline justify-between;
+  }
+  .cart-panel__title {
+    @apply font-display text-3xl text-wine;
+  }
+  .cart-panel__list {
+    @apply mt-4 flex flex-col gap-3;
+  }
+  .cart-panel__total {
+    @apply mt-4 flex justify-between border-t border-line pt-4 font-semibold;
+  }
+  .cart-line {
+    @apply flex items-center gap-3;
+  }
+  .cart-line__name {
+    @apply flex-1;
+  }
+
+  /* Loading, errors and search results (data from the API) */
+  .skeleton {
+    @apply h-96 animate-pulse rounded-md border border-line bg-paper-deep;
+  }
+  .error {
+    @apply text-center text-tomato;
+  }
+  .results {
+    @apply font-display text-2xl;
+  }
+  .results__count {
+    @apply text-base text-ink-soft;
+  }
+}

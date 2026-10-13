@@ -1,0 +1,1203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La Maison · L30</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Karla:ital,wght@0,400..800;1,400..800&family=JetBrains+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="../_shared/deck.css">
+<link rel="stylesheet" href="../track.css">
+<style>
+/* ---------- L30 only ---------- */
+.ba { position: relative; height: 640px; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-2); }
+.ba img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.ba__tag { position: absolute; top: 18px; z-index: 3; padding: 9px 14px; border-radius: 8px; font: 700 15px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; background: rgba(46, 42, 38, .85); color: #fdfaf2; }
+.ba__tag.l { left: 18px; } .ba__tag.r { right: 18px; background: var(--wine); }
+.ba__after { position: absolute; inset: 0; z-index: 2; }
+
+/* a small browser for the demos */
+.browser { background: #f6f1e7; border-radius: 12px; box-shadow: var(--shadow-2); overflow: hidden; min-width: 0; }
+.browser__bar { display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 14px; background: #efe7d8; }
+.browser__bar button { border: 0; width: 34px; height: 34px; border-radius: 8px; background: transparent; color: #6e645a; display: grid; place-items: center; }
+.browser__bar button:hover { background: rgba(46, 42, 38, .08); }
+.browser__bar button svg { width: 18px; height: 18px; }
+.browser__url { flex: 1; height: 34px; display: flex; align-items: center; gap: 8px; padding: 0 14px; border-radius: 8px; background: #fdfaf2; font: 500 18px/1 var(--f-mono); color: #2e2a26; overflow: hidden; white-space: nowrap; }
+.browser__url b { color: #5c1a23; font-weight: 600; }
+.browser__url.flash { animation: urlflash .6s ease; }
+@keyframes urlflash { 30% { background: #f3e6c9; } }
+.browser__page { position: relative; min-height: 420px; transition: opacity .25s ease; }
+.browser__page.is-white { opacity: 0; }
+.bpage { padding: 18px 22px; display: flex; flex-direction: column; gap: 12px; }
+.bpage h5 { margin: 0; font: 600 34px/1.05 var(--f-display); color: #5c1a23; }
+.bpage .mgrid { gap: 10px; }
+.bpage .mcard img { aspect-ratio: 16 / 10; }
+.bpage .mcard__desc { display: none; }
+.bpage .mcard__title { font-size: 17px; }
+.bnav { display: flex; gap: 16px; font: 600 15px/1 var(--f-body); }
+.bnav a, .bnav button { color: #2e2a26; text-decoration: none; cursor: pointer; border: 0; background: none; padding: 0 0 4px; font: inherit; }
+.bnav .on { color: #5c1a23; border-bottom: 2px solid #5c1a23; }
+.bfoot { background: #421219; color: #fdfaf2; padding: 12px 22px; font: 600 18px/1 var(--f-display); display: flex; justify-content: space-between; }
+.bfoot small { font: 700 11px/1 var(--f-body); letter-spacing: .2em; text-transform: uppercase; color: #c9af7e; }
+.dish-mini { display: grid; grid-template-columns: 220px 1fr; gap: 18px; align-items: start; }
+.dish-mini img { width: 220px; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; }
+.dish-mini h6 { margin: 0; font: 600 36px/1 var(--f-display); color: #5c1a23; }
+.dish-mini p { margin: 6px 0 0; font: italic 500 18px/1.35 var(--f-display); color: #6e645a; }
+.status-mini { text-align: center; padding: 40px 0; }
+.status-mini .k { font: 700 14px/1 var(--f-mono); letter-spacing: .2em; color: #a98545; }
+.status-mini h6 { margin: 8px 0 0; font: 600 40px/1 var(--f-display); color: #5c1a23; }
+
+.pains { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin-top: 36px; }
+.pains .card { padding: 26px 28px; display: flex; flex-direction: column; gap: 12px; }
+.pains svg { width: 36px; height: 36px; color: var(--bad); }
+.pains h3 { font: 700 26px/1.25 var(--f-body); margin: 0; }
+.pains p { font-size: 21px; line-height: 1.45; color: var(--ink-2); }
+
+/* route matcher */
+.matcher { display: grid; grid-template-columns: minmax(0, 1fr) 520px; gap: 48px; margin-top: 26px; align-items: start; }
+.urlin { display: flex; gap: 12px; }
+.urlin input { flex: 1; font: 600 28px/1 var(--f-mono); padding: 16px 20px; border: 2px solid var(--line); border-radius: 12px; background: #fff; color: var(--ink); }
+.routes { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+.rrow { display: grid; grid-template-columns: 240px 40px minmax(0, 1fr) 160px; align-items: center; gap: 14px; padding: 14px 18px; border-radius: 12px; background: var(--surface); box-shadow: var(--shadow-1); font: 600 22px/1.2 var(--f-mono); transition: background-color .25s ease, box-shadow .25s ease, opacity .25s ease; }
+.rrow .arrow { color: var(--ink-3); }
+.rrow .page { font-family: var(--f-body); font-weight: 700; }
+.rrow .res { font: 700 14px/1 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); text-align: right; }
+.rrow.is-check { box-shadow: var(--shadow-1), inset 4px 0 0 var(--brass); }
+.rrow.is-miss { opacity: .45; }
+.rrow.is-hit { background: color-mix(in srgb, var(--good) 14%, var(--surface)); box-shadow: var(--shadow-2), inset 5px 0 0 var(--good); }
+.rrow.is-hit .res { color: var(--good); }
+.params { background: #1d1816; color: #e9dcc8; border-radius: 12px; padding: 18px 20px; font: 500 20px/1.55 var(--f-mono); white-space: pre; min-height: 160px; }
+.params b { color: #f3cd83; font-weight: 600; }
+.params .s { color: #b9d89a; }
+
+/* a vs Link */
+.avl { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 24px; }
+.avl .card { padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; }
+.avl h3 { margin: 0; font: 700 24px/1.2 var(--f-body); display: flex; gap: 10px; align-items: center; }
+.avl h3 svg { width: 28px; height: 28px; }
+.avl .browser__page { min-height: 150px; }
+.pagebox { padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; font: 600 20px/1.3 var(--f-body); }
+.pagebox .cartn { font: 700 22px/1 var(--f-mono); color: #5c1a23; }
+
+/* door matrix */
+.doors { width: 100%; border-collapse: separate; border-spacing: 0 10px; margin-top: 20px; }
+.doors th { font: 700 14px/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--brass); padding: 0 16px 6px; text-align: center; }
+.doors th:first-child { text-align: left; }
+.doors td { background: var(--surface); padding: 18px 16px; text-align: center; font-size: 30px; box-shadow: 0 1px 0 var(--line); }
+.doors td:first-child { text-align: left; font: 700 24px/1.2 var(--f-body); border-radius: 10px 0 0 10px; }
+.doors td:last-child { border-radius: 0 10px 10px 0; }
+.doors td small { display: block; font: 500 16px/1.3 var(--f-mono); color: var(--ink-3); margin-top: 4px; }
+.yes { color: var(--good); } .no { color: var(--bad); }
+
+/* doorman flow */
+.door { display: grid; grid-template-columns: 420px minmax(0, 1fr); gap: 40px; margin-top: 20px; align-items: start; }
+.door .pick { display: flex; flex-direction: column; gap: 12px; }
+.door .pick p { margin: 0; font: 700 14px/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--brass); }
+.door .node.is-path { box-shadow: var(--shadow-2), 0 0 0 4px var(--brass); }
+.door .node.is-end-good { background: color-mix(in srgb, var(--good) 16%, var(--surface)); box-shadow: var(--shadow-2), 0 0 0 4px var(--good); }
+.door .node.is-end-bad { background: color-mix(in srgb, var(--bad) 12%, var(--surface)); box-shadow: var(--shadow-2), 0 0 0 4px var(--bad); }
+
+/* login sequence: two lifelines, messages slide in from the side that sends them */
+.seq { position: relative; display: grid; grid-template-columns: 340px minmax(0, 1fr) 340px; row-gap: 24px; margin-top: 28px; }
+.seq::before, .seq::after { content: ""; position: absolute; top: 80px; bottom: 34px; border-left: 2px dashed color-mix(in srgb, var(--ink) 22%, transparent); }
+.seq::before { left: 170px; } .seq::after { right: 170px; }
+.seq__actor { grid-row: 1; grid-column: 1; position: relative; z-index: 1; padding: 14px 20px; border-radius: 12px; background: var(--surface); box-shadow: var(--shadow-2); text-align: center; font: 700 26px/1.15 var(--f-body); }
+.seq__actor small { display: block; margin-top: 4px; font: 500 15px/1.3 var(--f-mono); color: var(--ink-3); }
+.seq__actor.is-api { grid-column: 3; background: var(--wine); color: #fdfaf2; }
+.seq__actor.is-api small { color: #e3c9bb; }
+.seq__msg { grid-column: 1 / 4; margin: 0 170px; padding: 0 30px; }
+.seq__head { margin: 0; display: flex; align-items: center; gap: 12px; font: 600 24px/1.2 var(--f-mono); color: var(--ink); }
+.seq__msg.is-back .seq__head { justify-content: flex-end; }
+.seq__n { flex: none; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; color: #fff; font: 700 17px/1 var(--f-mono); background: var(--wine); }
+.seq__msg.is-back .seq__n { background: var(--good); }
+.seq__line { display: block; position: relative; height: 3px; margin: 10px -30px 8px; background: var(--wine); }
+.seq__line::after { content: ""; position: absolute; top: 50%; right: -2px; transform: translateY(-50%); border-left: 18px solid var(--wine); border-top: 10px solid transparent; border-bottom: 10px solid transparent; }
+.seq__msg.is-back .seq__line { background: var(--good); }
+.seq__msg.is-back .seq__line::after { right: auto; left: -2px; border-left: 0; border-right: 18px solid var(--good); }
+.seq__sub { margin: 0; font: 500 18px/1.3 var(--f-mono); color: var(--ink-3); }
+.seq__msg.is-back .seq__sub { text-align: right; }
+.seq__note { grid-column: 1 / 3; justify-self: start; position: relative; z-index: 1; display: flex; gap: 14px; align-items: center; margin-top: 6px; padding: 14px 22px; border-radius: 12px; background: color-mix(in srgb, var(--good) 14%, var(--surface)); box-shadow: var(--shadow-2), 0 0 0 3px var(--good); font: 600 24px/1.2 var(--f-mono); }
+.seq__note .seq__n { background: var(--good); }
+.seq__note small { display: block; margin-top: 4px; font: 500 16px/1.3 var(--f-body); color: var(--ink-2); }
+
+.lock { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 30px; }
+.lock .card { padding: 24px 26px; display: flex; flex-direction: column; gap: 12px; }
+.lock h3 { margin: 0; font: 700 26px/1.2 var(--f-body); display: flex; gap: 12px; align-items: center; }
+.lock h3 svg { width: 32px; height: 32px; }
+.lock p { font-size: 21px; line-height: 1.45; color: var(--ink-2); }
+
+.shots3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; margin-top: 30px; }
+.shots3 .shot__body { height: 330px; }
+.shots3 .shot__body img { height: 100%; object-fit: cover; object-position: top; }
+</style>
+</head>
+<body>
+<div class="deck">
+<div class="stage">
+
+<!-- ============================== HELLO ============================== -->
+
+<section class="slide" data-phase="hello" id="cover" data-title="La maison">
+  <div class="cover">
+    <div class="stack" style="--gap:24px">
+      <p class="cover__hello">Bonjour!</p>
+      <p class="eyebrow"><b>L30</b> React · lecture 5 · Le Bistro track 4 of 5</p>
+      <h1 class="display">La<br>maison</h1>
+      <p class="lead" style="max-width:930px">Routing, login and protected pages. A house has rooms with their own doors, and some doors are for the staff only.</p>
+      <dl class="cover__meta">
+        <div><dt>Theme</dt><dd>React Router, auth, guards</dd></div>
+        <div><dt>Le Bistro today</dt><dd>Pages, a dish page, login</dd></div>
+        <div><dt>Your project</dt><dd>v0.4 · pages and a login</dd></div>
+        <div><dt>Length</dt><dd>2 hours · one break</dd></div>
+      </dl>
+    </div>
+    <div class="plate">
+      <div class="plate__rim"></div>
+      <div class="plate__food"><img src="../_shared/img/dishes/french-onion-soup.jpg" alt=""></div>
+      <div class="plate__tag"><small>la maison</small>“rooms and doors”</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Bonjour! Le Bistro is real now: real data, a cart that survives F5. But it is one long page. Today it becomes a house: rooms (pages) with their own address, and a few doors only the staff can open.</p>
+  </aside>
+</section>
+
+<section class="slide v-center" data-phase="hello" data-title="Today's menu">
+  <div class="menu-card">
+    <div class="menu-card__head"><p class="eyebrow">Le Bistro · L30 · 120 minutes</p><h2>Today's menu</h2></div>
+    <ol class="menu-card__list">
+      <li class="course"><span class="course__k">Accueil</span><span class="course__name">Hello <small>where Le Bistro is today</small></span><span class="course__t">3′</span></li>
+      <li class="course"><span class="course__k">Apéritif</span><span class="course__name">Questions <small>and two homework demos</small></span><span class="course__t">9′</span></li>
+      <li class="course"><span class="course__k">Entrée</span><span class="course__name">Problem 1 <small>send me the link</small></span><span class="course__t">6′</span></li>
+      <li class="course"><span class="course__k">Plat</span><span class="course__name">React Router <small>pages, layouts, params</small></span><span class="course__t">24′</span></li>
+      <li class="course"><span class="course__k">Atelier</span><span class="course__name">Classwork 1 <small>your pages</small></span><span class="course__t">15′</span></li>
+      <li class="course is-pause"><span class="course__k">Pause café</span><span class="course__name">Break <small>music on, screens off</small></span><span class="course__t">10′</span></li>
+      <li class="course"><span class="course__k">Second plat</span><span class="course__name">Problem 2, login and guards <small>staff only</small></span><span class="course__t">30′</span></li>
+      <li class="course"><span class="course__k">Atelier</span><span class="course__name">Classwork 2 <small>a login and a locked page</small></span><span class="course__t">15′</span></li>
+      <li class="course"><span class="course__k">Dessert</span><span class="course__name">Wrap-up <small>recap, homework, next time</small></span><span class="course__t">8′</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-phase="hello" data-title="Le Bistro, lecture by lecture">
+  <p class="eyebrow"><b>Route</b> Lecture 4 of 5</p>
+  <h2 class="h2 mt-s">Le Bistro, lecture by lecture</h2>
+  <div class="road">
+    <div class="stop is-done"><div class="stop__shot"><img src="../img/l27-home.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L27 · done</p><p class="stop__t">Components</p><p class="stop__d">Home page and menu from components and a data file.</p></div>
+    <div class="stop is-done"><div class="stop__shot"><img src="../img/l28-cart.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L28 · done</p><p class="stop__t">State</p><p class="stop__d">Add to cart works. Chips filter, search finds.</p></div>
+    <div class="stop is-done"><div class="stop__shot"><img src="../img/l29-search.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L29 · done</p><p class="stop__t">Effects</p><p class="stop__d">The real menu from the API. A cart that survives a refresh.</p></div>
+    <div class="stop is-now"><div class="stop__shot"><img src="../img/l30-dish.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L30 · today</p><p class="stop__t">Routing</p><p class="stop__d">Pages with their own address. Login and staff-only doors.</p></div>
+    <div class="stop"><div class="stop__shot"><img src="../img/l31-faq.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L31</p><p class="stop__t">Context</p><p class="stop__d">One cart and one session for the whole site.</p></div>
+  </div>
+  <div class="lane">
+    <span class="lane__k">Your project</span>
+    <span class="lane__v"><b>v0.1 ✓</b>catalog from a data file</span>
+    <span class="lane__v"><b>v0.2 ✓</b>cart, filters, search</span>
+    <span class="lane__v"><b>v0.3 ✓</b>real API, saved cart</span>
+    <span class="lane__v"><b>v0.4 · today</b>pages, login, guards</span>
+    <span class="lane__v"><b>v0.5</b>context and reducer</span>
+  </div>
+</section>
+
+<section class="slide" data-phase="hello" data-title="Before and after today">
+  <div class="split-4-8 fill items-center" style="gap:56px">
+    <div class="stack" style="--gap:22px">
+      <p class="eyebrow"><b>Today's goal</b> Press next to unveil it</p>
+      <h2 class="h2">From one long page to a house of rooms</h2>
+      <p class="lead">Under the blind: Coq au Vin on its own page, at its own address.</p>
+      <ul class="checks is-done" data-step="1"><li><code>/menu/5</code> opens Coq au Vin, Back works</li><li><code>/menu?category=drinks</code> can be shared</li><li>A login; <code>/account</code> and <code>/kitchen</code> are locked</li></ul>
+    </div>
+    <div class="ba" data-step="1" data-fx="curtain" data-curtain="localhost:5173/menu/5">
+      <img src="../img/l30-dish.jpg" alt="Coq au Vin on its own page"><span class="ba__tag r">After today</span>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Press next: the blind rolls up on the dish page. Read its address aloud: /menu/5.</p></aside>
+</section>
+
+<!-- ============================== QUESTIONS ============================== -->
+
+<section class="slide" data-phase="questions" data-title="Questions from last time">
+  <div class="qa">
+    <div class="stack" style="--gap:26px">
+      <p class="eyebrow"><b>Apéritif</b> Before we start</p>
+      <h2 class="display">Questions from last time?</h2>
+      <p class="lead">Effects, dependencies, cleanups, custom hooks.</p>
+    </div>
+    <div class="qa-list">
+      <div class="qa-card" data-step="1"><span class="n">01</span><h3>When does <code>useEffect(fn, [category])</code> run?</h3>
+        <div class="reveal-box" data-reveal><button class="reveal-box__cover">[ show answer ]</button><p>After the first render, and after every render in which <code>category</code> changed.</p></div></div>
+      <div class="qa-card" data-step="2"><span class="n">02</span><h3>What is a cleanup for?</h3>
+        <div class="reveal-box" data-reveal><button class="reveal-box__cover">[ show answer ]</button><p>To cancel what the effect started: abort a request, clear a timer, remove a listener. It runs before the next effect and at the end.</p></div></div>
+      <div class="qa-card" data-step="3"><span class="n">03</span><h3>Do two components calling <code>useApi</code> share data?</h3>
+        <div class="reveal-box" data-reveal><button class="reveal-box__cover">[ show answer ]</button><p>No. Hooks share logic, not state. Each caller gets its own.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-phase="questions" data-title="Homework: show your v0.3">
+  <div class="split-7-5 fill items-center" style="gap:64px">
+    <div class="stack" style="--gap:22px">
+      <p class="eyebrow"><b>Homework check</b> Two volunteers, two minutes each</p>
+      <h2 class="h1">Show us your v0.3</h2>
+      <p class="lead">Open DevTools → Network. Click a category, type a search, press F5.</p>
+    </div>
+    <div class="done-when">
+      <p class="k">Look for</p>
+      <ul class="checks">
+        <li>Products from DummyJSON, no data file</li>
+        <li>A skeleton while loading, a message offline</li>
+        <li>One request per search, not per letter</li>
+        <li>The cart survives F5</li>
+        <li>No missing-dependency warnings</li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> End each demo by asking: "send me the link to one product". They can't. That's today's problem.</p></aside>
+</section>
+
+<!-- ============================== PROBLEM 1 ============================== -->
+
+<section class="slide" data-phase="problem" data-tone="dark" data-title="Send me the link to Coq au Vin">
+  <div class="problem-cover">
+    <div class="problem-cover__text">
+      <p class="eyebrow"><b>Entrée · Problem 1</b> Before the new tool</p>
+      <h2 class="display">“Send me<br>the link to<br>Coq au Vin.”</h2>
+      <p class="lead">A friend wants to see the dish before dinner. Our whole site lives at one address.</p>
+    </div>
+    <div class="problem-cover__photo"><img src="../img/photo-coq-au-vin.jpg" alt=""></div>
+  </div>
+</section>
+
+<section class="slide" data-phase="problem" id="onepage" data-title="One address for everything">
+  <p class="eyebrow"><b>Problem 1</b> Try it</p>
+  <h2 class="h2 mt-s">One address for everything</h2>
+  <div class="split" style="grid-template-columns:minmax(0,1fr) 500px;gap:44px;margin-top:26px">
+    <div class="browser">
+      <div class="browser__bar"><button type="button" id="op-back" aria-label="Back"><i data-icon="arrow-left"></i></button><span class="browser__url" id="op-url"><i data-icon="lock"></i>localhost:5173/</span><button type="button" id="op-copy" aria-label="Copy link"><i data-icon="copy"></i></button></div>
+      <div class="browser__page" id="op-page"></div>
+    </div>
+    <div class="stack" style="--gap:16px">
+      <div class="callout is-warn" data-step="1"><i data-icon="link"></i><div><p class="h4">Copy the link</p><p class="small muted mt-s">You get localhost:5173/: the home page, not the dish.</p></div></div>
+      <div class="callout is-bad" data-step="2"><i data-icon="arrow-left"></i><div><p class="h4">Press Back</p><p class="small muted mt-s">You leave Le Bistro instead of going back to the menu.</p></div></div>
+      <div class="callout is-bad" data-step="3"><i data-icon="refresh-cw"></i><div><p class="h4">Refresh</p><p class="small muted mt-s">You land on the home page again, not where you were.</p></div></div>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Click "View dish" on Coq au Vin: the content changes, the address doesn't. Click the copy icon: the link is the home page. Click Back: you leave the site. One press per callout to name each pain.</p></aside>
+</section>
+
+<section class="slide v-center" data-phase="problem" data-title="What would we need?">
+  <p class="eyebrow"><b>Problem 1</b> Your turn</p>
+  <h2 class="display mt-m" style="font-size:112px;max-width:1500px;color:var(--wine)">What would we need?</h2>
+  <div class="need">
+    <span class="chip" data-step="1" data-fx="pop">An address for every screen</span>
+    <span class="chip" data-step="2" data-fx="pop">Back and Forward that work</span>
+    <span class="chip" data-step="3" data-fx="pop">Change pages without reloading</span>
+    <span class="chip is-answer" data-step="4" data-fx="pop"><i data-icon="signpost"></i>That is routing</span>
+  </div>
+</section>
+
+<!-- ============================== SOLUTION 1 ============================== -->
+
+<section class="slide" data-phase="solution" id="matcher" data-title="The router reads the address">
+  <p class="eyebrow"><b>Plat · Solution 1</b> Type an address and press Enter</p>
+  <h2 class="h2 mt-s">The router reads the address, picks the page</h2>
+  <div class="matcher">
+    <div>
+      <div class="urlin"><input type="text" id="rt-input" value="/menu/5" data-keys-local aria-label="Address"><button class="btn is-wine" type="button" id="rt-go"><i data-icon="corner-down-right"></i>Go</button></div>
+      <div class="routes" id="rt-rows"></div>
+    </div>
+    <div class="stack" style="--gap:16px">
+      <p class="eyebrow"><b>Result</b></p>
+      <div class="params" id="rt-out">Press Go.</div>
+      <p class="small muted">Routes are checked against the address. <code>:id</code> matches any one segment and hands it to the page as a <b>param</b>. <code>*</code> catches everything else: the 404 page.</p>
+      <div class="row" style="--gap:8px"><button class="btn is-ghost no-caps" type="button" data-try="/">/</button><button class="btn is-ghost no-caps" type="button" data-try="/menu?category=drinks">/menu?category=drinks</button><button class="btn is-ghost no-caps" type="button" data-try="/kitchen">/kitchen</button><button class="btn is-ghost no-caps" type="button" data-try="/pizza">/pizza</button></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Press Go: the rows are checked one by one, the match turns green, and the param appears on the right. Try the four buttons.</p>
+    <p><b>Say:</b> React Router does exactly this on every click and every page load: it reads the address and renders the matching page component. The rest of the house stays.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" id="layout" data-title="One frame, many pages">
+  <p class="eyebrow"><b>Solution 1</b> Click the links in the frame</p>
+  <h2 class="h2 mt-s">One frame, many pages: <code style="font-size:.7em">&lt;Outlet /&gt;</code></h2>
+  <div class="split" style="grid-template-columns:minmax(0,1fr) 560px;gap:44px;margin-top:24px">
+    <div class="browser">
+      <div class="browser__bar"><button type="button" id="ly-back" aria-label="Back"><i data-icon="arrow-left"></i></button><span class="browser__url" id="ly-url"></span></div>
+      <div class="mhead"><div class="mhead__logo">Le Bistro<small>by IT Step</small></div><nav class="bnav" id="ly-nav"><button type="button" data-to="/">Home</button><button type="button" data-to="/menu">Menu</button><button type="button" data-to="/menu/5">Coq au Vin</button></nav></div>
+      <div class="browser__page" id="ly-page" style="min-height:330px;outline:3px dashed var(--brass-soft);outline-offset:-10px"></div>
+      <div class="bfoot"><span>Le Bistro</span><small>Open daily 12–23</small></div>
+    </div>
+    <div class="stack" style="--gap:16px">
+      <script type="text/plain" data-lang="tsx" data-file="src/layouts/SiteLayout.tsx" data-walk="1:4;2:6" style="--code-size:19px">
+        export function SiteLayout() {
+          return (
+            <>
+              <Header />
+              <main>
+                <Outlet />
+              </main>
+              <Footer />
+            </>
+          );
+        }
+      </script>
+      <div class="takeaway" data-step="2"><p class="k">The dashed hole</p><p>Header and Footer never change. <code>&lt;Outlet /&gt;</code> is where the current page goes.</p></div>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Click Home, Menu, Coq au Vin in the frame. The address changes, only the dashed area swaps, the header and footer stay. The Back arrow in the frame works.</p></aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="Recipe: install the router">
+  <p class="eyebrow"><b>Solution 1 · Recipe</b> Type it with me</p>
+  <h2 class="h3 mt-s">Install React Router and wrap the app</h2>
+  <div class="recipe">
+    <ol class="steps is-compact">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>Install it</b><span>One package: <code>react-router</code> (version 8).</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Wrap the app in BrowserRouter</b><span>It watches the address bar for the whole app.</span><span class="file-chip"><i data-icon="file-code"></i>src/main.tsx</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Make a pages folder</b><span>HomePage (Hero + Favourites), MenuPage (the old MenuSection).</span><span class="file-chip"><i data-icon="folder"></i>src/pages/</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="bash" data-file="terminal" data-build="1:1" style="--code-size:20px">
+        npm install react-router
+      </script>
+      <script type="text/plain" data-lang="tsx" data-file="src/main.tsx" data-copy data-build="2:3,9,11" style="--code-size:18px">
+        import { StrictMode } from "react";
+        import { createRoot } from "react-dom/client";
+        import { BrowserRouter } from "react-router";
+        import App from "./App.tsx";
+        import "./index.css";
+
+        createRoot(document.getElementById("root")!).render(
+          <StrictMode>
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </StrictMode>,
+        );
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Watch out:</b> old tutorials import from <code>react-router-dom</code>. Since version 7 everything is in <code>react-router</code>, and there is no <code>react-router-dom</code> for version 8: installing it adds a second, older router (7.x). Links from one don't see the BrowserRouter of the other.</p>
+    <p><b>Step 3:</b> HomePage is Hero + Favourites; MenuPage is the old MenuSection renamed. Copy both from <code>code/after-L30/src/pages/</code>.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="Recipe: the routes">
+  <p class="eyebrow"><b>Solution 1 · Recipe</b> The map of the house</p>
+  <h2 class="h3 mt-s">The routes in App</h2>
+  <div class="recipe">
+    <ol class="steps is-compact">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>Routes and a layout route</b><span>The layout wraps every page inside it.</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>The index page</b><span><code>index</code> = the address of the parent: <code>/</code>.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Paths</b><span>No leading slash inside a parent: <code>menu</code>, <code>menu/:id</code>.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>The catch-all</b><span><code>*</code> matches anything else: the 404 page.</span></li>
+      <li data-step="5" data-on="5-5:is-now;6:is-done"><b>SiteLayout with an Outlet</b><span>Header, the hole, Footer.</span><span class="file-chip"><i data-icon="file-code"></i>src/layouts/SiteLayout.tsx</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/App.tsx (structure: the cart props come next)" data-copy data-build="1:1,2,7,8;2:3;3:4,5;4:6" style="--code-size:19px">
+        <Routes>
+          <Route element={<SiteLayout />}>
+            <Route index element={<HomePage />} />
+            <Route path="menu" element={<MenuPage />} />
+            <Route path="menu/:id" element={<DishPage />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Route>
+        </Routes>
+      </script>
+      <div class="callout is-warn" data-step="5"><i data-icon="triangle-alert"></i><div><p class="h4">The pages still need the cart.</p><p class="small muted mt-s">In the real App every page gets <code>cart</code>, <code>onAdd</code>, <code>onChangeQty</code> as props (see <code>code/after-L30/src/App.tsx</code>). Remember how many: that's the problem of L31.</p></div></div>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Write the structure first, then add the cart props to HomePage, MenuPage and DishPage, and cart / onChangeQty / onRemove to SiteLayout, which passes them to Header. It's a lot of props: let the room notice it.</p></aside>
+</section>
+
+<section class="slide" id="avl" data-phase="solution" data-title="Link, not a">
+  <p class="eyebrow"><b>Solution 1</b> Click both, and watch the cart</p>
+  <h2 class="h2 mt-s"><code style="font-size:.8em">&lt;Link&gt;</code>, not <code style="font-size:.8em">&lt;a href&gt;</code></h2>
+  <div class="avl">
+    <div class="card"><h3 style="color:var(--bad)"><i data-icon="circle-x"></i>&lt;a href="/menu"&gt;</h3>
+      <div class="browser"><div class="browser__bar"><span class="browser__url" id="av-url-a">localhost:5173/</span></div><div class="browser__page" id="av-page-a"></div></div>
+      <div class="row" style="--gap:10px"><button class="btn is-ghost no-caps" type="button" data-av="add-a"><i data-icon="plus"></i>Add a dish</button><button class="btn is-wine no-caps" type="button" data-av="go-a"><i data-icon="link"></i>Go to /menu</button></div>
+      <p class="small muted">The browser loads the whole site again: a white flash, and all state in memory starts over.</p></div>
+    <div class="card"><h3 style="color:var(--good)"><i data-icon="circle-check"></i>&lt;Link to="/menu"&gt;</h3>
+      <div class="browser"><div class="browser__bar"><span class="browser__url" id="av-url-b">localhost:5173/</span></div><div class="browser__page" id="av-page-b"></div></div>
+      <div class="row" style="--gap:10px"><button class="btn is-ghost no-caps" type="button" data-av="add-b"><i data-icon="plus"></i>Add a dish</button><button class="btn is-wine no-caps" type="button" data-av="go-b"><i data-icon="link"></i>Go to /menu</button></div>
+      <p class="small muted">The router changes the address and swaps the page. No reload, state kept.</p></div>
+  </div>
+  <script type="text/plain" data-lang="tsx" data-file="Header.tsx: NavLink knows if it is the current page" data-step="1" style="--code-size:17px;margin-top:22px">
+    <NavLink to="/menu" className={({ isActive }) => (isActive ? "nav-link-on" : "nav-link")}>Menu</NavLink>
+  </script>
+  <aside class="notes">
+    <p><b>Do:</b> Add two dishes on both sides (in the deck, the left cart lives in memory, like useState). Click "Go to /menu": the left side flashes white and its cart resets; the right side keeps it.</p>
+    <p><b>Step 1:</b> NavLink is a Link that knows whether it points at the current page, to underline the active menu item.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="Recipe: the dish page">
+  <p class="eyebrow"><b>Solution 1 · Recipe</b> A page with a param</p>
+  <h2 class="h3 mt-s">Coq au Vin at <code>/menu/5</code></h2>
+  <div class="recipe">
+    <ol class="steps is-compact">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>Read the param</b><span><code>useParams()</code> gives <code>{ id: "5" }</code>. A string, always.</span><span class="file-chip"><i data-icon="file-code"></i>src/pages/DishPage.tsx</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Find the dish</b><span>The API has no "one dish" endpoint: load the menu, find by <code>Number(id)</code>.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Loading, error, not found</b><span>A wrong id like <code>/menu/999</code> shows the 404 page.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Link the cards to it</b><span>The photo and the name in DishCard become Links.</span><span class="file-chip"><i data-icon="file-code"></i>DishCard.tsx</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/pages/DishPage.tsx (top)" data-copy data-build="1:1,2;2:3,8;3:5,6,9" style="--code-size:17px">
+        export function DishPage({ cart, onAdd, onChangeQty }: DishPageProps) {
+          const { id } = useParams(); // from the URL /menu/5. Always a string: "5"
+          const { data, error, loading } = useApi<Dish[]>("/api/v1/enterprise/dishes");
+
+          if (loading) return <p className="status">Loading…</p>;
+          if (error) return <p className="status">We couldn't load this dish.</p>;
+
+          const dish = data?.find((d) => d.id === Number(id));
+          if (!dish) return <NotFoundPage />;
+          // … the page: photo, name, price, Add to cart, "Goes well with"
+      </script>
+      <script type="text/plain" data-lang="tsx" data-file="src/components/DishCard.tsx (the name)" data-build="4:1-3" style="--code-size:17px">
+        <h3 className="card__title">
+          <Link to={`/menu/${dish.id}`}>{dish.name}</Link>
+          …
+      </script>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Copy the rest of DishPage (the JSX) from <code>code/after-L30</code>. Then click a card's name: the address changes to /menu/5, Back returns to the menu. Copy the address, open it in a new tab: it works. Problem 1 solved.</p></aside>
+</section>
+
+<section class="slide" id="sp" data-phase="solution" data-title="State in the address">
+  <p class="eyebrow"><b>Solution 1</b> Click the chips, then Back</p>
+  <h2 class="h2 mt-s">Filters in the address: <code style="font-size:.7em">useSearchParams</code></h2>
+  <div class="split" style="grid-template-columns:minmax(0,1fr) 640px;gap:40px;margin-top:24px">
+    <div class="browser">
+      <div class="browser__bar"><button type="button" id="sp-back" aria-label="Back"><i data-icon="arrow-left"></i></button><span class="browser__url" id="sp-url"></span><button type="button" id="sp-copy" aria-label="Copy link"><i data-icon="copy"></i></button></div>
+      <div class="bpage"><div class="mchips" id="sp-chips"></div><div class="mgrid" id="sp-grid"></div></div>
+    </div>
+    <div class="stack" style="--gap:16px">
+      <script type="text/plain" data-lang="tsx" data-file="src/pages/MenuPage.tsx" data-copy data-walk="1:1;2:2,3;3:5-7" style="--code-size:17px">
+        const [params, setParams] = useSearchParams();
+        const category = params.get("category") ?? "all";
+        const query = params.get("q") ?? "";
+
+        function selectCategory(slug: string) {
+          setParams(slug === "all" ? {} : { category: slug });
+        }
+      </script>
+      <div class="takeaway" data-step="4"><p class="k">Where does this state live?</p><p>In the URL. It survives F5, it can be shared, and Back undoes it. <code>useState</code> for category and query is gone.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Click Drinks, then Desserts. The address changes each time. Press Back in the frame: Drinks again. Copy the link: it opens the same filter.</p>
+    <p><b>Typing:</b> for the search box we pass <code>{ replace: true }</code>, so each letter replaces the history entry instead of adding one.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="Refresh on Vercel: 404">
+  <div class="idea" style="grid-template-columns:minmax(0,1fr) 700px;gap:48px">
+    <div class="schema" data-wire-sides="r l" style="width:860px;height:540px">
+      <div class="node lg" id="v-browser" style="left:0;top:150px">Browser<small>F5 on /menu/5</small></div>
+      <div class="node lg" id="v-vercel" style="left:250px;top:150px">Vercel<small>looks for a file /menu/5</small></div>
+      <div class="node lg is-bad" id="v-404" style="left:690px;top:30px" data-step="1">404<small>no such file</small></div>
+      <div class="node lg" id="v-rule" style="left:200px;top:390px" data-step="2">vercel.json rewrite<small>anything else → /index.html</small></div>
+      <div class="node lg is-good" id="v-app" style="left:600px;top:390px" data-step="3">React Router<small>reads /menu/5 → DishPage</small></div>
+      <b class="wire" data-from="v-browser" data-to="v-vercel"></b>
+      <b class="wire is-bad" data-from="v-vercel" data-to="v-404" data-step="1"></b>
+      <b class="wire is-good" data-from="v-vercel" data-to="v-rule" data-sides="b t" data-step="2"></b>
+      <b class="wire is-good" data-from="v-rule" data-to="v-app" data-step="3"></b>
+    </div>
+    <div class="idea__side">
+      <p class="eyebrow"><b>Solution 1</b> One file fixes it</p>
+      <h2 class="h2">Refresh on Vercel: 404</h2>
+      <script type="text/plain" data-lang="json" data-file="vercel.json" data-step="2" data-copy style="--code-size:15px">
+        {
+          "$schema": "https://openapi.vercel.sh/vercel.json",
+          "rewrites": [
+            {
+              "source": "/api/:path*",
+              "destination": "https://srmsapi.stepacademy.ge/api/:path*"
+            },
+            { "source": "/(.*)", "destination": "/index.html" }
+          ]
+        }
+      </script>
+      <p class="small muted" data-step="3">The first rule is the production twin of Vite's proxy: the deployed site asks Vercel for /api/…, Vercel asks the API.</p>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Say:</b> In development Vite serves index.html for every address. Vercel serves files; there is no file called /menu/5. The rewrite says "if there's no such file, send index.html", and the router takes over in the browser. Students need only the second rule (DummyJSON has no CORS problem).</p></aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="When routing goes wrong">
+  <p class="eyebrow"><b>Solution 1</b> The errors you will see today</p>
+  <h2 class="h2 mt-s">When routing goes wrong</h2>
+  <div class="mistakes">
+    <div class="mistake" data-step="1"><h4>A Link outside the router</h4><div class="bad">&lt;App /&gt; without &lt;BrowserRouter&gt; in main.tsx</div><div class="err">useHref() may be used only in the context of a &lt;Router&gt; component.</div><div class="good">&lt;BrowserRouter&gt;&lt;App /&gt;&lt;/BrowserRouter&gt;</div></div>
+    <div class="mistake" data-step="2"><h4>The layout forgot its Outlet</h4><div class="bad">&lt;Header /&gt;&lt;main&gt;&lt;/main&gt;&lt;Footer /&gt;</div><div class="err">Header and Footer appear, every page is empty.</div><div class="good">&lt;main&gt;&lt;Outlet /&gt;&lt;/main&gt;</div></div>
+    <div class="mistake" data-step="3"><h4>A param compared as a number</h4><div class="bad">data.find((d) =&gt; d.id === id)</div><div class="err">Always "not found": 5 === "5" is false.</div><div class="good">data.find((d) =&gt; d.id === Number(id))</div></div>
+    <div class="mistake" data-step="4"><h4>The old import</h4><div class="bad">import { Link } from "react-router-dom";</div><div class="err">Cannot find module 'react-router-dom'</div><div class="good">import { Link } from "react-router";</div></div>
+  </div>
+</section>
+
+<section class="slide" data-phase="solution" data-title="Which route matches?">
+  <div class="split-5-7 fill items-center">
+    <div class="stack" style="--gap:24px">
+      <p class="eyebrow"><b>Quick check</b> The router's eyes</p>
+      <h2 class="h1">Which page opens <code style="font-size:.7em">/menu/drinks</code>?</h2>
+    </div>
+    <div class="quiz" data-quiz>
+      <div class="quiz__opts">
+        <button class="quiz__opt">MenuPage, filtered to drinks</button>
+        <button class="quiz__opt" data-correct>DishPage, with <code>id = "drinks"</code></button>
+        <button class="quiz__opt">NotFoundPage</button>
+        <button class="quiz__opt">An error</button>
+      </div>
+      <p class="quiz__explain"><code>menu/:id</code> matches any one segment after /menu. DishPage then can't find a dish with that id and shows the 404 page itself. Filters belong in the query: <code>/menu?category=drinks</code>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== CLASSWORK 1 ============================== -->
+
+<section class="slide" data-phase="classwork" data-title="Classwork 1: your pages">
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Atelier · Classwork 1</b> 15 minutes, on your own project</p><h2 class="h1">Your pages</h2></div>
+    <div class="timer" data-timer="900"></div>
+  </div>
+  <div class="cw">
+    <div class="tiers">
+      <div class="tier base"><div class="tier__k"><span>Base</span><span>everyone</span></div><h3>Routes and a layout</h3>
+        <ul><li><code>npm install react-router</code>, <code>&lt;BrowserRouter&gt;</code> in main.tsx.</li><li>A layout with Header, <code>&lt;Outlet /&gt;</code>, Footer.</li><li>Routes: <code>/</code> (home), <code>/products</code>, <code>*</code> (404). NavLinks in the Header.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Plus</span><span>most of you</span></div><h3>A product page</h3>
+        <ul><li><code>/products/:id</code> with <code>useParams</code> and <code>https://dummyjson.com/products/{id}</code>.</li><li>Cards link to it.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Pro</span><span>fast finishers</span></div><h3>Filters in the URL</h3>
+        <ul><li>The category lives in <code>?category=</code> with <code>useSearchParams</code>.</li></ul></div>
+    </div>
+    <div class="cw__side">
+      <div class="done-when"><p class="k">Done when</p><ul class="checks"><li>Every page has its own address</li><li>Back and Forward work</li><li>No full reload when you click a link</li><li>A wrong address shows your 404</li></ul></div>
+      <div class="hint" data-peek="click for a hint"><div><p class="k">Stuck?</p><pre>&lt;Routes&gt;
+  &lt;Route element={&lt;Layout /&gt;}&gt;
+    &lt;Route index element={&lt;Home /&gt;} /&gt;
+    &lt;Route path="products" element={&lt;Products /&gt;} /&gt;
+    &lt;Route path="*" element={&lt;NotFound /&gt;} /&gt;
+  &lt;/Route&gt;
+&lt;/Routes&gt;</pre></div></div>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Watch for:</b> <code>react-router-dom</code> imports, <code>&lt;a href&gt;</code> left in the Header, a missing Outlet, and <code>path="/products"</code> with a leading slash inside the layout (it works, but be consistent).</p></aside>
+</section>
+
+<!-- ============================== BREAK ============================== -->
+
+<section class="slide" data-phase="break" data-tone="dark" data-title="Pause café">
+  <div class="pause">
+    <div class="stack" style="--gap:28px">
+      <p class="eyebrow"><b>Pause café</b> 10 minutes</p>
+      <h2 class="display">Pause café</h2>
+      <p class="lead">After the break: some doors are for the staff only.</p>
+      <button class="pause__btn" type="button" data-start-break><i data-icon="coffee"></i>Start the break</button>
+    </div>
+    <div class="cup" aria-hidden="true"><span class="cup__steam"></span><span class="cup__steam"></span><span class="cup__steam"></span><div class="cup__plate"></div><div class="cup__body"></div><div class="cup__coffee"></div><div class="cup__handle"></div></div>
+  </div>
+</section>
+
+<!-- ============================== PROBLEM 2 ============================== -->
+
+<section class="slide" data-phase="problem2" data-tone="dark" data-title="Staff only">
+  <div class="problem-cover">
+    <div class="problem-cover__text">
+      <p class="eyebrow"><b>Second plat · Problem 2</b> Every page now has an address</p>
+      <h2 class="display">Staff<br>only.</h2>
+      <p class="lead">Anyone can type /kitchen into the address bar. Guests must not see the kitchen's queue, and your account page is yours alone.</p>
+    </div>
+    <div class="problem-cover__photo"><img src="../img/photo-tarte-tatin.jpg" alt=""></div>
+  </div>
+</section>
+
+<section class="slide" data-phase="problem2" data-title="Who may open which door?">
+  <p class="eyebrow"><b>Problem 2</b> The house rules</p>
+  <h2 class="h2 mt-s">Who may open which door?</h2>
+  <table class="doors">
+    <thead><tr><th>Page</th><th>Guest</th><th>Student · signed in</th><th>Kitchen · Waiter</th></tr></thead>
+    <tbody>
+      <tr data-step="1"><td>/menu, /menu/5<small>public</small></td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+      <tr data-step="2"><td>/account<small>any signed-in user</small></td><td class="no">✗ → /login</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+      <tr data-step="3"><td>/kitchen<small>staff only</small></td><td class="no">✗ → /login</td><td class="no">✗ → /forbidden</td><td class="yes">✓</td></tr>
+    </tbody>
+  </table>
+  <div class="need" style="margin-top:34px">
+    <span class="chip" data-step="4" data-fx="pop">Know who is signed in</span>
+    <span class="chip" data-step="5" data-fx="pop">Send guests to the login, then back</span>
+    <span class="chip" data-step="6" data-fx="pop">Check the role</span>
+    <span class="chip is-answer" data-step="7" data-fx="pop"><i data-icon="shield-check"></i>Login and guards</span>
+  </div>
+  <aside class="notes"><p><b>Say:</b> The real Le Bistro API has four kinds of accounts: admin, waiter, kitchen and student (a guest who registered). The order queue is for waiters and the kitchen only, so our guard lets exactly those two roles in. Admins have their own pages on the real site; we don't build them.</p>
+    <p><b>Test accounts</b> (published on the API's Swagger page): kitchen@itstep.ge / Kitchen123!, student@itstep.ge / Student123!.</p></aside>
+</section>
+
+<!-- ============================== SOLUTION 2 ============================== -->
+
+<section class="slide" data-phase="solution2" data-title="How a login works">
+  <p class="eyebrow"><b>Solution 2</b> Press next, one message at a time</p>
+  <h2 class="h2 mt-s">How a login works</h2>
+  <div class="seq">
+    <div class="seq__actor">LoginPage<small>in the browser</small></div>
+    <div class="seq__actor is-api">Le Bistro API<small>srmsapi.stepacademy.ge</small></div>
+    <div class="seq__msg is-out" data-step="1" data-fx="left"><p class="seq__head"><span class="seq__n">1</span>POST /api/v1/auth/login</p><i class="seq__line"></i><p class="seq__sub">body: { email, password }</p></div>
+    <div class="seq__msg is-back" data-step="2" data-fx="right"><p class="seq__head">200 { accessToken: "eyJhb…" }<span class="seq__n">2</span></p><i class="seq__line"></i><p class="seq__sub">the password was right · the token lives 2 minutes</p></div>
+    <div class="seq__msg is-out" data-step="3" data-fx="left"><p class="seq__head"><span class="seq__n">3</span>GET /api/v1/auth/me</p><i class="seq__line"></i><p class="seq__sub">header: Authorization: Bearer eyJhb…</p></div>
+    <div class="seq__msg is-back" data-step="4" data-fx="right"><p class="seq__head">200 { displayName, role: "Kitchen" }<span class="seq__n">4</span></p><i class="seq__line"></i><p class="seq__sub">who the token belongs to</p></div>
+    <div class="seq__note" data-step="5" data-fx="pop"><span class="seq__n">5</span><div>session = { token, user }<small>saved in localStorage · then navigate(from)</small></div></div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> The token is a wristband. The API gives it once, after checking the password. From then on every protected request shows the wristband in the Authorization header. We never store the password.</p>
+    <p><b>The trap:</b> this API's tokens live 2 minutes, on purpose. After that, every protected request answers 401.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Recipe: the login page">
+  <p class="eyebrow"><b>Solution 2 · Recipe</b> The form's submit handler</p>
+  <h2 class="h3 mt-s">The login page</h2>
+  <div class="recipe">
+    <ol class="steps is-compact">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>Stop the browser's own submit</b><span><code>e.preventDefault()</code>: no page reload.</span><span class="file-chip"><i data-icon="file-code"></i>src/pages/LoginPage.tsx</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Ask for a token</b><span>POST the email and password.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Ask who we are</b><span>The token in the header, the role in the answer.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Save the session, go back</b><span>To the page the guest wanted (<code>from</code>), replacing the login in history.</span></li>
+      <li data-step="5" data-on="5-5:is-now;6:is-done"><b>A friendly error</b><span>And the button disabled while we wait.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/pages/LoginPage.tsx (the handler)" data-copy data-build="1:1-4;2:5-9;3:10;4:11-15;5:16-21" style="--code-size:15px">
+        async function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
+          e.preventDefault();
+          setBusy(true);
+          setError("");
+          try {
+            const auth = await api<AuthResponse>("/api/v1/auth/login", {
+              method: "POST",
+              body: JSON.stringify({ email, password }),
+            });
+            const me = await api<UserProfile>("/api/v1/auth/me", {}, auth.accessToken);
+            onLogin({
+              token: auth.accessToken,
+              user: { email: me.email ?? email, displayName: me.displayName, role: toRole(me.role) },
+            });
+            navigate(from, { replace: true });
+          } catch {
+            setError("That email and password don't match. Try again.");
+          } finally {
+            setBusy(false);
+          }
+        }
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Copy LoginPage.tsx from <code>code/after-L30</code> (the form JSX is two controlled inputs, known from L28) and walk through the handler step by step.</p>
+    <p><b>api() with a token:</b> lib/api.ts now takes a third argument and sets <code>Authorization: Bearer …</code>. Copy the new version.</p>
+    <p><b>SubmitEvent:</b> React 19.2+ types use <code>SubmitEvent</code>; older tutorials show <code>FormEvent</code> (deprecated).</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Recipe: the session in App">
+  <p class="eyebrow"><b>Solution 2 · Recipe</b> Who is signed in?</p>
+  <h2 class="h3 mt-s">The session in App, the name in the Header</h2>
+  <div class="recipe">
+    <ol class="steps is-compact">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>A session state that survives F5</b><span><code>null</code> = a guest. Our hook from L29.</span><span class="file-chip"><i data-icon="file-code"></i>src/App.tsx</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Login and logout are setters</b><span>LoginPage gets <code>setSession</code>, Header gets <code>logout</code>.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>The Header changes with it</b><span>"Log in" for guests; the name and "Sign out" for users; "Kitchen" for staff.</span><span class="file-chip"><i data-icon="file-code"></i>Header.tsx</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/App.tsx" data-build="1:1-2;2:4,6" style="--code-size:16px">
+        // Kept in localStorage for this course. Next.js moves it into httpOnly cookies.
+        const [session, setSession] = useLocalStorage<Session | null>("bistro.session", null);
+
+        const logout = () => setSession(null);
+
+        <Route path="login" element={<LoginPage onLogin={setSession} />} />
+      </script>
+      <script type="text/plain" data-lang="tsx" data-file="src/components/Header.tsx (excerpt)" data-build="3:1-11" style="--code-size:16px">
+        const isStaff = session?.user.role === "kitchen" || session?.user.role === "waiter";
+
+        {isStaff && <NavLink to="/kitchen" className={navClass}>Kitchen</NavLink>}
+        {session && (
+          <NavLink to="/account" className={navClass}>{session.user.displayName ?? "Account"}</NavLink>
+        )}
+        {session ? (
+          <button type="button" className="btn-outline" onClick={signOut}>Sign out</button>
+        ) : (
+          <Link to="/login" className="btn-outline">Log in</Link>
+        )}
+      </script>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Pass <code>session</code> and <code>logout</code> to SiteLayout, which passes them to Header. Copy the final Header from <code>code/after-L30</code>. Sign in with a test account from the Swagger page: the Header changes.</p></aside>
+</section>
+
+<section class="slide" id="doorman" data-phase="solution2" data-title="The guard is a doorman">
+  <p class="eyebrow"><b>Solution 2</b> Pick a visitor and a door</p>
+  <h2 class="h2 mt-s">The guard is a doorman</h2>
+  <div class="door">
+    <div class="pick">
+      <p>Visitor</p><div class="seg" id="dm-who"><button type="button" class="is-on" data-v="guest">Guest</button><button type="button" data-v="student">Student</button><button type="button" data-v="kitchen">Kitchen</button></div>
+      <p style="margin-top:12px">Door</p><div class="seg" id="dm-door"><button type="button" class="is-on" data-v="/account">/account</button><button type="button" data-v="/kitchen">/kitchen</button></div>
+      <button class="btn is-wine" type="button" id="dm-go" style="margin-top:18px;align-self:flex-start"><i data-icon="door-open"></i>Knock</button>
+      <div class="params" id="dm-out" style="margin-top:8px;min-height:110px">Pick, then knock.</div>
+    </div>
+    <div class="schema" style="width:1100px;height:600px">
+      <div class="node lg" id="dm-start" style="left:0;top:240px">&lt;RequireAuth&gt;</div>
+      <div class="node lg" id="dm-q1" style="left:300px;top:110px">session?</div>
+      <div class="node lg" id="dm-q2" style="left:300px;top:380px">role allowed?</div>
+      <div class="node lg" id="dm-login" style="left:720px;top:20px">&lt;Navigate to="/login" /&gt;<small>remembers where you wanted to go</small></div>
+      <div class="node lg" id="dm-forb" style="left:720px;top:250px">&lt;Navigate to="/forbidden" /&gt;</div>
+      <div class="node lg" id="dm-ok" style="left:720px;top:460px">&lt;Outlet /&gt;<small>the page opens</small></div>
+      <b class="wire" data-from="dm-start" data-to="dm-q1" data-sides="r l"></b>
+      <b class="wire is-bad" data-from="dm-q1" data-to="dm-login" data-sides="r l" data-label="no" data-ly="-12"></b>
+      <b class="wire is-good" data-from="dm-q1" data-to="dm-q2" data-sides="b t" data-label="yes" data-lx="30"></b>
+      <b class="wire is-bad" data-from="dm-q2" data-to="dm-forb" data-sides="r l" data-label="no" data-ly="-12"></b>
+      <b class="wire is-good" data-from="dm-q2" data-to="dm-ok" data-sides="r l" data-label="yes" data-ly="-12"></b>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Guest + /account → login. Student + /kitchen → forbidden. Kitchen + /kitchen → the page. The path lights up through the flow each time.</p></aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Recipe: RequireAuth">
+  <p class="eyebrow"><b>Solution 2 · Recipe</b> The doorman as a component</p>
+  <h2 class="h3 mt-s"><code>RequireAuth</code> and the locked routes</h2>
+  <div class="recipe">
+    <ol class="steps is-compact">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>A guest? To the login</b><span><code>&lt;Navigate&gt;</code> redirects while rendering. <code>state.from</code> remembers the door.</span><span class="file-chip"><i data-icon="file-code"></i>src/routes/RequireAuth.tsx</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>The wrong role? Forbidden</b><span><code>roles</code> is optional: leave it out for "any signed-in user".</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Otherwise, the page</b><span><code>&lt;Outlet /&gt;</code>: the guard is a layout route.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Wrap the routes</b><span>One guard per kind of door.</span><span class="file-chip"><i data-icon="file-code"></i>src/App.tsx</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/routes/RequireAuth.tsx" data-copy data-build="1:1,2,4,5,7,8,10,11,13-15;2:16-18;3:19,20" style="--code-size:15px">
+        type RequireAuthProps = {
+          session: Session | null;
+          roles?: Role[]; // leave out: any signed-in user may enter
+        };
+
+        // A sign on the door, not a lock: the API checks the token and the role again.
+        export function RequireAuth({ session, roles }: RequireAuthProps) {
+          const location = useLocation();
+
+          if (session === null) {
+            return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+          }
+          if (roles && !roles.includes(session.user.role)) {
+            return <Navigate to="/forbidden" replace />;
+          }
+          return <Outlet />;
+        }
+      </script>
+      <script type="text/plain" data-lang="tsx" data-file="src/App.tsx (inside the layout route)" data-build="4:1-6" style="--code-size:15px">
+        <Route element={<RequireAuth session={session} />}>
+          <Route path="account" element={session && <AccountPage session={session} onExpired={logout} />} />
+        </Route>
+        <Route element={<RequireAuth session={session} roles={["kitchen", "waiter"]} />}>
+          <Route path="kitchen" element={session && <KitchenPage session={session} onExpired={logout} />} />
+        </Route>
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Note:</b> the build steps reveal the file out of order on purpose (the type at step 1 includes <code>roles</code>, used at step 2). Copy the full file with the button, or from <code>code/after-L30</code>.</p>
+    <p><b>Copy AccountPage and KitchenPage</b> from <code>code/after-L30/src/pages/</code>: both use <code>useApi(path, session.token)</code>.</p>
+    <p><b>Test:</b> as a guest open /kitchen → the login. Sign in as kitchen@itstep.ge → you land on /kitchen, because LoginPage navigates to <code>from</code>.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="The 2-minute token">
+  <div class="split-7-5 fill items-center" style="gap:56px">
+    <div class="stack" style="--gap:16px">
+      <div class="devtools"><div class="devtools__head"><span>Console</span><b>Network</b></div><div class="devtools__body" style="min-height:0">
+        <div class="netlist">
+          <div class="netrow" data-step="1"><span>POST</span><span>/api/v1/auth/login</span><span class="st">200</span><span>14:02</span></div>
+          <div class="netrow" data-step="1"><span>GET</span><span>/api/v1/profile</span><span class="st">200</span><span>14:02</span></div>
+          <div class="netrow" data-step="2"><span>GET</span><span>/api/v1/profile</span><span class="st">200</span><span>14:03</span></div>
+          <div class="netrow" data-step="3"><span>GET</span><span>/api/v1/profile</span><span class="st bad">401</span><span>14:05</span></div>
+          <div class="devtools__line is-err" data-step="3">response header · X-Token-Expired: true</div>
+        </div></div></div>
+      <script type="text/plain" data-lang="tsx" data-file="AccountPage.tsx: a 401 has its own message" data-step="4" style="--code-size:16px">
+        {error?.status === 401 && (
+          <div className="notice">
+            <p>{error.message}</p>   {/* "Your session has ended — please sign in again." */}
+            <button type="button" className="btn" onClick={onExpired}>Sign in again</button>
+          </div>
+        )}
+      </script>
+    </div>
+    <div class="stack" style="--gap:20px">
+      <p class="eyebrow"><b>Solution 2</b> The API's trap</p>
+      <h2 class="h2">The 2-minute token</h2>
+      <p class="lead">Tokens of this API live 2 minutes, on purpose. Then every protected request answers 401.</p>
+      <div class="takeaway" data-step="4"><p class="k">Our answer</p><p>Show it kindly. "Sign in again" clears the session; the guard sends the guest to the login, which brings them back.</p></div>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Sign in, open My account, wait two minutes, open it again: 401 and the message. Real apps refresh the token silently (POST /auth/refresh); that is a later topic.</p></aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="A sign on the door, not a lock">
+  <p class="eyebrow"><b>Solution 2</b> The most important security sentence of the course</p>
+  <h2 class="h2 mt-s">A guard is a sign on the door, not a lock</h2>
+  <div class="lock">
+    <div class="card" data-step="1"><h3><i data-icon="signpost"></i>The guard (React)</h3><p>Hides pages from people who shouldn't see them. Nice for users. But the code runs in their browser: anyone can open DevTools and change it.</p></div>
+    <div class="card" data-step="2"><h3><i data-icon="lock"></i>The lock (the API)</h3><p>Checks the token and the role on <b>every</b> request: 401 without a valid token, 403 with the wrong role. That is the real protection.</p></div>
+  </div>
+  <div class="split-7-5 mt-l" style="gap:28px;align-items:stretch">
+    <div class="devtools" data-step="3"><div class="devtools__head"><b>Console</b><span>signed in as a student · try it</span></div><div class="devtools__body" style="min-height:0">
+      <div class="devtools__line is-dim">// change my role by hand</div>
+      <div class="devtools__line">&gt; const s = JSON.parse(localStorage["bistro.session"]);</div>
+      <div class="devtools__line">&gt; s.user.role = "kitchen"; localStorage["bistro.session"] = JSON.stringify(s);</div>
+      <div class="devtools__line is-ok" data-step="4">✓ F5 on /kitchen: the page opens. The sign let me in.</div>
+      <div class="devtools__line is-err" data-step="5">✗ GET /api/v1/enterprise/orders/queue 403 (Forbidden). The lock held.</div>
+    </div></div>
+    <div class="callout is-warn" data-step="6"><i data-icon="shield-alert"></i><div><p class="h4">Never put a secret in React code.</p><p class="small muted mt-s">No admin passwords, no API keys, no "if (password === 'chef123')". Everything in the bundle is public.</p></div></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Steps 3–5 can be done live: sign in with a student account, run the two lines in the Console, press F5 on /kitchen. The page frame opens (React believed localStorage), but the queue request answers 403 because the token still says "student".</p>
+    <p><b>Say:</b> The token is signed by the API. Nobody can change the role inside it without breaking the signature.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="The house at the end of today">
+  <p class="eyebrow"><b>Solution 2</b> Le Bistro, version 0.4</p>
+  <h2 class="h2 mt-s">The house at the end of today</h2>
+  <div class="shots3">
+    <figure class="shot" data-step="1"><div class="shot__bar"><i></i><i></i><i></i><span class="shot__url">…/<b>menu/5</b></span></div><div class="shot__body"><img src="../img/l30-dish.jpg" alt="Dish page"></div></figure>
+    <figure class="shot" data-step="2"><div class="shot__bar"><i></i><i></i><i></i><span class="shot__url">…/<b>login</b></span></div><div class="shot__body"><img src="../img/l30-login.jpg" alt="Login page"></div></figure>
+    <figure class="shot" data-step="3"><div class="shot__bar"><i></i><i></i><i></i><span class="shot__url">…/<b>forbidden</b></span></div><div class="shot__body"><img src="../img/l30-403.jpg" alt="Staff only page"></div></figure>
+  </div>
+  <p class="small muted mt-m" data-step="4">Full code: <code>bistro-track/code/after-L30</code>. Deploy it to Vercel: <code>vercel.json</code> is included.</p>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Auth mistakes">
+  <p class="eyebrow"><b>Solution 2</b> The bugs of the second half</p>
+  <h2 class="h2 mt-s">When auth goes wrong</h2>
+  <div class="mistakes">
+    <div class="mistake" data-step="1"><h4>Redirect without replace</h4><div class="bad">&lt;Navigate to="/login" /&gt;</div><div class="err">Back from the login goes to /kitchen, which redirects to the login again: a loop.</div><div class="good">&lt;Navigate to="/login" replace /&gt;</div></div>
+    <div class="mistake" data-step="2"><h4>Storing the password</h4><div class="bad">localStorage.setItem("password", password)</div><div class="err">Anyone with the laptop, or any script on the page, can read it.</div><div class="good">Store the token. Never the password.</div></div>
+    <div class="mistake" data-step="3"><h4>A secret in the frontend</h4><div class="bad">if (code === "kitchen2026") setStaff(true)</div><div class="err">The code is in the JavaScript bundle. It's public.</div><div class="good">Roles come from the API: GET /auth/me</div></div>
+    <div class="mistake" data-step="4"><h4>Forgetting the token</h4><div class="bad">useApi("/api/v1/profile")</div><div class="err">401 Unauthorized, even when signed in.</div><div class="good">useApi("/api/v1/profile", session.token)</div></div>
+  </div>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Where does the guest land?">
+  <div class="split-5-7 fill items-center">
+    <div class="stack" style="--gap:24px">
+      <p class="eyebrow"><b>Quick check</b> The doorman</p>
+      <h2 class="h1">A guest types <code style="font-size:.7em">/kitchen</code>. Where do they land?</h2>
+    </div>
+    <div class="quiz" data-quiz>
+      <div class="quiz__opts">
+        <button class="quiz__opt">On the kitchen page, but empty</button>
+        <button class="quiz__opt" data-correct>On /login, and after signing in on /kitchen</button>
+        <button class="quiz__opt">On /forbidden</button>
+        <button class="quiz__opt">On the 404 page</button>
+      </div>
+      <p class="quiz__explain">No session → the first check sends them to /login with <code>from: "/kitchen"</code>. After a staff login they go back there. A signed-in student would get /forbidden instead.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== CLASSWORK 2 ============================== -->
+
+<section class="slide" data-phase="classwork2" data-title="Classwork 2: a login and a locked page">
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Atelier · Classwork 2</b> 15 minutes, on your own project</p><h2 class="h1">A login and a locked page</h2></div>
+    <div class="timer" data-timer="900"></div>
+  </div>
+  <div class="cw">
+    <div class="tiers">
+      <div class="tier base"><div class="tier__k"><span>Base</span><span>everyone</span></div><h3>Login with DummyJSON</h3>
+        <ul><li>A <code>/login</code> page: POST <code>https://dummyjson.com/auth/login</code> with <code>{ username, password }</code>.</li><li>Save <code>{ token, user }</code> with <code>useLocalStorage</code>. The Header shows the name.</li><li>Test user: <code>emilys</code> / <code>emilyspass</code>.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Plus</span><span>most of you</span></div><h3>A locked /profile</h3>
+        <ul><li><code>RequireAuth</code> around <code>/profile</code>. It shows <code>GET /auth/me</code> with the token.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Pro</span><span>fast finishers</span></div><h3>An admin door</h3>
+        <ul><li><code>/admin</code> only for <code>role === "admin"</code> (DummyJSON users have a role).</li></ul></div>
+    </div>
+    <div class="cw__side">
+      <div class="done-when"><p class="k">Done when</p><ul class="checks"><li>Login, then F5: still signed in</li><li>A guest on /profile lands on /login</li><li>After the login they go back to /profile</li><li>Sign out clears the session</li></ul></div>
+      <div class="hint" data-peek="click for a hint"><div><p class="k">Stuck?</p><pre>fetch("https://dummyjson.com/auth/login", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ username, password }),
+})</pre></div></div>
+    </div>
+  </div>
+  <aside class="notes"><p><b>DummyJSON auth:</b> the answer is <code>{ accessToken, refreshToken, id, username, firstName, … }</code>. <code>GET /auth/me</code> with <code>Authorization: Bearer &lt;token&gt;</code> returns the user, including <code>role</code> ("admin", "moderator" or "user"). Users with role "user": averyp / averyppass.</p></aside>
+</section>
+
+<!-- ============================== WRAP-UP ============================== -->
+
+<section class="slide" data-phase="wrap" data-title="Two problems, two tools">
+  <p class="eyebrow"><b>Dessert</b> What we solved today</p>
+  <h2 class="h2 mt-s">Two problems, two tools</h2>
+  <div class="recap">
+    <div class="recap__row" data-step="1">
+      <div class="recap__p"><p class="k">Problem 1</p><p>One address for everything: no link to a dish, Back left the site.</p></div>
+      <div class="recap__arrow"><i data-icon="arrow-right"></i></div>
+      <div class="recap__s"><p class="k">React Router</p><p>Routes map addresses to pages. A layout frames them with <code>&lt;Outlet /&gt;</code>. <code>Link</code>, params, search params.</p></div>
+    </div>
+    <div class="recap__row" data-step="2">
+      <div class="recap__p"><p class="k">Problem 2</p><p>Anyone could type /kitchen or /account.</p></div>
+      <div class="recap__arrow"><i data-icon="arrow-right"></i></div>
+      <div class="recap__s"><p class="k">Login and guards</p><p>A token from the API, a session that survives F5, <code>RequireAuth</code> with roles. The API is the lock.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-phase="wrap" data-title="What does this do?">
+  <p class="eyebrow"><b>Dessert</b> Click a card to check yourself</p>
+  <h2 class="h2 mt-s">What does this do?</h2>
+  <div class="flips">
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">01 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx"><Route path="menu/:id" … /></script></div><div class="flip__face flip__back"><span class="flip__k">01</span><p>Shows a page for /menu/anything, with the segment as a param.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">02 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx"><Outlet /></script></div><div class="flip__face flip__back"><span class="flip__k">02</span><p>The place in a layout where the current child page renders.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">03 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx"><Link to="/menu">Menu</Link></script></div><div class="flip__face flip__back"><span class="flip__k">03</span><p>Changes the address without reloading the page. State is kept.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">04 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">const { id } = useParams();</script></div><div class="flip__face flip__back"><span class="flip__k">04</span><p>Reads the :id part of the address. Always a string.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">05 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx"><Navigate to="/login" replace /></script></div><div class="flip__face flip__back"><span class="flip__k">05</span><p>Redirects while rendering, replacing the current history entry.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">06 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">Authorization: Bearer eyJhb…</script></div><div class="flip__face flip__back"><span class="flip__k">06</span><p>Shows the API our token on a protected request.</p></div></div></div>
+  </div>
+</section>
+
+<section class="slide" data-phase="wrap" data-title="Homework: v0.4">
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Homework</b> Before L31</p><h2 class="h1">Your shop, version 0.4</h2></div>
+    <span class="sticker">Live link required</span>
+  </div>
+  <div class="hw">
+    <div class="tiers">
+      <div class="tier base"><div class="tier__k"><span>Base</span><span>required</span></div><h3>Pages and a login</h3>
+        <ul><li>Routes: <code>/</code>, <code>/products</code>, <code>/products/:id</code>, <code>/login</code>, <code>/profile</code>, <code>*</code>, in a layout with NavLinks.</li><li>Login with DummyJSON, the session saved, Sign out.</li><li><code>/profile</code> locked with <code>RequireAuth</code>, back to it after the login.</li><li><code>vercel.json</code> rewrite: F5 works on every page.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Plus</span><span>recommended</span></div><h3>State in the URL</h3>
+        <ul><li>Category and search in <code>?category=</code> and <code>?q=</code>.</li><li>An admin-only page.</li></ul></div>
+    </div>
+    <div class="cw__side">
+      <div class="done-when"><p class="k">Before you submit</p><ul class="checks"><li>Send a product link: it opens</li><li>F5 on Vercel: no 404</li><li>No password stored anywhere</li><li><code>react-router</code>, not <code>react-router-dom</code></li></ul></div>
+      <p class="small muted">Full brief and grading: <code>homework.md</code>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-phase="wrap" data-tone="dark" data-title="Merci">
+  <div class="merci">
+    <div class="stack" style="--gap:22px">
+      <p class="eyebrow"><b>L30</b> La maison</p>
+      <h2 class="display">Merci!</h2>
+      <p class="lead">Questions now, or in the class chat. See you at L31.</p>
+    </div>
+    <div class="teaser" data-step="1">
+      <p class="k">Next time · L31</p>
+      <h3>Count the props in App.tsx.</h3>
+      <p><code>cart</code>, <code>onAdd</code>, <code>onChangeQty</code>, <code>session</code>, <code>onLogout</code>… passed through layouts and pages that never use them. Next lecture: one cart and one session, available everywhere.</p>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Open your App.tsx and scroll through the route list. Ask: how many components pass <code>cart</code> along without using it? That's L31.</p></aside>
+</section>
+
+</div>
+</div>
+
+<script src="../_shared/vendor/icons.js"></script>
+<script src="../_shared/vendor/prism/prism.min.js" data-manual></script>
+<script src="../_shared/vendor/prism/prism-jsx.min.js"></script>
+<script src="../_shared/vendor/prism/prism-typescript.min.js"></script>
+<script src="../_shared/vendor/prism/prism-tsx.min.js"></script>
+<script src="../_shared/vendor/prism/prism-bash.min.js"></script>
+<script src="../_shared/vendor/prism/prism-json.min.js"></script>
+<script src="../_shared/music/tracks.js"></script>
+<script src="../_shared/bistro-data.js"></script>
+<script src="../_shared/deck.js"></script>
+<script src="../track.js"></script>
+<script>
+(function () {
+  'use strict';
+  Track.init();
+  Deck.init({
+    code: 'L30',
+    lecture: 30,
+    title: 'La maison',
+    footer: 'Le Bistro track · L30 · Routing, login, guards',
+    shared: '../_shared/',
+    breakMinutes: 10,
+    breakLine: 'Pause café. Stand up, refill, rest your eyes. Back in',
+    phases: [
+      { id: 'hello', label: 'Hello' }, { id: 'questions', label: 'Questions' },
+      { id: 'problem', label: 'Problem 1' }, { id: 'solution', label: 'Solution 1' }, { id: 'classwork', label: 'Classwork 1' },
+      { id: 'break', label: 'Break' },
+      { id: 'problem2', label: 'Problem 2' }, { id: 'solution2', label: 'Solution 2' }, { id: 'classwork2', label: 'Classwork 2' },
+      { id: 'wrap', label: 'Wrap-up' }
+    ]
+  });
+
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = Track.esc;
+  document.querySelectorAll('[data-start-break]').forEach(function (b) { b.addEventListener('click', function () { Deck.openBreak(); }); });
+  function url(el, path) { el.innerHTML = Deck.icon('lock') + 'localhost:5173<b>' + esc(path) + '</b>'; el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
+  function grid(ids, foot) { return '<div class="mgrid">' + ids.map(function (id) { return Track.card(Track.byId(id), { desc: false, foot: foot ? foot(id) : '' }); }).join('') + '</div>'; }
+  function dishMini(id) {
+    var d = Track.byId(id);
+    return '<div class="dish-mini"><img src="' + Track.img(d) + '" alt=""><div><span class="meyebrow" style="color:#a98545">' + esc(d.categoryName) + '</span><h6>' + esc(d.name) + '</h6><p>' + esc(d.description) + '</p><p style="font:600 26px var(--f-display);color:#2e2a26;font-style:normal">' + Track.price(d.price) + '</p></div></div>';
+  }
+
+  /* ---------- one address for everything ---------- */
+  var opView = 'menu';
+  function opRender() {
+    $('op-page').innerHTML = opView === 'menu'
+      ? '<div class="bpage"><h5>The menu</h5>' + grid([5, 15, 21], function (id) { return '<button type="button" class="mbtn" data-dish="' + id + '">View dish</button>'; }) + '</div>'
+      : opView === 'left' ? '<div class="status-mini"><span class="k">YOU LEFT LE BISTRO</span><h6>google.com</h6></div>'
+        : '<div class="bpage">' + dishMini(5) + '</div>';
+    $('op-url').innerHTML = Deck.icon('lock') + 'localhost:5173/';
+  }
+  $('op-page').addEventListener('click', function (e) { var b = e.target.closest('[data-dish]'); if (b) { opView = 'dish'; opRender(); } });
+  $('op-back').addEventListener('click', function () { opView = opView === 'left' ? 'menu' : 'left'; opRender(); });
+  $('op-copy').addEventListener('click', function () { Deck.toast('Copied: localhost:5173/ … that is the home page, not Coq au Vin.'); });
+  opRender();
+
+  /* ---------- route matcher ---------- */
+  var ROUTES = [
+    { path: '/', page: 'HomePage' }, { path: '/menu', page: 'MenuPage' }, { path: '/menu/:id', page: 'DishPage' },
+    { path: '/login', page: 'LoginPage' }, { path: '/kitchen', page: 'KitchenPage' }, { path: '*', page: 'NotFoundPage' }
+  ];
+  function rtRows() {
+    $('rt-rows').innerHTML = ROUTES.map(function (r, k) {
+      return '<div class="rrow" data-k="' + k + '"><span>' + esc(r.path) + '</span><span class="arrow">→</span><span class="page">&lt;' + r.page + ' /&gt;</span><span class="res"></span></div>';
+    }).join('');
+  }
+  function match(route, pathname) {
+    if (route.path === '*') return { '*': decodeURIComponent(pathname.slice(1)) }; // the splat: whatever is left
+    var a = route.path.split('/').filter(Boolean), b = pathname.split('/').filter(Boolean);
+    if (a.length !== b.length) return null;
+    var params = {};
+    for (var i = 0; i < a.length; i++) {
+      if (a[i].charAt(0) === ':') params[a[i].slice(1)] = decodeURIComponent(b[i]);
+      else if (a[i] !== b[i]) return null;
+    }
+    return params;
+  }
+  var rtRun = 0;
+  function rtGo(value) {
+    var run = ++rtRun;
+    var raw = (value || '/').trim(); if (raw.charAt(0) !== '/') raw = '/' + raw;
+    var qIndex = raw.indexOf('?'), pathname = qIndex < 0 ? raw : raw.slice(0, qIndex), search = qIndex < 0 ? '' : raw.slice(qIndex + 1);
+    rtRows();
+    $('rt-out').textContent = 'checking ' + pathname + ' …';
+    var rows = Array.prototype.slice.call($('rt-rows').children), k = 0;
+    (function step() {
+      if (run !== rtRun) return;
+      if (k > 0) rows[k - 1].classList.remove('is-check');
+      if (k >= rows.length) return;
+      var row = rows[k], r = ROUTES[k], params = match(r, pathname);
+      row.classList.add('is-check');
+      setTimeout(function () {
+        if (run !== rtRun) return;
+        row.classList.remove('is-check');
+        if (params) {
+          row.classList.add('is-hit'); row.querySelector('.res').textContent = 'match';
+          var sp = new URLSearchParams(search), lines = [];
+          Object.keys(params).forEach(function (p) { lines.push('<b>useParams()</b>  { ' + (p === '*' ? '"*"' : p) + ': <span class="s">"' + esc(params[p]) + '"</span> }'); });
+          sp.forEach(function (v, key) { lines.push('<b>useSearchParams()</b>  ' + esc(key) + ' = <span class="s">"' + esc(v) + '"</span>'); });
+          $('rt-out').innerHTML = 'page: <b>&lt;' + r.page + ' /&gt;</b>' + (lines.length ? '\n' + lines.join('\n') : '\nno params');
+          return;
+        }
+        row.classList.add('is-miss'); row.querySelector('.res').textContent = 'no';
+        k++; step();
+      }, 380);
+    })();
+  }
+  $('rt-go').addEventListener('click', function () { rtGo($('rt-input').value); });
+  $('rt-input').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); rtGo(this.value); } });
+  document.querySelectorAll('#matcher [data-try]').forEach(function (b) { b.addEventListener('click', function () { $('rt-input').value = b.getAttribute('data-try'); rtGo(b.getAttribute('data-try')); }); });
+  rtRows();
+
+  /* ---------- layout + outlet ---------- */
+  var lyHist = ['/'];
+  function lyRender() {
+    var path = lyHist[lyHist.length - 1];
+    url($('ly-url'), path);
+    Array.prototype.forEach.call($('ly-nav').children, function (b) { b.classList.toggle('on', b.getAttribute('data-to') === path); });
+    var page = $('ly-page');
+    page.innerHTML = path === '/' ? '<div class="mhero" style="margin:14px;border-radius:8px"><img src="../_shared/img/dishes/duck-confit.jpg" alt=""><span class="meyebrow">Vera · Tbilisi</span><h4>French cooking, at home in Tbilisi</h4></div>'
+      : path === '/menu' ? '<div class="bpage"><h5>The menu</h5>' + grid([5, 15, 21]) + '</div>'
+        : '<div class="bpage">' + dishMini(5) + '</div>';
+  }
+  $('ly-nav').addEventListener('click', function (e) { var b = e.target.closest('[data-to]'); if (!b) return; var to = b.getAttribute('data-to'); if (to !== lyHist[lyHist.length - 1]) lyHist.push(to); lyRender(); });
+  $('ly-back').addEventListener('click', function () { if (lyHist.length > 1) lyHist.pop(); lyRender(); });
+  lyRender();
+
+  /* ---------- a vs Link ---------- */
+  var av = { a: { path: '/', cart: 0 }, b: { path: '/', cart: 0 } };
+  function avRender(side) {
+    var s = av[side];
+    $('av-url-' + side).innerHTML = 'localhost:5173<b>' + s.path + '</b>';
+    $('av-page-' + side).innerHTML = '<div class="pagebox"><span>' + (s.path === '/' ? 'Home' : 'The menu') + '</span><span class="cartn">Your order · ' + s.cart + '</span></div>';
+  }
+  $('avl').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-av]'); if (!b) return;
+    var act = b.getAttribute('data-av'), side = act.slice(-1);
+    if (act.indexOf('add') === 0) { av[side].cart++; avRender(side); return; }
+    if (side === 'a') {
+      var page = $('av-page-a'); page.classList.add('is-white');
+      setTimeout(function () { av.a = { path: '/menu', cart: 0 }; avRender('a'); page.classList.remove('is-white'); }, 450);
+    } else { av.b.path = '/menu'; avRender('b'); }
+  });
+  avRender('a'); avRender('b');
+
+  /* ---------- search params ---------- */
+  var spHist = ['/menu'];
+  function spParams() { var p = spHist[spHist.length - 1], i = p.indexOf('?'); return new URLSearchParams(i < 0 ? '' : p.slice(i + 1)); }
+  function spRender() {
+    var cat = spParams().get('category') || 'all';
+    url($('sp-url'), spHist[spHist.length - 1]);
+    var chips = [{ slug: 'all', nameEn: 'Everything' }].concat(Track.categories);
+    $('sp-chips').innerHTML = chips.map(function (c) { return '<button type="button" class="mchip' + (c.slug === cat ? ' is-on' : '') + '" data-slug="' + c.slug + '">' + esc(c.nameEn) + '</button>'; }).join('');
+    var dishes = Track.dishes.filter(function (d) { return cat === 'all' || d.categorySlug === cat; }).slice(0, 6);
+    $('sp-grid').innerHTML = dishes.map(function (d) { return Track.card(d, { desc: false, foot: '' }); }).join('');
+  }
+  $('sp-chips').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-slug]'); if (!b) return;
+    var slug = b.getAttribute('data-slug'), next = slug === 'all' ? '/menu' : '/menu?category=' + slug;
+    if (next !== spHist[spHist.length - 1]) spHist.push(next);
+    spRender();
+  });
+  $('sp-back').addEventListener('click', function () { if (spHist.length > 1) spHist.pop(); spRender(); });
+  $('sp-copy').addEventListener('click', function () { Deck.toast('Copied: localhost:5173' + spHist[spHist.length - 1] + ' — it opens exactly this filter.'); });
+  spRender();
+
+  /* ---------- the doorman ---------- */
+  var dm = { who: 'guest', door: '/account' };
+  function seg(id, key) {
+    $(id).addEventListener('click', function (e) {
+      var b = e.target.closest('[data-v]'); if (!b) return;
+      dm[key] = b.getAttribute('data-v');
+      Array.prototype.forEach.call(this.children, function (x) { x.classList.toggle('is-on', x === b); });
+    });
+  }
+  seg('dm-who', 'who'); seg('dm-door', 'door');
+  var dmNodes = ['dm-start', 'dm-q1', 'dm-q2', 'dm-login', 'dm-forb', 'dm-ok'];
+  $('dm-go').addEventListener('click', function () {
+    dmNodes.forEach(function (n) { $(n).classList.remove('is-path', 'is-end-good', 'is-end-bad'); });
+    var path = ['dm-start', 'dm-q1'], end, msg;
+    if (dm.who === 'guest') { path.push('dm-login'); end = 'bad'; msg = 'No session → /login\nstate.from = "' + dm.door + '"\n(after the login: back to ' + dm.door + ')'; }
+    else {
+      path.push('dm-q2');
+      var staff = dm.who === 'kitchen';
+      if (dm.door === '/kitchen' && !staff) { path.push('dm-forb'); end = 'bad'; msg = 'Signed in as a student.\nRole not in ["kitchen", "waiter"]\n→ /forbidden'; }
+      else { path.push('dm-ok'); end = 'good'; msg = 'Signed in, role allowed\n→ <Outlet /> renders ' + dm.door; }
+    }
+    path.forEach(function (n, i) {
+      setTimeout(function () {
+        var last = i === path.length - 1;
+        $(n).classList.add(last ? (end === 'good' ? 'is-end-good' : 'is-end-bad') : 'is-path');
+        if (last) $('dm-out').textContent = msg;
+      }, i * 380);
+    });
+  });
+})();
+</script>
+</body>
+</html>

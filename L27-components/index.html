@@ -1,0 +1,1339 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mise en Place · L27</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Karla:ital,wght@0,400..800;1,400..800&family=JetBrains+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="../_shared/deck.css">
+<link rel="stylesheet" href="../track.css">
+<style>
+/* ---------- L27 only ---------- */
+.themes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 34px; }
+.theme { background: var(--surface); border-radius: var(--card-r); box-shadow: var(--shadow-1); padding: 22px 24px; display: flex; flex-direction: column; gap: 8px; }
+.theme svg { width: 34px; height: 34px; color: var(--wine); stroke-width: 1.6; }
+.theme h3 { font: 600 34px/1.05 var(--f-display); margin: 4px 0 0; }
+.theme p { margin: 0; font-size: 19px; line-height: 1.4; color: var(--ink-2); }
+.theme code { font-size: 15px; }
+.ms { width: 100%; border-collapse: collapse; margin-top: 26px; font-size: 21px; }
+.ms th { text-align: left; font: 700 14px/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--brass); padding: 0 18px 12px 0; }
+.ms td { padding: 13px 18px 13px 0; border-top: 1px solid var(--line); vertical-align: top; line-height: 1.38; }
+.ms td:first-child { font: 700 18px/1.3 var(--f-mono); color: var(--wine); white-space: nowrap; }
+.ms td b { font-weight: 700; }
+.ms tr.is-now td { background: color-mix(in srgb, var(--wine) 6%, transparent); }
+.rules { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 22px; }
+.rules div { background: var(--surface); border-radius: var(--card-r); box-shadow: var(--shadow-1); padding: 16px 18px; font-size: 18px; line-height: 1.4; }
+.rules b { display: block; font: 700 13px/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--brass); margin-bottom: 6px; }
+
+/* copy-paste kitchen */
+.cp { display: grid; grid-template-columns: minmax(0, 1fr) 470px; gap: 44px; margin-top: 26px; flex: 1; min-height: 0; }
+.cp-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; align-content: start; }
+.cp-grid .mcard__desc { display: none; }
+.cp-grid .mcard__body { padding: 12px 14px; }
+.cp-grid .mcard__title { font-size: 17px; }
+.cp-grid .file { font: 600 12px/1 var(--f-mono); color: #a3988a; letter-spacing: .06em; }
+.ticket { background: #fffdf6; padding: 26px 28px 30px; box-shadow: var(--shadow-2); position: relative; border-radius: 3px; transform: rotate(.6deg); }
+.ticket::after { content: ""; position: absolute; left: 0; right: 0; bottom: -12px; height: 12px; background: radial-gradient(circle at 10px -2px, transparent 9px, #fffdf6 10px) repeat-x; background-size: 20px 12px; }
+.ticket h3 { font: 600 34px/1.1 var(--f-display); margin: 6px 0 14px; color: var(--wine); }
+.ticket ol { margin: 0; padding-left: 26px; font-size: 22px; line-height: 1.45; }
+.cp-tools { display: flex; flex-direction: column; gap: 12px; margin-top: 30px; }
+.cp-tools .btn { justify-content: center; }
+.cp-count { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 6px; }
+.cp-count div { background: var(--surface); border-radius: var(--card-r); box-shadow: var(--shadow-1); padding: 14px 16px; }
+.cp-count b { display: block; font: 700 42px/1 var(--f-mono); color: var(--wine); }
+.cp-count span { font: 700 13px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+
+/* hard-coded card */
+.same { display: grid; grid-template-columns: 640px minmax(0, 1fr); gap: 56px; margin-top: 30px; align-items: start; }
+.same__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.same__grid .mcard { animation: fadeUp .45s var(--ease-out) both; }
+.same__grid .mcard img { aspect-ratio: 16 / 9; }
+
+/* functions vs components */
+.analogy { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 30px; }
+.analogy .card { padding: 26px 28px; display: flex; flex-direction: column; gap: 14px; }
+.analogy .card .code { --code-size: 21px; box-shadow: none; }
+.analogy .out { font: 600 22px/1.3 var(--f-mono); color: var(--ink-2); }
+.analogy .out b { color: var(--wine); }
+
+/* props playground */
+.pg { display: grid; grid-template-columns: 420px minmax(0, 1fr) 380px; gap: 36px; margin-top: 30px; align-items: start; }
+.pg__form { display: flex; flex-direction: column; gap: 16px; background: var(--surface); padding: 24px; border-radius: var(--card-r); box-shadow: var(--shadow-1); }
+.pg__form label { display: flex; flex-direction: column; gap: 6px; font: 700 14px/1 var(--f-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.pg__form input[type="text"], .pg__form input[type="number"], .pg__form select { font: 500 22px/1.2 var(--f-body); padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--ink); text-transform: none; letter-spacing: 0; }
+.pg__form .check { flex-direction: row; align-items: center; gap: 12px; font-size: 16px; }
+.pg__form .check input { width: 22px; height: 22px; accent-color: var(--wine); }
+#pg-code code { padding: 0 30px; }
+
+/* map machine */
+.machine { width: 1632px; height: 560px; margin-top: 28px; }
+.obj { position: absolute; left: 0; width: 380px; padding: 14px 18px; border-radius: 10px; background: var(--code-bg); color: var(--code-fg); font: 500 19px/1.4 var(--f-mono); box-shadow: var(--shadow-1); transition: transform 1s var(--ease-out), opacity .8s ease; z-index: 2; }
+.obj b { color: var(--tok-num); font-weight: 600; }
+.obj s { text-decoration: none; color: var(--tok-string); }
+.obj.is-in { transform: translateX(560px) scale(.6); opacity: 0; }
+.funnel { position: absolute; left: 520px; top: 130px; width: 380px; height: 300px; border-radius: 22px; background: var(--wine); color: var(--accent-ink); display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 12px; box-shadow: var(--shadow-2); z-index: 1; }
+.funnel code { background: rgba(255, 255, 255, .12); color: #fbe9c8; font-size: 24px; padding: 8px 14px; border-radius: 8px; }
+.funnel small { font: 600 16px/1.3 var(--f-mono); opacity: .75; text-align: center; padding: 0 20px; }
+.outcards { position: absolute; left: 980px; top: 110px; width: 652px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.outcards .mcard__desc { display: none; }
+.outcards .mcard__title { font-size: 18px; }
+.keytag { position: absolute; top: -14px; right: 10px; z-index: 2; background: var(--brass); color: #fff; font: 700 14px/1 var(--f-mono); padding: 7px 10px; border-radius: 6px; box-shadow: var(--shadow-1); }
+.outcards .mcard { position: relative; overflow: visible; }
+
+/* children: a frame with a hole */
+.frame-demo { position: relative; width: 760px; height: 600px; background: var(--surface); border-radius: 14px; box-shadow: var(--shadow-2); padding: 30px 34px; }
+.frame-demo__head { text-align: center; }
+.frame-demo__head p { margin: 0; font: 700 13px/1 var(--f-body); letter-spacing: .25em; text-transform: uppercase; color: var(--brass); }
+.frame-demo__head h4 { margin: 8px 0 0; font: 600 44px/1 var(--f-display); color: var(--wine); }
+.frame-demo__head i { display: block; width: 56px; height: 2px; background: var(--brass); margin: 14px auto 0; }
+.hole { position: absolute; left: 34px; right: 34px; top: 170px; bottom: 30px; border: 3px dashed var(--brass-soft); border-radius: 12px; display: grid; place-items: center; overflow: hidden; }
+.hole__label { font: 700 30px/1 var(--f-mono); color: var(--brass); transition: opacity .4s ease; }
+.hole__fill { position: absolute; inset: 14px; display: flex; flex-direction: column; gap: 12px; transition: transform .8s var(--ease-out), opacity .6s ease; transform: translateY(110%); opacity: 0; }
+.hole__fill.is-in { transform: none; opacity: 1; }
+.hole__fill.is-out { transform: translateY(-110%); opacity: 0; }
+.hole__fill .mgrid { gap: 10px; }
+.hole__fill .mcard__desc { display: none; }
+.hole__fill .mcard__title { font-size: 17px; }
+.hole__fill .tag { font: 700 15px/1 var(--f-mono); color: var(--wine); }
+.frame-demo.has-fill .hole__label { opacity: 0; }
+
+.mfoot { background: #421219; color: #fdfaf2; padding: 16px 24px; display: flex; justify-content: space-between; font: 600 22px/1 var(--f-display); }
+.mfoot small { font: 600 12px/1 var(--f-body); letter-spacing: .2em; text-transform: uppercase; color: #c9af7e; }
+.preview-stack { display: flex; flex-direction: column; }
+.preview-stack > * { transition: opacity .45s ease, transform .6s var(--ease-out); }
+</style>
+</head>
+<body>
+<div class="deck">
+<div class="stage">
+
+<!-- ============================== HELLO ============================== -->
+
+<section class="slide" data-phase="hello" id="cover" data-title="Mise en place">
+  <div class="cover">
+    <div class="stack" style="--gap:24px">
+      <p class="cover__hello">Bonjour!</p>
+      <p class="eyebrow"><b>L27</b> React · lecture 2 · Le Bistro track 1 of 5</p>
+      <h1 class="display">Mise<br>en place</h1>
+      <p class="lead" style="max-width:900px">Components and props. A chef sets out every ingredient in its own bowl before cooking. We set out every piece of the page in its own component before building it.</p>
+      <dl class="cover__meta">
+        <div><dt>Theme</dt><dd>Components, props, lists</dd></div>
+        <div><dt>Le Bistro today</dt><dd>Home page and menu</dd></div>
+        <div><dt>Your project</dt><dd>v0.1 · a static catalog</dd></div>
+        <div><dt>Length</dt><dd>2 hours · one break</dd></div>
+      </dl>
+    </div>
+    <div class="plate">
+      <div class="plate__rim"></div>
+      <div class="plate__food"><img src="../img/photo-ratatouille.jpg" alt=""></div>
+      <div class="plate__tag"><small>mise en place</small>“everything in its place”</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Bonjour! Today React stops being theory. We start building Le Bistro, a real restaurant site, and you start your own project.</p>
+    <p><b>Do:</b> Take attendance while the room settles. Chrome, fullscreen with F. Press P if you want the presenter window on your laptop.</p>
+    <p><b>The title:</b> "mise en place" is how French kitchens work. Before service every ingredient is cut and waiting in its own bowl. React works the same way: we prepare small pieces (components), then build the page from them.</p>
+  </aside>
+</section>
+
+<section class="slide v-center" data-phase="hello" data-title="Today's menu">
+  <div class="menu-card">
+    <div class="menu-card__head"><p class="eyebrow">Le Bistro · L27 · 120 minutes</p><h2>Today's menu</h2></div>
+    <ol class="menu-card__list">
+      <li class="course"><span class="course__k">Accueil</span><span class="course__name">Hello <small>Le Bistro and your own project</small></span><span class="course__t">8′</span></li>
+      <li class="course"><span class="course__k">Apéritif</span><span class="course__name">Questions <small>from the TypeScript lecture</small></span><span class="course__t">7′</span></li>
+      <li class="course"><span class="course__k">Entrée</span><span class="course__name">Problem 1 <small>25 dishes, 25 copies</small></span><span class="course__t">6′</span></li>
+      <li class="course"><span class="course__k">Plat</span><span class="course__name">Components <small>the page as a tree</small></span><span class="course__t">24′</span></li>
+      <li class="course"><span class="course__k">Atelier</span><span class="course__name">Classwork 1 <small>your project's skeleton</small></span><span class="course__t">15′</span></li>
+      <li class="course is-pause"><span class="course__k">Pause café</span><span class="course__name">Break <small>music on, screens off</small></span><span class="course__t">10′</span></li>
+      <li class="course"><span class="course__k">Second plat</span><span class="course__name">Problem 2 and props <small>one card, many dishes</small></span><span class="course__t">27′</span></li>
+      <li class="course"><span class="course__k">Atelier</span><span class="course__name">Classwork 2 <small>your catalog from data</small></span><span class="course__t">15′</span></li>
+      <li class="course"><span class="course__k">Dessert</span><span class="course__name">Wrap-up <small>recap, homework, next time</small></span><span class="course__t">8′</span></li>
+    </ol>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Every lecture has the same shape: questions, a problem, the new tool that solves it, practice, a break, a second problem, practice, wrap-up.</p>
+    <p><b>Do:</b> The break is the slide after Classwork 1. You can also start it any time with B or the coffee button (top right).</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="hello" data-title="Le Bistro, lecture by lecture">
+  <p class="eyebrow"><b>Route</b> Five lectures, one restaurant</p>
+  <h2 class="h2 mt-s">Le Bistro, lecture by lecture</h2>
+  <div class="road">
+    <div class="stop is-now"><div class="stop__shot"><img src="../img/l27-home.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L27 · today</p><p class="stop__t">Components</p><p class="stop__d">Home page and menu, built from reusable pieces and a data file.</p></div>
+    <div class="stop" data-step="1"><div class="stop__shot"><img src="../img/l28-cart.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L28</p><p class="stop__t">State</p><p class="stop__d">Add to cart works. Chips filter, search finds.</p></div>
+    <div class="stop" data-step="2"><div class="stop__shot"><img src="../img/l29-search.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L29</p><p class="stop__t">Effects</p><p class="stop__d">The real menu from the API. A cart that survives a refresh.</p></div>
+    <div class="stop" data-step="3"><div class="stop__shot"><img src="../img/l30-dish.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L30</p><p class="stop__t">Routing</p><p class="stop__d">Pages with their own address. Login and staff-only doors.</p></div>
+    <div class="stop" data-step="4"><div class="stop__shot"><img src="../img/l31-faq.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L31</p><p class="stop__t">Context</p><p class="stop__d">One cart and one session for the whole site.</p></div>
+  </div>
+  <div class="lane" data-step="5">
+    <span class="lane__k">Your project<br>grows the same way</span>
+    <span class="lane__v"><b>v0.1</b>catalog from a data file</span>
+    <span class="lane__v"><b>v0.2</b>cart, filters, search</span>
+    <span class="lane__v"><b>v0.3</b>real API, saved cart</span>
+    <span class="lane__v"><b>v0.4</b>pages, login, guards</span>
+    <span class="lane__v"><b>v0.5</b>context and reducer</span>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> In five lectures we rebuild a real site. Each lecture adds one React idea to it, and each idea answers a problem the site really has.</p>
+    <p><b>Do:</b> Press next for each stop. Read the one-line description, nothing more. The details come in their own lecture.</p>
+    <p><b>Step 5:</b> Below runs your own project. The same five steps, on your own idea.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="hello" data-title="Meet Le Bistro">
+  <div class="split-5-7 fill items-center">
+    <div class="stack" style="--gap:24px">
+      <p class="eyebrow"><b>My project</b> Built live, on this screen</p>
+      <h2 class="h1">Meet Le Bistro</h2>
+      <p class="lead">A real restaurant site made at IT Step, with a real API behind it. We rebuild it in React, one lecture at a time. I type it here, then you build the same idea in your own project.</p>
+      <dl class="facts">
+        <div><dt>Live site</dt><dd>srms.stepacademy.ge</dd></div>
+        <div><dt>API</dt><dd>srmsapi.stepacademy.ge, docs at /swagger</dd></div>
+        <div><dt>Today</dt><dd>The home page and the menu. No clicks yet.</dd></div>
+      </dl>
+    </div>
+    <figure class="shot"><div class="shot__bar"><i></i><i></i><i></i><span class="shot__url"><i data-icon="lock"></i>srms.stepacademy.ge</span></div><div class="shot__body" style="height:600px"><img src="../img/srms-home.jpg" alt="The Le Bistro home page"></div></figure>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Open srms.stepacademy.ge in a tab. Scroll the home page, open the menu, click a dish. Thirty seconds, no more.</p>
+    <p><b>Say:</b> This site was made in Angular. We rebuild the parts we need in React. By lecture L31 our version has the menu, a cart, real data, pages, login and a FAQ.</p>
+    <p><b>Expect:</b> "Can we use their code?" No. We write ours, and we use their API (the server) as a real backend.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="hello" data-title="Your project: a shop of your own">
+  <p class="eyebrow"><b>Your project</b> Starts today, presented at Demo Day</p>
+  <h2 class="h2 mt-s">A shop of your own</h2>
+  <p class="lead mt-s">Pick one theme. The data comes from <b>dummyjson.com</b>: free, no key, and it even has login.</p>
+  <div class="themes">
+    <div class="theme" data-step="1"><i data-icon="clock"></i><h3>Watch boutique</h3><p><code>mens-watches</code> <code>womens-watches</code></p><p>Cart, wishlist, sizes.</p></div>
+    <div class="theme" data-step="1"><i data-icon="sparkles"></i><h3>Beauty bar</h3><p><code>beauty</code> <code>skin-care</code> <code>fragrances</code></p><p>Cart, filters by brand.</p></div>
+    <div class="theme" data-step="1"><i data-icon="house"></i><h3>Furniture house</h3><p><code>furniture</code> <code>home-decoration</code></p><p>Cart, room filters.</p></div>
+    <div class="theme" data-step="1"><i data-icon="smartphone"></i><h3>Tech store</h3><p><code>smartphones</code> <code>laptops</code> <code>tablets</code></p><p>Cart, compare list.</p></div>
+    <div class="theme" data-step="1"><i data-icon="shopping-bag"></i><h3>Fashion street</h3><p><code>tops</code> <code>womens-dresses</code> <code>mens-shoes</code></p><p>Cart, size filter.</p></div>
+    <div class="theme" data-step="1"><i data-icon="chef-hat"></i><h3>Recipe book</h3><p><code>/recipes</code> with cuisine and meal type</p><p>A meal plan instead of a cart.</p></div>
+  </div>
+  <div class="callout is-warn mt-m" data-step="2"><i data-icon="ban"></i><div><p class="h4">Not a restaurant.</p><p class="small muted mt-s">Le Bistro is mine, the shop is yours. Another idea or another free API? Show it to me first.</p></div></div>
+  <aside class="notes">
+    <p><b>Say:</b> While I build Le Bistro on screen, you build your own shop at home. Same ideas, different products. That way you can't copy my code, you have to understand it.</p>
+    <p><b>Do:</b> Step 1 shows the six themes. Open dummyjson.com/products/category-list in a tab to show where the categories come from.</p>
+    <p><b>If asked:</b> "Can two students take the same theme?" Yes. The code will still differ. "Can I use another API?" Yes, if it is free, has no key, and you show it to me first.</p>
+    <p><b>Hand out:</b> the full brief is <code>bistro-track/student-project.md</code>. Put the link in the class chat.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="hello" data-title="Your project: lecture by lecture">
+  <p class="eyebrow"><b>Your project</b> What to build, and when</p>
+  <h2 class="h2 mt-s">One step every lecture</h2>
+  <table class="ms">
+    <thead><tr><th>Lecture</th><th>Le Bistro, on screen</th><th>Your shop, at home</th></tr></thead>
+    <tbody>
+      <tr class="is-now"><td>L27</td><td>Home page and menu from components</td><td><b>v0.1</b> Header, hero, product grid from a data file. Live on Vercel.</td></tr>
+      <tr><td>L28</td><td>Cart, stepper, filters, search</td><td><b>v0.2</b> Cart (or meal plan), category filter, search box.</td></tr>
+      <tr><td>L29</td><td>Real API, loading, saved cart</td><td><b>v0.3</b> Products from DummyJSON, loading and errors, cart saved on refresh.</td></tr>
+      <tr><td>L30</td><td>Pages, dish page, login, guards</td><td><b>v0.4</b> List and detail pages, login with DummyJSON, a protected page.</td></tr>
+      <tr><td>L31</td><td>One cart and session everywhere</td><td><b>v0.5</b> Cart in a reducer, shared with context.</td></tr>
+    </tbody>
+  </table>
+  <div class="rules" data-step="1">
+    <div><b>Repo</b>One GitHub repository, from today.</div>
+    <div><b>Deploy</b>A live Vercel link every week.</div>
+    <div><b>README</b>A screenshot and what works.</div>
+    <div><b>AI</b>Yes as a teacher. Write it down in AI.md.</div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> The table is the whole plan. After the React lectures the project keeps growing: forms, TanStack Query, shadcn/ui, tests. You present it at Demo Day.</p>
+    <p><b>Step 1:</b> four rules. A live link every week, so we always see the real thing, not screenshots.</p>
+  </aside>
+</section>
+
+<!-- ============================== QUESTIONS ============================== -->
+
+<section class="slide" data-phase="questions" data-title="Questions from last time">
+  <div class="qa">
+    <div class="stack" style="--gap:26px">
+      <p class="eyebrow"><b>Apéritif</b> Before we start</p>
+      <h2 class="display">Questions from last time?</h2>
+      <p class="lead">TypeScript: types, unions, optional fields. Anything that broke in your homework is a good question.</p>
+    </div>
+    <div class="qa-list">
+      <div class="qa-card" data-step="1"><span class="n">01</span><h3><code>type</code> or <code>interface</code>?</h3>
+        <div class="reveal-box" data-reveal><button class="reveal-box__cover">[ show answer ]</button><p>For our objects they do the same job. In this course we write <code>type</code>: it also works for unions like <code>"loading" | "error"</code>.</p></div></div>
+      <div class="qa-card" data-step="2"><span class="n">02</span><h3>What does the <code>?</code> in <code>price?: number</code> mean?</h3>
+        <div class="reveal-box" data-reveal><button class="reveal-box__cover">[ show answer ]</button><p>The field is optional: it may be missing. Its type becomes <code>number | undefined</code>.</p></div></div>
+      <div class="qa-card" data-step="3"><span class="n">03</span><h3>Why describe our data with types at all?</h3>
+        <div class="reveal-box" data-reveal><button class="reveal-box__cover">[ show answer ]</button><p>So the editor catches mistakes before the browser does. <code>dish.prise</code> becomes a red line, not an empty card.</p></div></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Wait for real questions first, ten seconds of silence is fine. If nobody asks, press next to show the backup questions one by one. Ask the room, then click the cover to reveal the answer.</p>
+    <p><b>Why these three:</b> today every component gets a <code>type</code> for its props. Optional fields and "why types" come back within the hour.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="questions" data-title="Which type fits this dish?">
+  <div class="split-5-7 fill items-center">
+    <div class="stack" style="--gap:22px">
+      <p class="eyebrow"><b>Warm-up</b> From the real API</p>
+      <h2 class="h2">Which type fits this dish?</h2>
+      <script type="text/plain" data-lang="json" data-file="GET /api/v1/learning/menu → one item">
+        {
+          "id": 5,
+          "name": "Coq au Vin",
+          "price": 32,
+          "isAvailable": true
+        }
+      </script>
+    </div>
+    <div class="quiz" data-quiz>
+      <div class="quiz__opts">
+        <button class="quiz__opt"><code>type Dish = { id: string; name: string; price: string; isAvailable: string }</code></button>
+        <button class="quiz__opt" data-correct><code>type Dish = { id: number; name: string; price: number; isAvailable: boolean }</code></button>
+        <button class="quiz__opt"><code>type Dish = { id; name; price; isAvailable }</code></button>
+        <button class="quiz__opt"><code>type Dish = number | string | boolean</code></button>
+      </div>
+      <p class="quiz__explain">Numbers stay numbers, <code>true</code> is a boolean. C has no types at all, D describes one value, not an object. Today this exact type travels into our components.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Let the room vote with fingers (1 to 4), then click their answer or press its number key.</p>
+    <p><b>Say:</b> Keep this type in mind. In twenty minutes it becomes the shape of a "prop".</p>
+  </aside>
+</section>
+
+<!-- ============================== PROBLEM 1 ============================== -->
+
+<section class="slide" data-phase="problem" data-tone="dark" data-title="25 dishes. 25 copies.">
+  <div class="problem-cover">
+    <div class="problem-cover__text">
+      <p class="eyebrow"><b>Entrée · Problem 1</b> Before the new tool</p>
+      <h2 class="display">25 dishes.<br>25 copies.</h2>
+      <p class="lead">In the JavaScript module you built cards from HTML. Le Bistro's menu has 25 dishes. Now the chef wants to change the card.</p>
+    </div>
+    <div class="problem-cover__photo"><img src="../img/photo-macarons.jpg" alt=""></div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Every React lecture starts with a problem. If we don't feel the pain, the new tool looks like extra work.</p>
+    <p><b>Ask:</b> How would you have built 25 dish cards a month ago? <b>Expect:</b> copy the HTML 25 times, or a loop that builds an HTML string with innerHTML. Both are fair answers.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="problem" id="copies" data-title="The copy-paste kitchen">
+  <p class="eyebrow"><b>Problem 1</b> Try it</p>
+  <h2 class="h2 mt-s">The copy-paste kitchen</h2>
+  <div class="cp">
+    <div class="cp-grid" id="cp-grid"></div>
+    <div>
+      <div class="ticket">
+        <p class="eyebrow">Ticket from the chef</p>
+        <h3>Two small changes</h3>
+        <ol><li>Prices in lari: <b>₾32</b>, not 32 GEL.</li><li>Bouillabaisse is <b>off the menu today</b>. Say so on its card.</li></ol>
+      </div>
+      <div class="cp-tools">
+        <button class="btn is-wine" type="button" id="cp-hand"><i data-icon="pencil"></i>Edit 12 copies by hand</button>
+        <button class="btn is-ghost" type="button" id="cp-one"><i data-icon="component"></i>Edit one component</button>
+        <button class="btn is-ghost" type="button" id="cp-reset"><i data-icon="rotate-ccw"></i>Reset</button>
+        <div class="cp-count"><div><b id="cp-edits">0</b><span>edits made</span></div><div><b id="cp-miss">0</b><span>copies forgotten</span></div></div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Click "Edit 12 copies by hand". It edits one card at a time and, like a tired human, forgets two. One of the forgotten cards is the Bouillabaisse: the most important change of all.</p>
+    <p><b>Then:</b> Reset, and click "Edit one component". One edit, twelve cards updated.</p>
+    <p><b>Say:</b> With 25 dishes and 3 pages that show cards (menu, favourites, search), one change means 75 edits. Components turn that into one edit.</p>
+  </aside>
+</section>
+
+<section class="slide v-center" data-phase="problem" data-title="What would make this easy?">
+  <p class="eyebrow"><b>Problem 1</b> Your turn</p>
+  <h2 class="display mt-m" style="font-size:118px;max-width:1500px;color:var(--wine)">What would make this easy?</h2>
+  <div class="need">
+    <span class="chip" data-step="1" data-fx="pop">Write the card once</span>
+    <span class="chip" data-step="2" data-fx="pop">Fill it with different data</span>
+    <span class="chip" data-step="3" data-fx="pop">Use it like a new HTML tag</span>
+    <span class="chip is-answer" data-step="4" data-fx="pop"><i data-icon="component"></i>That is a component</span>
+  </div>
+  <aside class="notes">
+    <p><b>Ask:</b> What would you want instead of copies? Collect two or three answers before pressing next. "A function", "a template", "a loop" are all on the right track.</p>
+    <p><b>Step 4:</b> the name of today's tool. Chips 1 and 3 are the first half of the lecture, chip 2 is the second half (props).</p>
+  </aside>
+</section>
+
+<!-- ============================== SOLUTION 1 ============================== -->
+
+<section class="slide" data-phase="solution" data-title="A page is boxes inside boxes" style="padding-top:120px;padding-bottom:96px">
+  <div class="split-4-8 fill" style="gap:56px">
+    <div class="stack" style="--gap:20px">
+      <p class="eyebrow"><b>Plat · Solution 1</b> Look at any page like this</p>
+      <h2 class="h2">A page is boxes inside boxes</h2>
+      <ol class="steps is-compact">
+        <li data-step="1" data-on="1-1:is-now;2:is-done"><b>&lt;Header /&gt;</b><span>Logo, links, order. The same on every page.</span></li>
+        <li data-step="2" data-on="2-2:is-now;3:is-done"><b>&lt;Hero /&gt;</b><span>The big photo and the welcome.</span></li>
+        <li data-step="3" data-on="3-3:is-now;4:is-done"><b>&lt;Section /&gt;</b><span>A title, then something inside it.</span></li>
+        <li data-step="4" data-on="4-4:is-now;5:is-done"><b>&lt;DishCard /&gt; × 3</b><span>One component, three different dishes.</span></li>
+        <li data-step="5" data-on="5-5:is-now;6:is-done"><b>&lt;DishGrid /&gt;</b><span>Lays the cards out in rows.</span></li>
+      </ol>
+    </div>
+    <figure class="hotspots shot" data-hotspots data-size="1440x1500" style="width:790px;justify-self:end">
+      <img src="../img/l27-page.jpg" alt="Our Le Bistro home page at the end of today">
+      <span class="hs tip-inside" data-step="1" data-box="0,0,1440,86" data-name="Header"></span>
+      <span class="hs is-warm tip-inside" data-step="2" data-box="0,86,1440,566" data-name="Hero"></span>
+      <span class="hs is-alt tip-inside" data-step="3" data-box="144,652,1152,688" data-name="Section"></span>
+      <span class="hs" data-step="4" data-box="168,829,352,447"></span>
+      <span class="hs tip-inside" data-step="4" data-box="544,829,352,447" data-name="DishCard"></span>
+      <span class="hs" data-step="4" data-box="920,829,352,447"></span>
+      <span class="hs is-warm tip-below" data-step="5" data-box="160,821,1120,463" data-name="DishGrid"></span>
+    </figure>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> This is how a React developer reads a design: boxes inside boxes. Each box we can name becomes a component.</p>
+    <p><b>Do:</b> Before each press, ask the room to name the box. Then press next.</p>
+    <p><b>Step 4:</b> the key moment. Three cards, one component. Only the data differs. Hold that thought for the second half.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="The component tree">
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Solution 1</b> The same page, as a tree</p><h2 class="h2">The component tree</h2></div>
+    <p class="small muted" style="max-width:520px" data-step="6">React builds the page from the top: <b>App</b> renders its children, they render theirs, down to the last card.</p>
+  </div>
+  <div class="schema" data-wire-sides="b t" data-wire-route="elbow" style="width:1632px;height:640px;margin-top:34px">
+    <div class="node is-wine lg" id="t-app" style="left:736px;top:0" data-step="1">App<small>the whole page</small></div>
+    <div class="node" id="t-header" style="left:20px;top:190px" data-step="2">Header</div>
+    <div class="node" id="t-hero" style="left:300px;top:190px" data-step="2">Hero</div>
+    <div class="node" id="t-sec1" style="left:600px;top:190px" data-step="2">Section<small>Today's favourites</small></div>
+    <div class="node" id="t-sec2" style="left:1000px;top:190px" data-step="2">Section<small>The menu</small></div>
+    <div class="node" id="t-footer" style="left:1430px;top:190px" data-step="2">Footer</div>
+    <div class="node" id="t-grid1" style="left:609px;top:360px" data-step="3">DishGrid</div>
+    <div class="node" id="t-chips" style="left:890px;top:360px" data-step="3">CategoryChips</div>
+    <div class="node" id="t-grid2" style="left:1190px;top:360px" data-step="3">DishGrid</div>
+    <div class="node is-brass" id="t-cards1" style="left:578px;top:530px" data-step="4" data-on="5:is-hot">DishCard × 3</div>
+    <div class="node is-brass" id="t-cards2" style="left:1153px;top:530px" data-step="4" data-on="5:is-hot">DishCard × 12</div>
+    <b class="wire" data-from="t-app" data-to="t-header" data-step="2"></b>
+    <b class="wire" data-from="t-app" data-to="t-hero" data-step="2"></b>
+    <b class="wire" data-from="t-app" data-to="t-sec1" data-step="2"></b>
+    <b class="wire" data-from="t-app" data-to="t-sec2" data-step="2"></b>
+    <b class="wire" data-from="t-app" data-to="t-footer" data-step="2"></b>
+    <b class="wire" data-from="t-sec1" data-to="t-grid1" data-step="3"></b>
+    <b class="wire" data-from="t-sec2" data-to="t-chips" data-step="3"></b>
+    <b class="wire" data-from="t-sec2" data-to="t-grid2" data-step="3"></b>
+    <b class="wire is-wine" data-from="t-grid1" data-to="t-cards1" data-step="4"></b>
+    <b class="wire is-wine" data-from="t-grid2" data-to="t-cards2" data-step="4"></b>
+    <div class="callout" style="position:absolute;left:20px;top:440px;width:470px" data-step="5" data-fx="left"><i data-icon="component"></i><div><p class="h4">One component, 15 cards</p><p class="small muted mt-s">Write DishCard once. Use it everywhere a dish appears.</p></div></div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> The boxes from the last slide, drawn as a family tree. App is the root. Every component is a child of the one that uses it.</p>
+    <p><b>Do:</b> One press per level. At step 5 both DishCard nodes light up: same component in two places.</p>
+    <p><b>Remember:</b> this tree is the plan we type next. Folders follow it: one file per box in <code>src/components/</code>.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="Anatomy of a component">
+  <p class="eyebrow"><b>Solution 1</b> What a component is made of</p>
+  <h2 class="h2 mt-s">A component is a function that returns UI</h2>
+  <div class="anatomy" style="margin-top:36px">
+    <div class="anatomy__code" style="display:block;font-size:44px;line-height:1.45"><span class="part" data-on="1:is-on">export</span> <span class="part" data-on="2:is-on">function Header()</span> {
+  <span class="part" data-on="3:is-on">return (</span>
+    <span class="part" data-on="4:is-on">&lt;header className="site-header"&gt;…&lt;/header&gt;</span>
+  <span class="part" data-on="3:is-on">);</span>
+}</div>
+    <div class="anatomy__notes">
+      <div class="card" data-step="1"><span class="num">01</span><p><code>export</code><br>Other files may import it. Forget it and App cannot see the component.</p></div>
+      <div class="card" data-step="2"><span class="num">02</span><p><code>Header</code><br>A capital letter. That is how React tells your component from an HTML tag.</p></div>
+      <div class="card" data-step="3"><span class="num">03</span><p><code>return ( … )</code><br>What the component shows. React calls the function and puts the result on the page.</p></div>
+      <div class="card" data-step="4"><span class="num">04</span><p><code>&lt;header&gt;</code><br>JSX: HTML-like markup inside JavaScript. Exactly one root element.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> No new magic: a component is a plain JavaScript function. Its name starts with a capital letter and it returns JSX.</p>
+    <p><b>Do:</b> One press per part. Each card lights its piece of code.</p>
+    <p><b>If asked "what is JSX?":</b> markup written inside JavaScript. The build tool (Vite) turns it into normal function calls. The browser never sees JSX.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="Six JSX rules">
+  <p class="eyebrow"><b>Solution 1</b> JSX looks like HTML, with six differences</p>
+  <h2 class="h2 mt-s">Six JSX rules</h2>
+  <div class="mistakes cols-3">
+    <div class="mistake" data-step="1"><h4>1. className</h4><div class="bad">&lt;div class="card"&gt;</div><div class="good">&lt;div className="card"&gt;</div></div>
+    <div class="mistake" data-step="2"><h4>2. Close every tag</h4><div class="bad">&lt;img src={src}&gt;</div><div class="good">&lt;img src={src} /&gt;</div></div>
+    <div class="mistake" data-step="3"><h4>3. One parent</h4><div class="bad">return &lt;h1/&gt;&lt;p/&gt;</div><div class="good">return &lt;&gt;&lt;h1/&gt;&lt;p/&gt;&lt;/&gt;</div></div>
+    <div class="mistake" data-step="4"><h4>4. Braces for JavaScript</h4><div class="bad">&lt;p&gt;dish.name&lt;/p&gt;</div><div class="good">&lt;p&gt;{dish.name}&lt;/p&gt;</div></div>
+    <div class="mistake" data-step="5"><h4>5. camelCase attributes</h4><div class="bad">onclick  for  tabindex</div><div class="good">onClick  htmlFor  tabIndex</div></div>
+    <div class="mistake" data-step="6"><h4>6. Comments in braces</h4><div class="bad">&lt;!-- the menu --&gt;</div><div class="good">{/* the menu */}</div></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> One rule per press. Read the red line, ask what is wrong, then read the green line.</p>
+    <p><b>Rule 3:</b> <code>&lt;&gt;…&lt;/&gt;</code> is a "fragment": a parent that adds no element to the page.</p>
+    <p><b>Rule 4:</b> braces mean "this is JavaScript, put its value here". Without braces it is plain text.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="Order the setup">
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Solution 1</b> Drag into the right order</p><h2 class="h2">Set up the Le Bistro project</h2></div>
+    <p class="small muted" style="max-width:560px">You know every command from the Vite and Tailwind lectures. Put them in order. When it is right, the terminal replays them.</p>
+  </div>
+  <div class="split mt-l" style="grid-template-columns:minmax(0,1fr) 640px;gap:48px">
+    <div class="order is-compact" data-order data-term="#setup-term">
+      <ol class="order__list">
+        <li data-pos="4" data-cmd="npm install tailwindcss @tailwindcss/vite" data-out="added 2 packages"><code>npm install tailwindcss @tailwindcss/vite</code><small>Tailwind v4 and its Vite plugin</small></li>
+        <li data-pos="1" data-cmd="npm create vite@latest le-bistro -- --template react-ts" data-out="Scaffolding project in ./le-bistro...|Done."><code>npm create vite@latest le-bistro -- --template react-ts</code><small>A new React + TypeScript project</small></li>
+        <li data-pos="7" data-cmd="npm run dev" data-out="VITE v8 ready|➜  Local:   http://localhost:5173/"><code>npm run dev</code><small>Start the dev server</small></li>
+        <li data-pos="2" data-cmd="cd le-bistro"><code>cd le-bistro</code><small>Go into the folder</small></li>
+        <li data-pos="6" data-cmd="# src/index.css: @import &quot;tailwindcss&quot;;" data-out="(and delete App.css and src/assets)"><code>src/index.css → @import "tailwindcss";</code><small>Replace the template CSS</small></li>
+        <li data-pos="3" data-cmd="npm install" data-out="added 160 packages"><code>npm install</code><small>Download the dependencies</small></li>
+        <li data-pos="5" data-cmd="# vite.config.ts: plugins: [react(), tailwindcss()]"><code>vite.config.ts → plugins: [react(), tailwindcss()]</code><small>Switch Tailwind on</small></li>
+      </ol>
+    </div>
+    <div class="term" id="setup-term" data-prompt="~/projects $"><div class="term__bar"><i></i><i></i><i></i></div><div class="term__body"><div class="term__line"><span class="term__prompt">~/projects $</span><span class="term__caret"></span></div></div></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> The room dictates, you drag (or use the arrow keys on a focused row). "Check order" tells you which rows are wrong. "Show answer" if time is short.</p>
+    <p><b>Live:</b> run the real commands now in your terminal, in an empty folder. The dev server should open the Vite page at localhost:5173.</p>
+    <p><b>Then:</b> copy the colours: paste the <code>@theme</code> block from <code>code/after-L27/src/index.css</code> into your index.css. It is the Le Bistro palette, not React, so we don't type it live.</p>
+    <p><b>If it fails:</b> Node must be 20.19+ or 22.12+ (<code>node -v</code>). On Windows run the terminal as a normal user inside a folder you own.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="Recipe: our first component">
+  <p class="eyebrow"><b>Solution 1 · Recipe</b> Type it with me, step by step</p>
+  <h2 class="h3 mt-s">Our first component: the Header</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>Create the file and the function</b><span>Capital letter. <code>export</code> so App can import it.</span><span class="file-chip"><i data-icon="file-code"></i>src/components/Header.tsx</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Return the JSX</b><span>One root element: <code>&lt;header&gt;</code>. className, not class.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>The logo</b><span>Plain HTML inside JSX. The classes come from index.css.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>The navigation</b><span>Static for now. The buttons start working in L28 and L30.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/components/Header.tsx" data-copy data-build="1:1,22;2:2,3,20,21;3:4-8,19;4:9-18" style="--code-size:17px">
+        export function Header() {
+          return (
+            <header className="site-header">
+              <div className="site-header__bar">
+                <a href="#top" className="logo">
+                  <span className="logo__name">Le Bistro</span>
+                  <span className="eyebrow">by IT Step</span>
+                </a>
+                <nav className="nav">
+                  <a href="#favourites">Favourites</a>
+                  <a href="#menu">Menu</a>
+                  <button type="button" className="btn-outline">
+                    Your order · 0
+                  </button>
+                  <button type="button" className="btn-outline">
+                    Log in
+                  </button>
+                </nav>
+              </div>
+            </header>
+          );
+        }
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Each press adds the lines of one step (green). Type them in VS Code at the same time, with the font size up (Ctrl and +). If you get lost, the Copy button copies exactly what is on the slide.</p>
+    <p><b>Step 1:</b> say the rule out loud: a component is a function with a capital letter.</p>
+    <p><b>Step 3:</b> the classes (logo, eyebrow) are defined in index.css with Tailwind's @apply. Students know Tailwind from module 3. We keep the JSX short so every file fits on a slide.</p>
+    <p><b>Nothing appears yet?</b> Correct. A component shows up only when someone uses it. That is the next slide.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="Recipe: compose the page">
+  <p class="eyebrow"><b>Solution 1 · Recipe</b> Same recipe, three times</p>
+  <h2 class="h3 mt-s">Hero and Footer, then App puts them together</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>Use the Header</b><span>Import it, then write it like a tag: <code>&lt;Header /&gt;</code>.</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Hero: same recipe</b><span>New file, function, JSX. Copy it from <code>code/after-L27</code>.</span><span class="file-chip"><i data-icon="file-code"></i>src/components/Hero.tsx</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Footer: same recipe</b><span>And use it at the bottom of App.</span><span class="file-chip"><i data-icon="file-code"></i>src/components/Footer.tsx</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>The fragment <code>&lt;&gt;…&lt;/&gt;</code></b><span>One parent for three components, without an extra div.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <div class="grid" style="grid-template-columns:600px minmax(0,1fr);gap:26px;align-items:start">
+        <script type="text/plain" data-lang="tsx" data-file="src/App.tsx" data-copy data-build="1:2,5-8,13-15;2:3,9-11;3:1,12" data-walk="4:7,13" style="--code-size:18px">
+          import { Footer } from "./components/Footer";
+          import { Header } from "./components/Header";
+          import { Hero } from "./components/Hero";
+
+          export default function App() {
+            return (
+              <>
+                <Header />
+                <main>
+                  <Hero />
+                </main>
+                <Footer />
+              </>
+            );
+          }
+        </script>
+        <div class="mock preview-stack">
+          <div class="mock__bar"><i></i><i></i><i></i><span>localhost:5173</span></div>
+          <div class="mhead" data-step="1"><div class="mhead__logo">Le Bistro<small>by IT Step</small></div><nav><span>Menu</span><span class="mbtn">Log in</span></nav></div>
+          <div class="mhero" data-step="2"><img src="../_shared/img/dishes/duck-confit.jpg" alt=""><span class="meyebrow">Vera · Tbilisi</span><h4>French cooking, at home in Tbilisi</h4><span class="mbtn is-solid">View the menu</span></div>
+          <div class="mfoot" data-step="3"><span>Le Bistro</span><small>Open daily 12–23</small></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Replace everything in the template's App.tsx with these lines. Delete <code>App.css</code> and <code>src/assets</code>, they belong to the template.</p>
+    <p><b>Step 2 and 3:</b> don't type Hero and Footer live, it is the same recipe. Copy them from <code>bistro-track/code/after-L27/src/components/</code> and show that they follow the same three moves: file, function, JSX.</p>
+    <p><b>Show:</b> save, and the browser updates without a reload (HMR). Three components, one page.</p>
+    <p><b>The recipe, in three words:</b> file → function → use. Write it on the board, it stays there all lecture.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="When it goes wrong">
+  <p class="eyebrow"><b>Solution 1</b> The four errors you will see today</p>
+  <h2 class="h2 mt-s">When it goes wrong</h2>
+  <div class="mistakes">
+    <div class="mistake" data-step="1"><h4>A lowercase name</h4><div class="bad">function dishCard() … &lt;dishCard /&gt;</div><div class="err">&lt;dishCard /&gt; is using incorrect casing. Use PascalCase for React components.</div><div class="good">function DishCard() … &lt;DishCard /&gt;</div></div>
+    <div class="mistake" data-step="2"><h4>Forgot export</h4><div class="bad">function Hero() { … }</div><div class="err">Module "./components/Hero" has no exported member "Hero".</div><div class="good">export function Hero() { … }</div></div>
+    <div class="mistake" data-step="3"><h4>Two roots</h4><div class="bad">return &lt;Header /&gt;&lt;Hero /&gt;</div><div class="err">JSX expressions must have one parent element.</div><div class="good">return &lt;&gt;&lt;Header /&gt;&lt;Hero /&gt;&lt;/&gt;</div></div>
+    <div class="mistake" data-step="4"><h4>HTML habits</h4><div class="bad">&lt;div class="hero"&gt;</div><div class="err">Invalid DOM property `class`. Did you mean `className`?</div><div class="good">&lt;div className="hero"&gt;</div></div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> These are the real messages, word for word. When a student calls you, look for these four first.</p>
+    <p><b>Where they appear:</b> 1 and 4 in the browser console (F12). 2 and 3 in VS Code as red lines, and in the terminal.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="Which one is a component?">
+  <div class="split-5-7 fill items-center">
+    <div class="stack" style="--gap:24px">
+      <p class="eyebrow"><b>Quick check</b> Vote, then click</p>
+      <h2 class="h1">Which one is a valid component?</h2>
+      <p class="lead">Exactly one of them renders the title.</p>
+    </div>
+    <div class="quiz" data-quiz>
+      <div class="quiz__opts">
+        <button class="quiz__opt"><code>function header() { return &lt;h1&gt;Le Bistro&lt;/h1&gt; }</code></button>
+        <button class="quiz__opt" data-correct><code>function Header() { return &lt;h1&gt;Le Bistro&lt;/h1&gt; }</code></button>
+        <button class="quiz__opt"><code>function Header() { &lt;h1&gt;Le Bistro&lt;/h1&gt; }</code></button>
+        <button class="quiz__opt"><code>function Header() { return &lt;h1&gt;Le&lt;/h1&gt;&lt;h2&gt;Bistro&lt;/h2&gt; }</code></button>
+      </div>
+      <p class="quiz__explain">A: lowercase, React treats <code>&lt;header /&gt;</code> as the HTML tag. C: no <code>return</code>, so it shows nothing. D: two roots, a compile error.</p>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Fingers up for 1 to 4, then press the number key of the most common answer. If most chose C, repeat: a function returns its result, a component too.</p></aside>
+</section>
+
+<!-- ============================== CLASSWORK 1 ============================== -->
+
+<section class="slide" data-phase="classwork" data-title="Classwork 1: your skeleton">
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Atelier · Classwork 1</b> 15 minutes, on your own project</p><h2 class="h1">Your project's skeleton</h2></div>
+    <div class="timer" data-timer="900"></div>
+  </div>
+  <div class="cw">
+    <div class="tiers">
+      <div class="tier base"><div class="tier__k"><span>Base</span><span>everyone</span></div><h3>Three components</h3>
+        <ul><li>Create your project with Vite (react-ts) and Tailwind, if you have not yet.</li><li>Draw your home page as boxes, on paper. Name every box.</li><li>Make <code>Header</code>, <code>Hero</code> and <code>Footer</code> in <code>src/components/</code>, and use them in <code>App</code>.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Plus</span><span>most of you</span></div><h3>Your colours</h3>
+        <ul><li>Put your shop's colours and fonts in an <code>@theme</code> block, like Le Bistro.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Pro</span><span>fast finishers</span></div><h3>A fourth box</h3>
+        <ul><li>One more component from your drawing, for example a "Why shop with us" strip.</li></ul></div>
+    </div>
+    <div class="cw__side">
+      <div class="done-when"><p class="k">Done when</p><ul class="checks"><li>Three files in <code>src/components/</code>, one component each</li><li>Every name starts with a capital letter</li><li>App only puts the components together</li><li>No errors in the console (F12)</li></ul></div>
+      <div class="hint" data-peek="click for a hint"><div><p class="k">Stuck?</p><p>Same three moves for every component: <b>file</b> → <b>export function</b> returning JSX → <b>import and use</b> in App.</p></div></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Start the timer. Walk around. Look at screens, not faces.</p>
+    <p><b>Common problems:</b> template leftovers (App.css, the counter) still on screen, lowercase file or function names, a component imported but never used.</p>
+    <p><b>Students without a theme yet:</b> they can start with the generic shop name "My Shop" and rename later.</p>
+    <p>Full brief and solutions: <code>classwork.md</code>.</p>
+  </aside>
+</section>
+
+<!-- ============================== BREAK ============================== -->
+
+<section class="slide" data-phase="break" data-tone="dark" data-title="Pause café">
+  <div class="pause">
+    <div class="stack" style="--gap:28px">
+      <p class="eyebrow"><b>Pause café</b> 10 minutes</p>
+      <h2 class="display">Pause café</h2>
+      <p class="lead">Stand up, refill, rest your eyes. After the break: one card, twenty-five different dishes.</p>
+      <button class="pause__btn" type="button" data-start-break><i data-icon="coffee"></i>Start the break</button>
+    </div>
+    <div class="cup" aria-hidden="true"><span class="cup__steam"></span><span class="cup__steam"></span><span class="cup__steam"></span><div class="cup__plate"></div><div class="cup__body"></div><div class="cup__coffee"></div><div class="cup__handle"></div></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Click "Start the break" (or press B). A 10-minute countdown starts with radio music. +1 / −1 minute adjusts it. When it ends, a chime plays and a "Welcome back" screen appears.</p>
+    <p><b>No internet?</b> The radio needs it. Put mp3 files in <code>_shared/music/</code> and list them in <code>tracks.js</code>.</p>
+  </aside>
+</section>
+
+<!-- ============================== PROBLEM 2 ============================== -->
+
+<section class="slide" data-phase="problem2" data-tone="dark" data-title="One card. 25 dishes.">
+  <div class="problem-cover">
+    <div class="problem-cover__text">
+      <p class="eyebrow"><b>Second plat · Problem 2</b> We have a DishCard now</p>
+      <h2 class="display">One card.<br>25 dishes.</h2>
+      <p class="lead">The component exists. But how does one DishCard know which dish to show?</p>
+    </div>
+    <div class="problem-cover__photo"><img src="../img/photo-champagne-brut.jpg" alt=""></div>
+  </div>
+  <aside class="notes"><p><b>Say:</b> Welcome back. Before the break we wrote components. Now we use one component for many different things.</p></aside>
+</section>
+
+<section class="slide" data-phase="problem2" id="same" data-title="Every card says Coq au Vin">
+  <p class="eyebrow"><b>Problem 2</b> Try it</p>
+  <h2 class="h2 mt-s">Every card says Coq au Vin</h2>
+  <div class="same">
+    <div class="stack" style="--gap:18px">
+      <script type="text/plain" data-lang="tsx" data-file="DishCard.tsx (first try)" style="--code-size:19px">
+        export function DishCard() {
+          return (
+            <article className="card">
+              <h3 className="card__title">
+                Coq au Vin
+                <span className="card__price">₾32</span>
+              </h3>
+              <p className="card__desc">Chicken braised slowly…</p>
+            </article>
+          );
+        }
+      </script>
+      <button class="btn is-wine" type="button" id="same-run" style="align-self:flex-start"><i data-icon="play"></i>Render the menu: &lt;DishCard /&gt; × 6</button>
+      <div class="callout is-warn" data-step="1"><i data-icon="triangle-alert"></i><div><p class="h4">The text is written inside the function.</p><p class="small muted mt-s">A function without inputs gives the same result every time.</p></div></div>
+    </div>
+    <div class="same__grid" id="same-grid"></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Click the button. Six cards, six times Coq au Vin.</p>
+    <p><b>Ask:</b> How do you make a function give a different result each time? <b>Expect:</b> "parameters", "arguments". Exactly. Press next for the callout.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="problem2" data-title="A component is a function. Props are its inputs.">
+  <p class="eyebrow"><b>Problem 2</b> You already know the answer</p>
+  <h2 class="h2 mt-s">A component is a function. Props are its inputs.</h2>
+  <div class="analogy">
+    <div class="card" data-step="1">
+      <p class="eyebrow">Plain JavaScript</p>
+      <script type="text/plain" data-lang="tsx">
+        function formatPrice(price: number) {
+          return "₾" + price;
+        }
+
+        formatPrice(32);    // "₾32"
+        formatPrice(14.5);  // "₾14.5"
+      </script>
+      <p class="out">One function, <b>different arguments</b>, different results.</p>
+    </div>
+    <div class="card" data-step="2">
+      <p class="eyebrow">React</p>
+      <script type="text/plain" data-lang="tsx">
+        function DishCard({ dish }: DishCardProps) {
+          return <h3>{dish.name}</h3>;
+        }
+
+        <DishCard dish={coqAuVin} />   // Coq au Vin
+        <DishCard dish={espresso} />   // Espresso
+      </script>
+      <p class="out">One component, <b>different props</b>, different cards.</p>
+    </div>
+  </div>
+  <div class="need" style="margin-top:34px">
+    <span class="chip is-answer" data-step="3" data-fx="pop"><i data-icon="package"></i>Props: the inputs of a component</span>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Nothing new to learn here. Props are function parameters, written like HTML attributes.</p>
+    <p><b>Step 2:</b> point at <code>dish={coqAuVin}</code> and at <code>{ dish }</code>. Same name on both sides: what goes in at the call is what the function receives.</p>
+  </aside>
+</section>
+
+<!-- ============================== SOLUTION 2 ============================== -->
+
+<section class="slide" data-phase="solution2" data-title="Props flow down">
+  <div class="idea">
+    <div class="schema" style="width:1040px;height:720px">
+      <div class="node is-wine lg" id="p-app" style="left:400px;top:0" data-step="1">App<small>owns the data: dishes[]</small></div>
+      <div class="node lg" id="p-grid" style="left:400px;top:250px" data-step="1">DishGrid<small>gets dishes</small></div>
+      <div class="node is-brass" id="p-c1" style="left:40px;top:520px" data-step="1">DishCard<small>Coq au Vin</small></div>
+      <div class="node is-brass" id="p-c2" style="left:410px;top:520px" data-step="1">DishCard<small>Crème Brûlée</small></div>
+      <div class="node is-brass" id="p-c3" style="left:780px;top:520px" data-step="1">DishCard<small>Bordeaux Rouge</small></div>
+      <b class="wire is-wine" data-id="pw-a" data-from="p-app" data-to="p-grid" data-step="2" data-label="dishes={favourites}" data-lx="120"></b>
+      <b class="wire is-wine" data-id="pw-1" data-from="p-grid" data-to="p-c1" data-sides="b t" data-bend="0.3" data-step="3"></b>
+      <b class="wire is-wine" data-id="pw-2" data-from="p-grid" data-to="p-c2" data-sides="b t" data-bend="0.3" data-step="3" data-label="dish={dish}" data-lx="80"></b>
+      <b class="wire is-wine" data-id="pw-3" data-from="p-grid" data-to="p-c3" data-sides="b t" data-bend="0.3" data-step="3"></b>
+      <b class="packet is-wine" data-wire="pw-a" data-on="2:go" style="--dur:1.6s">[ 3 dishes ]</b>
+      <b class="packet" data-wire="pw-1" data-on="3:go" style="--dur:1.5s">Coq au Vin</b>
+      <b class="packet" data-wire="pw-2" data-on="3:go" style="--dur:1.5s;--delay:.2s">Crème Brûlée</b>
+      <b class="packet" data-wire="pw-3" data-on="3:go" style="--dur:1.5s;--delay:.4s">Bordeaux</b>
+      <b class="wire is-bad is-dash" data-from="p-c3" data-to="p-grid" data-sides="t r" data-step="4" data-label="✗ change a prop" data-lx="60"></b>
+    </div>
+    <div class="idea__side">
+      <p class="eyebrow"><b>Solution 2</b> The rule of the tree</p>
+      <h2 class="h2">Props flow down</h2>
+      <div class="takeaway" data-step="2"><p class="k">Parent → child</p><p>A parent passes data to its children as props. App passes the list, DishGrid passes one dish to each card.</p></div>
+      <div class="takeaway" data-step="4" style="border-color:var(--bad)"><p class="k" style="color:var(--bad)">Read-only</p><p>A child never changes its props. <code>dish.price = 0</code> inside DishCard is a bug. (Changing data is lecture L28.)</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Step 2 sends the list down from App. Step 3 splits it: each card gets its own dish. Step 4 is the red arrow: not allowed.</p>
+    <p><b>Say:</b> Data in React flows one way, from parent to child, like water down a staircase. Remember the picture: next lecture asks how a click at the bottom changes data at the top.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Props on both sides">
+  <p class="eyebrow"><b>Solution 2</b> Where a prop is sent, and where it arrives</p>
+  <h2 class="h2 mt-s">Props on both sides</h2>
+  <div class="grid cols-2" style="margin-top:34px;--gap:28px">
+    <div class="stack" style="--gap:12px">
+      <p class="eyebrow">Sent by the parent</p>
+      <script type="text/plain" data-lang="tsx" data-file="DishGrid.tsx" data-walk="1:1;2:1;3:2-5" style="--code-size:24px">
+        <DishCard dish={dish} />
+
+        <Section title="The menu" />   // text: quotes
+        <Section count={12} />         // number: braces
+        <DishCard isNew={false} />     // boolean: braces
+      </script>
+    </div>
+    <div class="stack" style="--gap:12px">
+      <p class="eyebrow">Received by the child</p>
+      <script type="text/plain" data-lang="tsx" data-file="DishCard.tsx" data-walk="1:5;2:1-3,5" style="--code-size:24px">
+        type DishCardProps = {
+          dish: Dish;
+        };
+
+        export function DishCard({ dish }: DishCardProps) {
+          return <h3>{dish.name}</h3>;
+        }
+      </script>
+    </div>
+  </div>
+  <div class="row mt-l" style="--gap:14px">
+    <span class="chip big" data-step="1"><i data-icon="equal"></i>Same name: <code>dish</code> = <code>{ dish }</code></span>
+    <span class="chip big" data-step="2"><i data-icon="shield-check"></i>A type says what a prop must be</span>
+    <span class="chip big" data-step="3"><i data-icon="quote"></i>Quotes for text, braces for everything else</span>
+  </div>
+  <aside class="notes">
+    <p><b>Step 1:</b> the name written at the call (<code>dish=</code>) is the name inside the braces of the function.</p>
+    <p><b>Step 2:</b> the props type is a contract. Forget the prop, or pass a number instead of a Dish, and TypeScript underlines it before you run anything.</p>
+    <p><b>Step 3:</b> the classic mistake is <code>price="32"</code>: that is the text "32", not the number 32.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Recipe: a DishCard with props">
+  <p class="eyebrow"><b>Solution 2 · Recipe</b> Type it with me</p>
+  <h2 class="h3 mt-s">DishCard, part 1: describe the input</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>Describe one dish</b><span>The same fields as the API. Written once, used everywhere.</span><span class="file-chip"><i data-icon="file-code"></i>src/types.ts</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Imports</b><span>The price helper, the image address and the Dish type.</span><span class="file-chip"><i data-icon="file-code"></i>src/components/DishCard.tsx</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>The props type</b><span>DishCard needs one thing: a dish.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Receive the prop</b><span>Destructure it in the parameters: <code>{ dish }</code>.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/types.ts" data-copy data-build="1:1-11" style="--code-size:17px">
+        // One dish, with the same fields as the Le Bistro API
+        export type Dish = {
+          id: number;
+          name: string;
+          description: string;
+          price: number;
+          categorySlug: string;
+          categoryName: string;
+          imageUrl: string;
+          isAvailable: boolean;
+        };
+      </script>
+      <script type="text/plain" data-lang="tsx" data-file="src/components/DishCard.tsx" data-copy data-build="2:1-3;3:5-7;4:9" style="--code-size:17px">
+        import { formatPrice } from "../lib/format";
+        import { IMAGE_BASE } from "../lib/images";
+        import type { Dish } from "../types";
+
+        type DishCardProps = {
+          dish: Dish;
+        };
+
+        export function DishCard({ dish }: DishCardProps) {
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Create <code>src/types.ts</code> and type it. Then start DishCard.tsx with the three imports.</p>
+    <p><b>The two helpers:</b> <code>lib/format.ts</code> (formatPrice: 32 → "₾32") and <code>lib/images.ts</code> (the server address of the photos) are three lines each. Copy them from <code>code/after-L27/src/lib/</code>.</p>
+    <p><b>Say at step 4:</b> <code>{ dish }</code> takes the dish out of the props object. Writing <code>(props)</code> and then <code>props.dish</code> works too, it's just longer.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Recipe: use the props in JSX">
+  <p class="eyebrow"><b>Solution 2 · Recipe</b> Continue the same file</p>
+  <h2 class="h3 mt-s">DishCard, part 2: show the dish</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>The card and the photo</b><span>Braces put JavaScript values into attributes.</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Name and price</b><span><code>{dish.name}</code> and <code>{formatPrice(dish.price)}</code>.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>The description</b><span>Each card shows its own dish now.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Show something only sometimes</b><span><code>condition &amp;&amp; &lt;p&gt;…&lt;/p&gt;</code>: the badge appears only if the dish is unavailable.</span></li>
+      <li data-step="5" data-on="5-5:is-now;6:is-done"><b>The button</b><span>Disabled when the dish is unavailable. It does nothing yet (L28).</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/components/DishCard.tsx" data-copy data-build="1:2-4,10,19-21;2:5-9;3:11;4:12;5:13-17" style="--code-size:17px">
+        export function DishCard({ dish }: DishCardProps) {
+          return (
+            <article className="card">
+              <img src={IMAGE_BASE + dish.imageUrl} alt={dish.name} className="card__img" />
+              <div className="card__body">
+                <h3 className="card__title">
+                  {dish.name}
+                  <span className="card__leader" />
+                  <span className="card__price">{formatPrice(dish.price)}</span>
+                </h3>
+                <p className="card__desc">{dish.description}</p>
+                {!dish.isAvailable && <p className="badge">Off the menu today</p>}
+                <div className="card__actions">
+                  <button type="button" className="btn-outline" disabled={!dish.isAvailable}>
+                    Add to cart
+                  </button>
+                </div>
+              </div>
+            </article>
+          );
+        }
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Continue typing in DishCard.tsx. Then test with one dish in App: <code>&lt;DishCard dish={dishes[0]} /&gt;</code> (the data file comes in two slides; for a quick test write one dish object inline).</p>
+    <p><b>Step 4:</b> <code>&amp;&amp;</code> is plain JavaScript: if the left side is false, React renders nothing. The other way to choose is the ternary <code>a ? b : c</code>, which we use next lecture.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" id="pg" data-title="Props playground">
+  <p class="eyebrow"><b>Solution 2</b> Change a prop, watch the card</p>
+  <h2 class="h2 mt-s">Props playground</h2>
+  <div class="pg">
+    <div class="pg__form">
+      <label>name<input type="text" id="pg-name" value="Coq au Vin"></label>
+      <label>price<input type="number" id="pg-price" value="32" min="0" step="0.5"></label>
+      <label>category<select id="pg-cat"><option>Main Courses</option><option>Starters</option><option>Desserts</option><option>Drinks</option></select></label>
+      <label class="check"><input type="checkbox" id="pg-avail" checked>isAvailable</label>
+    </div>
+    <pre class="code" id="pg-code" style="--code-size:21px;margin:0"><code></code></pre>
+    <div id="pg-card"></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Change the name and the price: the JSX in the middle and the card on the right change together. Untick isAvailable: the badge appears and the button is disabled.</p>
+    <p><b>Say:</b> The component never changes. Only its input does. That is the whole idea of props.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="From an array to cards">
+  <p class="eyebrow"><b>Solution 2</b> Lists: one card per item</p>
+  <h2 class="h2 mt-s">From an array to cards: <code style="font-size:.8em">.map()</code></h2>
+  <div class="schema machine">
+    <div class="obj" style="top:30px" data-on="1:is-in">{ id: <b>5</b>, name: <s>"Coq au Vin"</s>, … }</div>
+    <div class="obj" style="top:180px" data-on="2:is-in">{ id: <b>15</b>, name: <s>"Crème Brûlée"</s>, … }</div>
+    <div class="obj" style="top:330px" data-on="3:is-in">{ id: <b>21</b>, name: <s>"Bordeaux Rouge"</s>, … }</div>
+    <div class="funnel"><span class="eyebrow" style="color:#e9c27f">for each dish</span><code>dishes.map((dish) =&gt; …)</code><small>returns &lt;DishCard dish={dish} /&gt;</small></div>
+    <div class="outcards" id="map-out"></div>
+    <div class="callout" style="position:absolute;left:0;top:470px;width:900px" data-step="4"><i data-icon="badge-check"></i><div><p class="h4"><code>key={dish.id}</code>: a name tag for every card</p><p class="small muted mt-s">React needs a stable, unique key to tell the cards apart. Use the id, never the position in the list (lecture L28 shows why).</p></div></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Steps 1 to 3 send one object at a time through <code>map</code>: each comes out as a card. Step 4 adds the name tags.</p>
+    <p><b>Say:</b> You know map from the JavaScript module: it turns every item of an array into something else. Here: every dish into a DishCard.</p>
+    <p><b>If asked "why not a for loop?"</b> JSX needs a value it can render. map returns a new array of cards, a for loop returns nothing.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Recipe: data file and DishGrid">
+  <p class="eyebrow"><b>Solution 2 · Recipe</b> The data, the grid, and reuse</p>
+  <h2 class="h3 mt-s">A data file and a DishGrid</h2>
+  <div class="recipe">
+    <ol class="steps is-compact">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>The data file</b><span>Real dishes, copied from the API. Typed <code>Dish[]</code>.</span><span class="file-chip"><i data-icon="file-code"></i>src/data/dishes.ts</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>DishGrid takes the list</b><span>Its prop is the whole array.</span><span class="file-chip"><i data-icon="file-code"></i>src/components/DishGrid.tsx</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>map with a key</b><span>One DishCard per dish. key = the dish id.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Use it in App, twice</b><span>All dishes for the menu, three for "Today's favourites". Same component.</span><span class="file-chip"><i data-icon="file-code"></i>src/App.tsx</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/data/dishes.ts (excerpt)" data-build="1:1-6" style="--code-size:16px">
+        import type { Dish } from "../types";
+
+        export const dishes: Dish[] = [
+          { id: 5, name: "Coq au Vin", price: 32, categorySlug: "main-courses", isAvailable: true, … },
+          // … 11 more dishes, copied from the API
+        ];
+      </script>
+      <div class="grid" style="grid-template-columns:1fr 1fr;--gap:18px">
+        <script type="text/plain" data-lang="tsx" data-file="DishGrid.tsx" data-copy data-build="2:1-6,8-10,14-16;3:11-13" style="--code-size:15px">
+          import type { Dish } from "../types";
+          import { DishCard } from "./DishCard";
+
+          type DishGridProps = {
+            dishes: Dish[];
+          };
+
+          export function DishGrid({ dishes }: DishGridProps) {
+            return (
+              <div className="grid-3">
+                {dishes.map((dish) => (
+                  <DishCard key={dish.id} dish={dish} />
+                ))}
+              </div>
+            );
+          }
+        </script>
+        <script type="text/plain" data-lang="tsx" data-file="App.tsx (excerpt)" data-build="4:1-9" style="--code-size:15px">
+          const favouriteIds = [5, 15, 21];
+
+          // inside App():
+          const favourites = dishes.filter(
+            (dish) => favouriteIds.includes(dish.id),
+          );
+
+          <DishGrid dishes={favourites} />
+          <DishGrid dishes={dishes} />
+        </script>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Don't type the 12 dishes. Copy <code>code/after-L27/src/data/dishes.ts</code> and <code>categories.ts</code>. Show one object and point out: same fields as the <code>Dish</code> type.</p>
+    <p><b>Say:</b> The data file is temporary. In L29 it is replaced by a request to the real API, and the components don't change at all. That is the power of props.</p>
+    <p><b>Step 4:</b> one component, two places, different data. The copy-paste problem from the start of the lecture is solved.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" id="children" data-title="children: a frame with a hole">
+  <div class="split" style="grid-template-columns:760px minmax(0,1fr);gap:72px;flex:1;align-items:center">
+    <div class="frame-demo" id="frame">
+      <div class="frame-demo__head"><p>From the kitchen</p><h4>Today's favourites</h4><i></i></div>
+      <div class="hole">
+        <span class="hole__label">{children}</span>
+        <div class="hole__fill" data-on="2-2:is-in;3:is-out"><span class="tag">&lt;DishGrid dishes={favourites} /&gt;</span><div class="mgrid" id="hole-a"></div></div>
+        <div class="hole__fill" data-on="3:is-in"><span class="tag">&lt;CategoryChips /&gt; + &lt;DishGrid /&gt;</span><div class="mchips"><span class="mchip is-on">Everything</span><span class="mchip">Starters</span><span class="mchip">Main Courses</span><span class="mchip">Desserts</span></div><div class="mgrid" id="hole-b"></div></div>
+      </div>
+    </div>
+    <div class="stack" style="--gap:18px">
+      <p class="eyebrow"><b>Solution 2</b> The last prop of the day</p>
+      <h2 class="h2">children: a frame with a hole</h2>
+      <script type="text/plain" data-lang="tsx" data-file="src/components/Section.tsx" data-copy data-walk="1:7,18;2:7,18;3:10" style="--code-size:15px">
+        import type { ReactNode } from "react";
+
+        type SectionProps = {
+          id?: string;
+          eyebrow: string;
+          title: string;
+          children: ReactNode;
+        };
+
+        export function Section({ id, eyebrow, title, children }: SectionProps) {
+          return (
+            <section id={id} className="section">
+              <div className="section__head">
+                <p className="eyebrow">{eyebrow}</p>
+                <h2 className="title">{title}</h2>
+                <div className="section__rule" />
+              </div>
+              {children}
+            </section>
+          );
+        }
+      </script>
+      <p class="tiny muted" data-step="1">Whatever you write <b>between</b> <code>&lt;Section&gt;</code> and <code>&lt;/Section&gt;</code> arrives as the prop <code>children</code>.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Some components are frames: a title and a style, with a hole in the middle. The hole is filled by whatever the parent puts between the tags.</p>
+    <p><b>Do:</b> Step 2 drops a DishGrid into the frame. Step 3 swaps in something else: same Section, different children. That's how both sections of our page share one component.</p>
+    <p><b>Type:</b> <code>ReactNode</code> means "anything React can render": text, elements, components, lists.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="The page at the end of today">
+  <div class="split-7-5 fill items-center" style="gap:64px">
+    <figure class="shot"><div class="shot__bar"><i></i><i></i><i></i><span class="shot__url"><i data-icon="globe"></i>localhost:5173/<b>#menu</b></span></div><div class="shot__body" style="height:620px"><img src="../img/l27-menu.jpg" alt="Our menu section"></div></figure>
+    <div class="stack" style="--gap:20px">
+      <p class="eyebrow"><b>Solution 2</b> Le Bistro, version 0.1</p>
+      <h2 class="h2">The page at the end of today</h2>
+      <ul class="checks is-done">
+        <li data-step="1">One file per component in <code>src/components/</code></li>
+        <li data-step="2">Every component has a props type</li>
+        <li data-step="3">Dishes come from one data file</li>
+        <li data-step="4">Lists use <code>map</code> with <code>key={dish.id}</code></li>
+        <li data-step="5">Section frames its content with <code>children</code></li>
+      </ul>
+      <p class="small muted" data-step="6">Full code: <code>bistro-track/code/after-L27</code>. Run it with <code>npm install</code> and <code>npm run dev</code>.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Show your live result instead of the screenshot if it works. Click a chip or "Add to cart": nothing happens. That is the problem of the next lecture, plant it now.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Props mistakes">
+  <p class="eyebrow"><b>Solution 2</b> The props errors you will see today</p>
+  <h2 class="h2 mt-s">When props go wrong</h2>
+  <div class="mistakes">
+    <div class="mistake" data-step="1"><h4>A number in quotes</h4><div class="bad">&lt;Price value="32" /&gt;</div><div class="err">Type 'string' is not assignable to type 'number'.</div><div class="good">&lt;Price value={32} /&gt;</div></div>
+    <div class="mistake" data-step="2"><h4>No key in a list</h4><div class="bad">dishes.map((dish) =&gt; &lt;DishCard dish={dish} /&gt;)</div><div class="err">Each child in a list should have a unique "key" prop.</div><div class="good">&lt;DishCard key={dish.id} dish={dish} /&gt;</div></div>
+    <div class="mistake" data-step="3"><h4>Forgot the braces in the parameters</h4><div class="bad">function DishCard(dish: DishCardProps)</div><div class="err">dish.name is undefined (the dish is in dish.dish)</div><div class="good">function DishCard({ dish }: DishCardProps)</div></div>
+    <div class="mistake" data-step="4"><h4>A missing prop</h4><div class="bad">&lt;DishGrid /&gt;</div><div class="err">Property 'dishes' is missing in type '{}' but required in type 'DishGridProps'.</div><div class="good">&lt;DishGrid dishes={dishes} /&gt;</div></div>
+  </div>
+  <aside class="notes"><p><b>Say:</b> Two of these are caught by TypeScript before you even save (1 and 4). The key warning appears in the browser console. Number 3 shows an empty card: check the parameters.</p></aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Which line passes the number 32?">
+  <div class="split-5-7 fill items-center">
+    <div class="stack" style="--gap:24px">
+      <p class="eyebrow"><b>Quick check</b> Vote, then click</p>
+      <h2 class="h1">Which line passes the number 32?</h2>
+    </div>
+    <div class="quiz" data-quiz>
+      <div class="quiz__opts">
+        <button class="quiz__opt"><code>&lt;Price value="32" /&gt;</code></button>
+        <button class="quiz__opt" data-correct><code>&lt;Price value={32} /&gt;</code></button>
+        <button class="quiz__opt"><code>&lt;Price value=32 /&gt;</code></button>
+        <button class="quiz__opt"><code>&lt;Price {value: 32} /&gt;</code></button>
+      </div>
+      <p class="quiz__explain">Quotes pass text. Braces pass any JavaScript value: numbers, booleans, objects, functions. C and D do not compile.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== CLASSWORK 2 ============================== -->
+
+<section class="slide" data-phase="classwork2" data-title="Classwork 2: your catalog">
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Atelier · Classwork 2</b> 15 minutes, on your own project</p><h2 class="h1">Your catalog, from data</h2></div>
+    <div class="timer" data-timer="900"></div>
+  </div>
+  <div class="cw">
+    <div class="tiers">
+      <div class="tier base"><div class="tier__k"><span>Base</span><span>everyone</span></div><h3>Card, grid, data</h3>
+        <ul><li>Open <code>dummyjson.com/products/category/your-category</code>. Write a <code>Product</code> type with the fields you need.</li><li>Copy 6 products into <code>src/data/products.ts</code>, typed <code>Product[]</code>.</li><li><code>ProductCard</code> with a typed prop, and <code>ProductGrid</code> with <code>map</code> and <code>key</code>.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Plus</span><span>most of you</span></div><h3>A Section with children</h3>
+        <ul><li>Wrap the grid in a <code>Section</code> with a title, like Le Bistro.</li><li>Show a "Low stock" badge when <code>stock &lt; 10</code>.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Pro</span><span>fast finishers</span></div><h3>Reuse</h3>
+        <ul><li>A second grid: "Top rated" (rating ≥ 4.5), same <code>ProductGrid</code>.</li></ul></div>
+    </div>
+    <div class="cw__side">
+      <div class="done-when"><p class="k">Done when</p><ul class="checks"><li>The products come from one data file</li><li>Every component has a props type</li><li>No key warning in the console</li><li>A change in the data file changes the page</li></ul></div>
+      <div class="hint" data-peek="click for a hint"><div><p class="k">Stuck?</p><pre>&lt;div className="grid-3"&gt;
+  {products.map((product) =&gt; (
+    &lt;ProductCard key={product.id}
+      product={product} /&gt;
+  ))}
+&lt;/div&gt;</pre></div></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Start the timer and walk around.</p>
+    <p><b>Watch for:</b> <code>id: string</code> in the type (DummyJSON ids are numbers), price passed in quotes, and the key on the wrong element (it goes on the component inside map, not on the div inside the card).</p>
+    <p>Full brief and a sample solution: <code>classwork.md</code>.</p>
+  </aside>
+</section>
+
+<!-- ============================== WRAP-UP ============================== -->
+
+<section class="slide" data-phase="wrap" data-title="Two problems, two tools">
+  <p class="eyebrow"><b>Dessert</b> What we solved today</p>
+  <h2 class="h2 mt-s">Two problems, two tools</h2>
+  <div class="recap">
+    <div class="recap__row" data-step="1">
+      <div class="recap__p"><p class="k">Problem 1</p><p>25 dishes, 25 copies. One change, 25 edits, and some are forgotten.</p></div>
+      <div class="recap__arrow"><i data-icon="arrow-right"></i></div>
+      <div class="recap__s"><p class="k">Components</p><p>Write the card once. Use it like a tag: <code>&lt;DishCard /&gt;</code>. The page is a tree of components.</p></div>
+    </div>
+    <div class="recap__row" data-step="2">
+      <div class="recap__p"><p class="k">Problem 2</p><p>One DishCard, but every card said Coq au Vin.</p></div>
+      <div class="recap__arrow"><i data-icon="arrow-right"></i></div>
+      <div class="recap__s"><p class="k">Props, lists, children</p><p>Props are the inputs. <code>map</code> turns the data into cards, <code>key</code> names them, <code>children</code> fills a frame.</p></div>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Ask:</b> Before each press, ask the room what the solution was. Then reveal.</p></aside>
+</section>
+
+<section class="slide" data-phase="wrap" data-title="What does this do?">
+  <p class="eyebrow"><b>Dessert</b> Click a card to check yourself</p>
+  <h2 class="h2 mt-s">What does this do?</h2>
+  <div class="flips">
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">01 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">export function Hero() {…}</script></div><div class="flip__face flip__back"><span class="flip__k">01</span><p>Declares a component and lets other files import it.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">02 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">&lt;Header /&gt;</script></div><div class="flip__face flip__back"><span class="flip__k">02</span><p>Uses (renders) the Header component here.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">03 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">{dish.name}</script></div><div class="flip__face flip__back"><span class="flip__k">03</span><p>Puts the value of a JavaScript expression into the JSX.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">04 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">dishes.map((dish) => …)</script></div><div class="flip__face flip__back"><span class="flip__k">04</span><p>Turns every dish in the array into a DishCard.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">05 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">key={dish.id}</script></div><div class="flip__face flip__back"><span class="flip__k">05</span><p>A stable name tag so React can tell the cards apart.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">06 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">{!dish.isAvailable && &lt;p&gt;…&lt;/p&gt;}</script></div><div class="flip__face flip__back"><span class="flip__k">06</span><p>Shows the paragraph only when the dish is unavailable.</p></div></div></div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Point at a student for each card. They explain, then you click to flip.</p></aside>
+</section>
+
+<section class="slide" data-phase="wrap" data-title="Homework: v0.1">
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Homework</b> Before L28</p><h2 class="h1">Your shop, version 0.1</h2></div>
+    <span class="sticker">Live link required</span>
+  </div>
+  <div class="hw">
+    <div class="tiers">
+      <div class="tier base"><div class="tier__k"><span>Base</span><span>required</span></div><h3>A static catalog</h3>
+        <ul><li><code>Header</code>, <code>Hero</code>, <code>Section</code>, <code>ProductCard</code>, <code>ProductGrid</code>, <code>Footer</code>, each in its own file.</li><li>8–12 real products in <code>data/products.ts</code>, typed.</li><li>Every component has a props type. Lists use <code>key={product.id}</code>.</li><li>Deployed on Vercel, link in the README.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Plus</span><span>recommended</span></div><h3>Categories and badges</h3>
+        <ul><li>Static category chips from <code>data/categories.ts</code> (they start working in L28).</li><li>Badges with <code>&amp;&amp;</code>: low stock, discount.</li></ul></div>
+    </div>
+    <div class="cw__side">
+      <div class="done-when"><p class="k">Before you submit</p><ul class="checks"><li><code>npm run build</code> passes</li><li>No warnings in the console</li><li>README: a screenshot and the live link</li><li>Optional: AI.md, what you asked an AI and what you kept</li></ul></div>
+      <p class="small muted">Full brief and grading: <code>homework.md</code> in this lecture's folder.</p>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Say:</b> Submit the GitHub link and the Vercel link. The deployed version is the one I check.</p></aside>
+</section>
+
+<section class="slide" data-phase="wrap" data-tone="dark" data-title="Merci">
+  <div class="merci">
+    <div class="stack" style="--gap:22px">
+      <p class="eyebrow"><b>L27</b> Mise en place</p>
+      <h2 class="display">Merci!</h2>
+      <p class="lead">Questions now, or in the class chat. See you at L28.</p>
+    </div>
+    <div class="teaser" data-step="1">
+      <p class="k">Next time · L28</p>
+      <h3>Click “Add to cart”. Nothing happens.</h3>
+      <p>Our page looks right but it cannot change. Next lecture it learns to react: a cart that counts, chips that filter, a search that finds.</p>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Step 1 shows the next problem. Click "Add to cart" in your app once more, live: nothing happens. That is the hook for L28.</p></aside>
+</section>
+
+</div>
+</div>
+
+<script src="../_shared/vendor/icons.js"></script>
+<script src="../_shared/vendor/prism/prism.min.js" data-manual></script>
+<script src="../_shared/vendor/prism/prism-jsx.min.js"></script>
+<script src="../_shared/vendor/prism/prism-typescript.min.js"></script>
+<script src="../_shared/vendor/prism/prism-tsx.min.js"></script>
+<script src="../_shared/vendor/prism/prism-bash.min.js"></script>
+<script src="../_shared/vendor/prism/prism-json.min.js"></script>
+<script src="../_shared/music/tracks.js"></script>
+<script src="../_shared/bistro-data.js"></script>
+<script src="../_shared/deck.js"></script>
+<script src="../track.js"></script>
+<script>
+(function () {
+  'use strict';
+  Track.init();
+  Deck.init({
+    code: 'L27',
+    lecture: 27,
+    title: 'Mise en place',
+    footer: 'Le Bistro track · L27 · Components and props',
+    shared: '../_shared/',
+    breakMinutes: 10,
+    breakLine: 'Pause café. Stand up, refill, rest your eyes. Back in',
+    phases: [
+      { id: 'hello', label: 'Hello' }, { id: 'questions', label: 'Questions' },
+      { id: 'problem', label: 'Problem 1' }, { id: 'solution', label: 'Solution 1' }, { id: 'classwork', label: 'Classwork 1' },
+      { id: 'break', label: 'Break' },
+      { id: 'problem2', label: 'Problem 2' }, { id: 'solution2', label: 'Solution 2' }, { id: 'classwork2', label: 'Classwork 2' },
+      { id: 'wrap', label: 'Wrap-up' }
+    ]
+  });
+
+  var $ = function (id) { return document.getElementById(id); };
+  document.querySelectorAll('[data-start-break]').forEach(function (b) { b.addEventListener('click', function () { Deck.openBreak(); }); });
+
+  /* ---------- copy-paste kitchen ---------- */
+  var cpIds = [1, 2, 3, 5, 6, 7, 9, 12, 15, 17, 21, 24];
+  var cpForgot = [3, 6]; // Coq au Vin and Bouillabaisse: a tired human skips them
+  var cpState, cpBusy = 0;
+  function cpReset() {
+    cpBusy++;
+    cpState = cpIds.map(function () { return { fixed: false, mark: '' }; });
+    $('cp-edits').textContent = '0'; $('cp-miss').textContent = '0';
+    cpRender();
+  }
+  function cpCard(i) {
+    var d = Track.byId(cpIds[i]), s = cpState[i];
+    var off = s.fixed && d.id === 9;
+    var price = s.fixed ? Track.price(d.price) : d.price + ' GEL';
+    return '<article class="mcard' + (s.mark ? ' is-' + s.mark : '') + '"><div class="mcard__body">' +
+      '<span class="file">menu.html · copy ' + String(i + 1).padStart(2, '0') + '</span>' +
+      '<div class="mcard__title"><span>' + Track.esc(d.name) + '</span><span class="p">' + price + '</span></div>' +
+      (off ? '<div class="mcard__badge">Off the menu today</div>' : '') +
+      '<div class="mcard__foot"><button type="button" class="mbtn"' + (off ? ' disabled' : '') + '>Add to cart</button></div></div></article>';
+  }
+  function cpRender() { $('cp-grid').innerHTML = cpIds.map(function (_, i) { return cpCard(i); }).join(''); }
+  $('cp-reset').addEventListener('click', cpReset);
+  $('cp-hand').addEventListener('click', function () {
+    cpReset();
+    var run = cpBusy, i = 0, edits = 0;
+    (function nextCard() {
+      if (run !== cpBusy) return;
+      if (i > 0) cpState[i - 1].mark = cpState[i - 1].mark === 'hot' ? '' : cpState[i - 1].mark;
+      if (i >= cpIds.length) {
+        cpForgot.forEach(function (k) { cpState[k].mark = 'wrong'; });
+        $('cp-miss').textContent = String(cpForgot.length);
+        cpRender();
+        Deck.toast('Two copies were forgotten. One of them is the Bouillabaisse.');
+        return;
+      }
+      if (cpForgot.indexOf(i) === -1) { cpState[i].fixed = true; edits++; $('cp-edits').textContent = String(edits); cpState[i].mark = 'hot'; }
+      cpRender();
+      i++;
+      setTimeout(nextCard, 420);
+    })();
+  });
+  $('cp-one').addEventListener('click', function () {
+    cpReset();
+    cpState.forEach(function (s) { s.fixed = true; s.mark = 'right'; });
+    $('cp-edits').textContent = '1';
+    cpRender();
+    setTimeout(function () { cpState.forEach(function (s) { s.mark = ''; }); cpRender(); }, 1400);
+  });
+  cpReset();
+
+  /* ---------- every card says Coq au Vin ---------- */
+  var coq = Track.byId(5);
+  $('same-run').addEventListener('click', function () {
+    var grid = $('same-grid'); grid.innerHTML = '';
+    for (var k = 0; k < 6; k++) {
+      grid.insertAdjacentHTML('beforeend', Track.card(coq, { desc: false }).replace('class="mcard"', 'class="mcard" style="animation-delay:' + (k * 90) + 'ms"'));
+    }
+  });
+  Deck.onSlide('same', { leave: function () { $('same-grid').innerHTML = ''; } });
+
+  /* ---------- props playground ---------- */
+  function pgUpdate() {
+    var name = $('pg-name').value || ' ', price = Number($('pg-price').value) || 0, cat = $('pg-cat').value, avail = $('pg-avail').checked;
+    var src = '<DishCard\n  dish={{\n    name: "' + name + '",\n    price: ' + price + ',\n    categoryName: "' + cat + '",\n    isAvailable: ' + avail + ',\n  }}\n/>';
+    var code = $('pg-code').querySelector('code');
+    code.className = 'language-tsx';
+    code.textContent = src;
+    if (window.Prism) Prism.highlightElement(code);
+    var dish = { id: 0, name: name, price: price, description: cat + ' · made today', imageUrl: '/images/coq-au-vin.jpg', isAvailable: avail };
+    $('pg-card').innerHTML = Track.card(dish);
+  }
+  ['pg-name', 'pg-price', 'pg-cat', 'pg-avail'].forEach(function (id) { $(id).addEventListener('input', pgUpdate); $(id).addEventListener('change', pgUpdate); });
+  pgUpdate();
+
+  /* ---------- map machine: the cards it produces ---------- */
+  var mapOut = $('map-out');
+  mapOut.innerHTML = [5, 15, 21].map(function (id, k) {
+    return Track.card(Track.byId(id), { desc: false })
+      .replace('class="mcard"', 'class="mcard" data-step="' + (k + 1) + '" data-fx="zoom"')
+      .replace('<img', '<span class="keytag" data-step="4" data-fx="pop">key=' + id + '</span><img');
+  }).join('');
+
+  /* ---------- children: what goes into the hole ---------- */
+  $('hole-a').innerHTML = [5, 15, 21].map(function (id) { return Track.card(Track.byId(id), { desc: false, foot: '' }); }).join('');
+  $('hole-b').innerHTML = [1, 6, 17].map(function (id) { return Track.card(Track.byId(id), { desc: false, foot: '' }); }).join('');
+  Deck.onSlide('children', { step: function (slide, step) { $('frame').classList.toggle('has-fill', step >= 2); } });
+})();
+</script>
+</body>
+</html>

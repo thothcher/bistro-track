@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Le Bistro track · L27–L31</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Karla:wght@400..700&family=JetBrains+Mono:wght@400..600&display=swap">
+<style>
+/* The start page of the Le Bistro track: five deck covers, each with its documents. */
+:root {
+  --bg: #f4efe6;
+  --surface: #fdfaf3;
+  --ink: #2e2a26;
+  --ink-2: #5d554d;
+  --ink-3: #8f8478;
+  --wine: #5c1a23;
+  --brass: #a98545;
+  --f-display: "Cormorant Garamond", Georgia, serif;
+  --f-body: "Karla", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 17px/1.55 var(--f-body); -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-block: 56px 72px; padding-inline: 24px; }
+header { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 26px; }
+.kicker { font: 600 13px/1 var(--f-mono); letter-spacing: .16em; text-transform: uppercase; color: var(--brass); margin: 0 0 14px; }
+h1 { font: 600 clamp(44px, 7vw, 84px)/.95 var(--f-display); color: var(--wine); margin: 0; text-wrap: balance; }
+header p { max-width: 560px; margin: 0; color: var(--ink-2); }
+.docs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 30px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr)); gap: 22px; }
+.deck { background: var(--surface); box-shadow: 0 1px 2px rgba(46, 42, 38, .06), 0 18px 40px -24px rgba(46, 42, 38, .35); display: flex; flex-direction: column; min-width: 0; }
+.deck > a { display: block; overflow: hidden; }
+.deck img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; transition: transform .6s cubic-bezier(.2, .7, .2, 1); }
+.deck > a:hover img { transform: scale(1.025); }
+.body { padding: 22px 24px 24px; display: flex; flex-direction: column; gap: 10px; }
+.num { font: 600 13px/1 var(--f-mono); letter-spacing: .14em; color: var(--brass); text-transform: uppercase; }
+h2 { margin: 0; font: 600 34px/1.05 var(--f-display); color: var(--wine); }
+.body p { margin: 0; color: var(--ink-2); }
+.links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.links a, .docs a { font: 500 14px/1 var(--f-mono); color: var(--ink); text-decoration: none; padding: 10px 12px; background: #ece4d6; }
+.links a:hover, .docs a:hover { background: var(--wine); color: #fdfaf3; }
+.links a.primary, .docs a.primary { background: var(--wine); color: #fdfaf3; }
+.links a:focus-visible, .docs a:focus-visible { outline: 3px solid var(--brass); outline-offset: 2px; }
+footer { margin-top: 40px; display: flex; flex-wrap: wrap; gap: 20px; font: 500 14px/1.6 var(--f-mono); color: var(--ink-3); }
+kbd { font: 600 12px/1 var(--f-mono); padding: 4px 6px; background: var(--surface); box-shadow: 0 1px 0 rgba(0, 0, 0, .15); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <p class="kicker">IT Step · React · syllabus v2 L27–L31</p>
+      <h1>The Le Bistro track</h1>
+    </div>
+    <p>Five lectures from components to context, for lecturers who are new to React. The lecturer builds Le Bistro live; the students build their own shop. Open a deck, press <kbd>F</kbd> for fullscreen, <kbd>N</kbd> for notes and <kbd>B</kbd> for the coffee break.</p>
+  </header>
+
+  <nav class="docs" aria-label="Documents">
+    <a class="primary" href="README.md">README</a>
+    <a href="lecturer-handbook.md">Lecturer handbook</a>
+    <a href="student-project.md">Student project</a>
+    <a href="code/">Code snapshots</a>
+  </nav>
+
+  <main class="grid">
+    <article class="deck">
+      <a href="L27-components/index.html" aria-label="Open the Mise en place deck"><img src="img/covers/L27.jpg" alt="Cover of the Mise en place deck"></a>
+      <div class="body">
+        <span class="num">L27 · 41 slides</span>
+        <h2>Mise en place</h2>
+        <p>Components, JSX, props, lists and keys. Le Bistro's home page and menu from components and a data file; the students' shop starts (v0.1).</p>
+        <div class="links"><a class="primary" href="L27-components/index.html">Deck</a><a href="L27-components/guide.md">Guide</a><a href="L27-components/classwork.md">Classwork</a><a href="L27-components/homework.md">Homework</a><a href="code/after-L27/">Code</a></div>
+      </div>
+    </article>
+    <article class="deck">
+      <a href="L28-state/index.html" aria-label="Open the À la minute deck"><img src="img/covers/L28.jpg" alt="Cover of the À la minute deck"></a>
+      <div class="body">
+        <span class="num">L28 · 41 slides</span>
+        <h2>À la minute</h2>
+        <p>useState, events, lifting state, derived values. A working cart, a stepper, filter chips and search (v0.2).</p>
+        <div class="links"><a class="primary" href="L28-state/index.html">Deck</a><a href="L28-state/guide.md">Guide</a><a href="L28-state/classwork.md">Classwork</a><a href="L28-state/homework.md">Homework</a><a href="code/after-L28/">Code</a></div>
+      </div>
+    </article>
+    <article class="deck">
+      <a href="L29-effects/index.html" aria-label="Open the Le marché deck"><img src="img/covers/L29.jpg" alt="Cover of the Le marché deck"></a>
+      <div class="body">
+        <span class="num">L29 · 42 slides</span>
+        <h2>Le marché</h2>
+        <p>useEffect, fetching, race conditions, custom hooks, useRef. The real menu from the API and a cart that survives F5 (v0.3).</p>
+        <div class="links"><a class="primary" href="L29-effects/index.html">Deck</a><a href="L29-effects/guide.md">Guide</a><a href="L29-effects/classwork.md">Classwork</a><a href="L29-effects/homework.md">Homework</a><a href="code/after-L29/">Code</a></div>
+      </div>
+    </article>
+    <article class="deck">
+      <a href="L30-routing/index.html" aria-label="Open the La maison deck"><img src="img/covers/L30.jpg" alt="Cover of the La maison deck"></a>
+      <div class="body">
+        <span class="num">L30 · 38 slides</span>
+        <h2>La maison</h2>
+        <p>React Router, params, search params, login and guards. A page per dish, staff-only doors, deployed on Vercel (v0.4).</p>
+        <div class="links"><a class="primary" href="L30-routing/index.html">Deck</a><a href="L30-routing/guide.md">Guide</a><a href="L30-routing/classwork.md">Classwork</a><a href="L30-routing/homework.md">Homework</a><a href="code/after-L30/">Code</a></div>
+      </div>
+    </article>
+    <article class="deck">
+      <a href="L31-context/index.html" aria-label="Open the Le passe deck"><img src="img/covers/L31.jpg" alt="Cover of the Le passe deck"></a>
+      <div class="body">
+        <span class="num">L31 · 43 slides</span>
+        <h2>Le passe</h2>
+        <p>Context, useReducer, compound components. One cart and one session for the whole site, and an FAQ (v0.5).</p>
+        <div class="links"><a class="primary" href="L31-context/index.html">Deck</a><a href="L31-context/guide.md">Guide</a><a href="L31-context/classwork.md">Classwork</a><a href="L31-context/homework.md">Homework</a><a href="code/after-L31/">Code</a></div>
+      </div>
+    </article>
+  </main>
+
+  <footer><span>Inside a deck: <kbd>→</kbd> next · <kbd>N</kbd> notes · <kbd>P</kbd> presenter · <kbd>O</kbd> overview · <kbd>B</kbd> break · <kbd>?</kbd> help</span></footer>
+</div>
+</body>
+</html>
