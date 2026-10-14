@@ -1,8 +1,8 @@
 # L28 · À la minute — lecturer guide
 
 **State and events.** Le Bistro track, lecture 2 of 5 (syllabus v2: L28, React lecture 3).
-**Deck:** [`index.html`](index.html), 41 slides. **Code:** starts from [`../code/after-L27`](../code/after-L27), ends at [`../code/after-L28`](../code/after-L28).
-**Students' sheets:** [`classwork.md`](classwork.md), [`homework.md`](homework.md).
+**Deck:** [`index.html`](index.html), 44 slides. **Code:** starts from [`../code/after-L27`](../code/after-L27), ends at [`../code/after-L28`](../code/after-L28).
+**Students' sheets:** [`classwork.md`](classwork.md), [`homework.md`](homework.md). **Masterclass script:** [`masterclass.md`](masterclass.md).
 
 ---
 
@@ -15,6 +15,7 @@
 | **Students' project** | v0.2: a working cart (or meal plan), category filter, search |
 | **The two problems** | 1. A click changes a variable, but the screen stays the same. 2. Each card counts its own dishes, but the Header can't see them |
 | **The two answers** | 1. `useState`. 2. Lift the state to the closest common parent: data down, events up |
+| **AI** | Classwork 2 is done with an AI: a CRAFT prompt (Context, Role, Action, Format, Target), then the students check the code. The Masterclass rebuilds Le Bistro after L28 with one prompt |
 
 ---
 
@@ -115,16 +116,36 @@ Further reading (react.dev): *State: A Component's Memory*, *Render and Commit*,
 |---|---|---|---|
 | 0:00 | Hello | 1–4 | Greeting, menu, route, before and after (the curtain wipes) |
 | 0:03 | Questions | 5–6 | Backup questions, two students show their v0.1 |
-| 0:12 | Problem 1 | 7–10 | The `let qty` demo: the console counts, the button doesn't |
-| 0:18 | Solution 1 | 11–19 | useState, the cycle demo, order a click, snapshots, **live: the stepper, the panel toggle** |
-| 0:42 | Classwork 1 | 20 | Steppers in their own cards |
-| 0:57 | Break | 21 | |
-| 1:07 | Problem 2 | 22–24 | Cards count, the badge stays at 0. The tree |
-| 1:12 | Solution 2 | 25–36 | Lifting, **live: cart in App, data down / events up, Header count, MenuSection filters** |
-| 1:37 | Classwork 2 | 37 | Lift their cart, filter their products |
-| 1:52 | Wrap-up | 38–41 | Recap, flip cards, homework, the next problem |
+| 0:11 | Problem 1 | 7–10 | The `let qty` demo: the console counts, the button doesn't |
+| 0:16 | Solution 1 | 11–19 | useState, the cycle demo, order a click, snapshots, **live: the stepper, the panel toggle** |
+| 0:40 | Classwork 1 | 20 | Steppers in their own cards |
+| 0:55 | Break | 21 |  |
+| 1:05 | Problem 2 | 22–24 | Cards count, the badge stays at 0. The tree |
+| 1:10 | Solution 2 | 25–36 | Lifting, **live: cart in App, data down / events up, Header count, MenuSection filters** |
+| 1:32 | Classwork 2 with AI | 37 | Students prompt an AI to lift their cart and filter their products, then check it |
+| 1:47 | Masterclass | 38–40 | One prompt rebuilds Le Bistro after L28: part by part, run and check, the short version |
+| 1:55 | Wrap-up | 41–44 | Recap, flip cards, homework, the next problem |
 
-Running late? Skip slides 13 (order a click), 19 (three clicks quiz) and 36 (category quiz).
+Running late? Skip slides 13 (order a click), 19 (three clicks quiz) and 36 (category quiz). In the Masterclass, show the parts (slide 38) and the short version (slide 40), and skip the live run.
+
+---
+
+## Classwork 2 with AI and the Masterclass
+
+From this track on, the second classwork is done with an AI, and the lecture ends with a Masterclass.
+
+**Classwork 2 with AI** (slide 37, 15 minutes). The task is a lifted cart, category chips and a search box, but the students don't type the code: they write a prompt in five parts (**CRAFT**: Context, Role, Action, Format, Target), the AI writes the code, and they check it against "Done when".
+- Any AI tool works: Claude, ChatGPT, Copilot Chat. Students who have none can pair up.
+- Walk around and ask students to explain one line the AI wrote. Code they can't explain doesn't count.
+- When the answer doesn't work, the next prompt is the exact error message.
+- The template, a sample prompt (blurred on the slide until clicked) and the follow-up prompts for the AI's usual mistakes are in [`classwork.md`](classwork.md).
+
+**Masterclass** (slides 38–40, 8 minutes). One prompt rebuilds Le Bistro as it is after today:
+1. **The prompt, part by part.** Each press opens one part. For each, one sentence: what would the AI do without it?
+2. **Run it, then check it.** Show the answer, then go through the checks on the slide: each one is something from today.
+3. **The short version.** The same five parts as one paragraph; press next and each part lights up in its colour.
+
+**Before class:** run the Masterclass prompt once in the AI tool you'll use and keep the answer open: answers take a minute or two and vary a little. The full script, with the exact prompt texts, is [`masterclass.md`](masterclass.md).
 
 ---
 

@@ -177,4 +177,43 @@
     return line;
   };
   Track.clear = function (panel) { var body = $('.devtools__body', panel) || panel; body.innerHTML = ''; };
+
+  /* ---------- AI: copy a CRAFT prompt ---------- */
+  Track.copy = function (text, btn, msg) {
+    function done() {
+      if (btn) {
+        btn.classList.add('is-done');
+        btn.innerHTML = Deck.icon('check') + 'Copied';
+        setTimeout(function () { btn.classList.remove('is-done'); btn.innerHTML = Deck.icon('copy') + 'Copy'; }, 2200);
+      }
+      Deck.toast(msg || 'Prompt copied. Paste it into your AI tool.');
+    }
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { if (document.execCommand('copy')) done(); else Deck.toast('Copy failed. Select the prompt and press Ctrl+C.'); }
+      catch (e) { Deck.toast('Copy failed. Select the prompt and press Ctrl+C.'); }
+      ta.remove();
+    }
+    try {
+      if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(done, fallback);
+      else fallback();
+    } catch (e) { fallback(); }
+  };
+  /* the text a CRAFT box copies: "CONTEXT\n…\n\nROLE\n…" for the parts, the plain paragraph for the short version */
+  Track.craftText = function (box) {
+    var parts = $$('.craft__part', box);
+    if (parts.length) {
+      return parts.map(function (p) { return p.getAttribute('data-label') + '\n' + $('.craft__text', p).textContent.trim(); }).join('\n\n');
+    }
+    var short = $('.craft__short', box);
+    return short ? short.textContent.replace(/\s+/g, ' ').trim() : '';
+  };
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-craft-copy]');
+    if (!btn) return;
+    e.stopPropagation();
+    Track.copy(Track.craftText(btn.closest('.craft')), btn);
+  });
 })();

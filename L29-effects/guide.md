@@ -1,8 +1,8 @@
 # L29 · Le marché — lecturer guide
 
 **useEffect, useRef and custom hooks: real data.** Le Bistro track, lecture 3 of 5 (syllabus v2: L29, React lecture 4).
-**Deck:** [`index.html`](index.html), 42 slides. **Code:** starts from [`../code/after-L28`](../code/after-L28), ends at [`../code/after-L29`](../code/after-L29).
-**Students' sheets:** [`classwork.md`](classwork.md), [`homework.md`](homework.md).
+**Deck:** [`index.html`](index.html), 45 slides. **Code:** starts from [`../code/after-L28`](../code/after-L28), ends at [`../code/after-L29`](../code/after-L29).
+**Students' sheets:** [`classwork.md`](classwork.md), [`homework.md`](homework.md). **Masterclass script:** [`masterclass.md`](masterclass.md).
 
 ---
 
@@ -15,6 +15,7 @@
 | **Students' project** | v0.3: products from DummyJSON, loading and error states, saved cart, debounced search |
 | **The two problems** | 1. The menu is a typed file; fetching during render loops forever. 2. Slow answers overwrite fast ones, every keystroke is a request, F5 empties the cart |
 | **The two answers** | 1. `useEffect` with dependencies. 2. Cleanups and custom hooks |
+| **AI** | Classwork 2 is done with an AI: a CRAFT prompt (Context, Role, Action, Format, Target), then the students check the code. The Masterclass rebuilds Le Bistro after L29 with one prompt |
 
 ---
 
@@ -135,16 +136,36 @@ Further reading (react.dev): *Synchronizing with Effects*, *You Might Not Need a
 |---|---|---|---|
 | 0:00 | Hello | 1–4 | Greeting, menu, route, the curtain opens on today's result |
 | 0:03 | Questions | 5–6 | Backup questions; two v0.2 demos, then **refresh** (the cart is gone) |
-| 0:12 | Problem 1 | 7–10 | File vs server, the endless fetch loop demo |
-| 0:18 | Solution 1 | 11–19 | useEffect, its life, dependencies, **CORS + proxy (live)**, **Favourites from the API (live)**, four endings, StrictMode |
-| 0:42 | Classwork 1 | 20 | Products from DummyJSON |
-| 0:57 | Break | 21 | |
-| 1:07 | Problem 2 | 22–25 | The race demo (switch No cleanup / With cleanup), 429 demo |
-| 1:12 | Solution 2 | 26–37 | Cancel + tag, **useApi (live or copy)**, MenuSection, **useLocalStorage (live)**, debounce, useRef, "you might not need an effect" |
-| 1:37 | Classwork 2 | 38 | Saved cart, debounced search |
-| 1:52 | Wrap-up | 39–42 | Recap, flip cards, homework, next problem |
+| 0:11 | Problem 1 | 7–10 | File vs server, the endless fetch loop demo |
+| 0:16 | Solution 1 | 11–19 | useEffect, its life, dependencies, **CORS + proxy (live)**, **Favourites from the API (live)**, four endings, StrictMode |
+| 0:40 | Classwork 1 | 20 | Products from DummyJSON |
+| 0:55 | Break | 21 |  |
+| 1:05 | Problem 2 | 22–25 | The race demo (switch No cleanup / With cleanup), 429 demo |
+| 1:10 | Solution 2 | 26–37 | Cancel + tag, **useApi (live or copy)**, MenuSection, **useLocalStorage (live)**, debounce, useRef, "you might not need an effect" |
+| 1:32 | Classwork 2 with AI | 38 | Students prompt an AI for a saved cart and a debounced search, then check it |
+| 1:47 | Masterclass | 39–41 | One prompt rebuilds Le Bistro after L29: part by part, run and check, the short version |
+| 1:55 | Wrap-up | 42–45 | Recap, flip cards, homework, next problem |
 
-Running late? Skip slides 13 (dependency table: say the rule), 31 (debounce timeline) and 37 (quiz). Copy `useApi.ts` instead of typing it.
+Running late? Skip slides 13 (dependency table: say the rule), 31 (debounce timeline) and 37 (quiz). Copy `useApi.ts` instead of typing it. In the Masterclass, show the parts (slide 39) and the short version (slide 41), and skip the live run.
+
+---
+
+## Classwork 2 with AI and the Masterclass
+
+From this track on, the second classwork is done with an AI, and the lecture ends with a Masterclass.
+
+**Classwork 2 with AI** (slide 38, 15 minutes). The task is a saved cart and a debounced search, but the students don't type the code: they write a prompt in five parts (**CRAFT**: Context, Role, Action, Format, Target), the AI writes the code, and they check it against "Done when".
+- Any AI tool works: Claude, ChatGPT, Copilot Chat. Students who have none can pair up.
+- Walk around and ask students to explain one line the AI wrote. Code they can't explain doesn't count.
+- When the answer doesn't work, the next prompt is the exact error message.
+- The template, a sample prompt (blurred on the slide until clicked) and the follow-up prompts for the AI's usual mistakes are in [`classwork.md`](classwork.md).
+
+**Masterclass** (slides 39–41, 8 minutes). One prompt rebuilds Le Bistro as it is after today:
+1. **The prompt, part by part.** Each press opens one part. For each, one sentence: what would the AI do without it?
+2. **Run it, then check it.** Show the answer, then go through the checks on the slide: each one is something from today.
+3. **The short version.** The same five parts as one paragraph; press next and each part lights up in its colour.
+
+**Before class:** run the Masterclass prompt once in the AI tool you'll use and keep the answer open: answers take a minute or two and vary a little. The full script, with the exact prompt texts, is [`masterclass.md`](masterclass.md).
 
 ---
 

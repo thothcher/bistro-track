@@ -76,7 +76,7 @@ The exact tasks and grading of each version are in the lecture's `homework.md`.
 1. **One GitHub repository** from L27 to Demo Day. Commit often, with messages that say what changed.
 2. **A live Vercel link, every week.** Lecturers check the deployed version, not screenshots. From v0.4 on, `vercel.json` makes refresh work on every page.
 3. **README.md**: the shop's name, a screenshot, the live link, and what works in this version.
-4. **AI is a teacher, not a ghostwriter.** You may ask an AI to explain, review or debug. Write it down in **AI.md**: what you asked, what you kept, what you threw away and why. Code you can't explain doesn't count.
+4. **AI is a teacher, not a ghostwriter.** You may ask an AI to explain, review or debug, and the second classwork of every lecture is done with an AI on purpose: you write a prompt in five parts (**CRAFT**: Context, Role, Action, Format, Target) and check what comes back. Write it all down in **AI.md**: what you asked, what you kept, what you threw away and why. Code you can't explain doesn't count.
 5. **Le Bistro is for ideas, not for copying.** Read its code (`bistro-track/code/after-LXX`), then write your own for your products.
 6. **No secrets in the code.** DummyJSON needs no key; never commit a password or a token.
 

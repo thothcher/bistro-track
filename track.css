@@ -441,6 +441,65 @@ code, .code-inline { background: color-mix(in srgb, var(--wine) 8%, transparent)
 .teaser h3 { font: 600 50px/1.05 var(--f-display); margin: 0 0 12px; color: #fbf3e6; }
 .teaser p { font-size: 24px; line-height: 1.45; color: rgba(246, 238, 226, .75); margin: 0; }
 
+/* ---------- AI: CRAFT prompts (Classwork 2 and the Masterclass) ----------
+   Five parts, one colour each: Context, Role, Action, Format, Target.
+   .craft            a dark prompt box; .craft__part rows open one per step; Copy copies "LABEL\ntext" for each part
+   .craft--short     the same prompt as one paragraph; .p-c/.p-r/.p-a/.p-f/.p-t spans light up with .show-parts
+   .craft-mini       the light five-row template on the classwork slide */
+.cr-c { --part: #a98545; --part-light: #e9c27f; }
+.cr-r { --part: #8f2f3b; --part-light: #f0a0a6; }
+.cr-a { --part: #3f6b4a; --part-light: #a5d491; }
+.cr-f { --part: #2f5d7c; --part-light: #92c4e8; }
+.cr-t { --part: #74508a; --part-light: #d4a9e6; }
+.craft { position: relative; min-width: 0; background: var(--code-bg); color: var(--code-fg); border-radius: 16px; box-shadow: var(--shadow-2); padding: 16px 26px 20px; }
+.craft__bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; font: 600 14px/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--code-dim); }
+.craft__bar > span { display: inline-flex; align-items: center; gap: 10px; }
+.craft__bar svg { width: 18px; height: 18px; }
+.craft__part { display: grid; grid-template-columns: 50px 230px minmax(0, 1fr); gap: 18px; align-items: start; padding: 12px 0; border-top: 1px solid rgba(255, 255, 255, .07); }
+.craft__part:first-of-type { border-top: 0; }
+.craft__badge { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: var(--part); color: #fff; font: 700 24px/1 var(--f-display); }
+.craft .craft__badge { background: var(--part-light); color: #1d1816; }
+.craft__name { margin: 0; font: 600 24px/1.1 var(--f-display); color: var(--part-light); }
+.craft__name small { display: block; margin-top: 6px; font: 500 14px/1.35 var(--f-body); color: var(--code-dim); }
+.craft__text { margin: 0; padding-top: 2px; font: 500 var(--craft-size, 17px)/1.48 var(--f-mono); white-space: pre-wrap; overflow-wrap: anywhere; color: var(--code-fg); }
+.craft--short .craft__short { margin: 0; font: 500 var(--craft-size, 21px)/1.65 var(--f-mono); color: var(--code-fg); }
+.craft--short .craft__short span { border-radius: 4px; padding: 1px 0; transition: background-color .5s ease, box-shadow .5s ease, color .5s ease; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.craft--short.show-parts .p-c { background: rgba(233, 194, 127, .14); box-shadow: inset 0 -2px 0 #e9c27f; }
+.craft--short.show-parts .p-r { background: rgba(240, 160, 166, .14); box-shadow: inset 0 -2px 0 #f0a0a6; }
+.craft--short.show-parts .p-a { background: rgba(165, 212, 145, .14); box-shadow: inset 0 -2px 0 #a5d491; }
+.craft--short.show-parts .p-f { background: rgba(146, 196, 232, .14); box-shadow: inset 0 -2px 0 #92c4e8; }
+.craft--short.show-parts .p-t { background: rgba(212, 169, 230, .14); box-shadow: inset 0 -2px 0 #d4a9e6; }
+.craft__legend { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, .08); font: 600 15px/1 var(--f-mono); }
+.craft__legend span { display: inline-flex; align-items: center; gap: 8px; color: var(--part-light); }
+.craft__legend span::before { content: ""; width: 14px; height: 4px; border-radius: 2px; background: var(--part-light); }
+.craft-mini { background: var(--surface); border-radius: var(--card-r); box-shadow: var(--shadow-1); padding: 16px 22px 12px; }
+.craft-mini__k { margin: 0 0 6px; font: 700 14px/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--brass); }
+.craft-mini__row { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 14px; align-items: center; padding: 7px 0; border-top: 1px solid var(--line); }
+.craft-mini__row:first-of-type { border-top: 0; }
+.craft-mini .craft__badge { width: 36px; height: 36px; border-radius: 10px; font-size: 20px; }
+.craft-mini__row p { margin: 0; font-size: 19px; line-height: 1.38; color: var(--ink-2); }
+.craft-mini__row p b { color: var(--part); margin-right: 6px; }
+.ai-levels { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: 20px; line-height: 1.4; color: var(--ink-2); }
+.ai-levels b { display: inline-block; min-width: 54px; font: 700 13px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--brass); }
+.ai-levels li:first-child b { color: var(--wine); }
+.hint pre.is-prompt { font-size: 14px; line-height: 1.45; }
+/* the five CRAFT letters (L27 introduces them) */
+.craft-cards { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; margin-top: 30px; }
+.craft-card { background: var(--surface); border-radius: var(--card-r); box-shadow: var(--shadow-1); padding: 22px 20px; border-top: 5px solid var(--part); display: flex; flex-direction: column; gap: 10px; }
+.craft-card .craft__badge { width: 54px; height: 54px; font-size: 32px; }
+.craft-card h3 { margin: 0; font: 600 30px/1.05 var(--f-display); color: var(--part); }
+.craft-card .q { margin: 0; font: 700 17px/1.3 var(--f-body); color: var(--ink); }
+.craft-card .ex { margin: 0; font: 500 16px/1.45 var(--f-mono); color: var(--ink-2); background: color-mix(in srgb, var(--part) 8%, transparent); border-radius: 8px; padding: 10px 12px; }
+/* masterclass: run it, check it */
+.mc-run { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 36px; margin-top: 26px; align-items: start; }
+.mc-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; counter-reset: mc; }
+.mc-steps li { position: relative; padding: 16px 20px 16px 72px; background: var(--surface); border-radius: var(--card-r); box-shadow: var(--shadow-1); font-size: 21px; line-height: 1.4; counter-increment: mc; }
+.mc-steps li::before { content: counter(mc); position: absolute; left: 20px; top: 14px; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--wine); color: #fdfaf2; font: 700 17px/1 var(--f-mono); }
+.mc-steps li span { display: block; margin-top: 4px; font-size: 17px; color: var(--ink-3); }
+.mc-check { background: var(--surface); border-radius: var(--card-r); box-shadow: var(--shadow-1); padding: 22px 26px; }
+.mc-check .k { margin: 0 0 12px; font: 700 14px/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--good); }
+.mc-check .checks li { font-size: 21px; }
+
 /* ---------- small utilities ---------- */
 .center { text-align: center; }
 .gap-s { --gap: 12px; }

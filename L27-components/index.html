@@ -142,15 +142,16 @@
   <div class="menu-card">
     <div class="menu-card__head"><p class="eyebrow">Le Bistro · L27 · 120 minutes</p><h2>Today's menu</h2></div>
     <ol class="menu-card__list">
-      <li class="course"><span class="course__k">Accueil</span><span class="course__name">Hello <small>Le Bistro and your own project</small></span><span class="course__t">8′</span></li>
-      <li class="course"><span class="course__k">Apéritif</span><span class="course__name">Questions <small>from the TypeScript lecture</small></span><span class="course__t">7′</span></li>
-      <li class="course"><span class="course__k">Entrée</span><span class="course__name">Problem 1 <small>25 dishes, 25 copies</small></span><span class="course__t">6′</span></li>
+      <li class="course"><span class="course__k">Accueil</span><span class="course__name">Hello <small>Le Bistro and your own project</small></span><span class="course__t">7′</span></li>
+      <li class="course"><span class="course__k">Apéritif</span><span class="course__name">Questions <small>from the TypeScript lecture</small></span><span class="course__t">6′</span></li>
+      <li class="course"><span class="course__k">Entrée</span><span class="course__name">Problem 1 <small>25 dishes, 25 copies</small></span><span class="course__t">5′</span></li>
       <li class="course"><span class="course__k">Plat</span><span class="course__name">Components <small>the page as a tree</small></span><span class="course__t">24′</span></li>
       <li class="course"><span class="course__k">Atelier</span><span class="course__name">Classwork 1 <small>your project's skeleton</small></span><span class="course__t">15′</span></li>
       <li class="course is-pause"><span class="course__k">Pause café</span><span class="course__name">Break <small>music on, screens off</small></span><span class="course__t">10′</span></li>
-      <li class="course"><span class="course__k">Second plat</span><span class="course__name">Problem 2 and props <small>one card, many dishes</small></span><span class="course__t">27′</span></li>
-      <li class="course"><span class="course__k">Atelier</span><span class="course__name">Classwork 2 <small>your catalog from data</small></span><span class="course__t">15′</span></li>
-      <li class="course"><span class="course__k">Dessert</span><span class="course__name">Wrap-up <small>recap, homework, next time</small></span><span class="course__t">8′</span></li>
+      <li class="course"><span class="course__k">Second plat</span><span class="course__name">Problem 2 and props <small>one card, many dishes</small></span><span class="course__t">25′</span></li>
+      <li class="course"><span class="course__k">Atelier</span><span class="course__name">Classwork 2 with AI <small>prompt it, then check it</small></span><span class="course__t">15′</span></li>
+      <li class="course"><span class="course__k">Masterclass</span><span class="course__name">One prompt, the whole Le Bistro <small>CRAFT, then the short version</small></span><span class="course__t">8′</span></li>
+      <li class="course"><span class="course__k">Dessert</span><span class="course__name">Wrap-up <small>recap, homework, next time</small></span><span class="course__t">5′</span></li>
     </ol>
   </div>
   <aside class="notes">
@@ -1106,36 +1107,138 @@
   </div>
 </section>
 
-<!-- ============================== CLASSWORK 2 ============================== -->
+<!-- ============================== CLASSWORK 2 · WITH AI ============================== -->
 
-<section class="slide" data-phase="classwork2" data-title="Classwork 2: your catalog">
+<section class="slide" data-phase="classwork2" data-title="Prompting with CRAFT">
+  <p class="eyebrow"><b>Before Classwork 2</b> Today you build with an AI</p>
+  <h2 class="h2 mt-s">A good prompt has five parts: CRAFT</h2>
+  <div class="craft-cards">
+    <div class="craft-card cr-c" data-step="1" data-fx="pop"><span class="craft__badge">C</span><h3>Context</h3><p class="q">What exists already?</p><p class="ex">Vite + React 19 + TypeScript. My shop sells watches. Two products: (pasted)</p></div>
+    <div class="craft-card cr-r" data-step="2" data-fx="pop"><span class="craft__badge">R</span><h3>Role</h3><p class="q">Who should answer?</p><p class="ex">A React teacher who writes code for beginners.</p></div>
+    <div class="craft-card cr-a" data-step="3" data-fx="pop"><span class="craft__badge">A</span><h3>Action</h3><p class="q">What exactly to do?</p><p class="ex">A ProductCard with a typed prop and a ProductGrid with map and key.</p></div>
+    <div class="craft-card cr-f" data-step="4" data-fx="pop"><span class="craft__badge">F</span><h3>Format</h3><p class="q">What should the answer look like?</p><p class="ex">Only new files, complete, with their paths.</p></div>
+    <div class="craft-card cr-t" data-step="5" data-fx="pop"><span class="craft__badge">T</span><h3>Target</h3><p class="q">Who is it for, when is it done?</p><p class="ex">For me, first React week. It must pass npm run build.</p></div>
+  </div>
+  <div class="callout is-warn mt-l" data-step="6"><i data-icon="lightbulb"></i><div><p class="h4">A missing part means the AI guesses.</p><p class="small muted mt-s">Guesses are where the bugs come from: another library, invented fields, code for experts. The AI writes fast; you decide if it's right.</p></div></div>
+  <aside class="notes">
+    <p><b>Say:</b> From today, the second classwork is done with an AI. The AI is only as good as what you tell it. Five questions make a good prompt: CRAFT.</p>
+    <p><b>Do:</b> One card per press. For each, ask: what would the AI do without it? (No context: another stack. No role: code for experts. No action: something else. No format: a wall of text. No target: no idea when it's done.)</p>
+    <p><b>Then:</b> Classwork 2. The slide has a template for each part.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="classwork2" data-title="Classwork 2 with AI: your catalog">
   <div class="row" style="justify-content:space-between;align-items:flex-end">
-    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Atelier · Classwork 2</b> 15 minutes, on your own project</p><h2 class="h1">Your catalog, from data</h2></div>
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Atelier · Classwork 2 · with AI</b> 15 minutes, on your own project</p><h2 class="h1">Prompt it: your catalog, from data</h2></div>
     <div class="timer" data-timer="900"></div>
   </div>
   <div class="cw">
-    <div class="tiers">
-      <div class="tier base"><div class="tier__k"><span>Base</span><span>everyone</span></div><h3>Card, grid, data</h3>
-        <ul><li>Open <code>dummyjson.com/products/category/your-category</code>. Write a <code>Product</code> type with the fields you need.</li><li>Copy 6 products into <code>src/data/products.ts</code>, typed <code>Product[]</code>.</li><li><code>ProductCard</code> with a typed prop, and <code>ProductGrid</code> with <code>map</code> and <code>key</code>.</li></ul></div>
-      <div class="tier"><div class="tier__k"><span>Plus</span><span>most of you</span></div><h3>A Section with children</h3>
-        <ul><li>Wrap the grid in a <code>Section</code> with a title, like Le Bistro.</li><li>Show a "Low stock" badge when <code>stock &lt; 10</code>.</li></ul></div>
-      <div class="tier"><div class="tier__k"><span>Pro</span><span>fast finishers</span></div><h3>Reuse</h3>
-        <ul><li>A second grid: "Top rated" (rating ≥ 4.5), same <code>ProductGrid</code>.</li></ul></div>
+    <div class="stack" style="--gap:14px">
+      <div class="tier base"><div class="tier__k"><span>The task</span><span>the AI writes, you check</span></div>
+        <ul class="ai-levels"><li><b>Base</b>A <code>Product</code> type, 6 real products from your DummyJSON category in <code>src/data/products.ts</code>, a <code>ProductCard</code> with a typed prop and a <code>ProductGrid</code> with <code>map</code> and <code>key</code>.</li><li><b>Plus</b>The grid inside a <code>Section</code> with <code>children</code>; a &quot;Low stock&quot; badge when <code>stock &lt; 10</code>.</li><li><b>Pro</b>A &quot;Top rated&quot; grid (rating ≥ 4.5) from the same <code>ProductGrid</code>.</li></ul></div>
+      <div class="craft-mini"><p class="craft-mini__k">Your prompt, in five parts (CRAFT)</p>
+        <div class="craft-mini__row cr-c"><span class="craft__badge">C</span><p><b>Context</b>Your shop and stack: Vite, React 19, TypeScript, Tailwind 4. Paste two products from your DummyJSON category.</p></div>
+        <div class="craft-mini__row cr-r"><span class="craft__badge">R</span><p><b>Role</b>&quot;A React teacher who writes simple code for a beginner.&quot;</p></div>
+        <div class="craft-mini__row cr-a"><span class="craft__badge">A</span><p><b>Action</b>The Base task in your own words. Plus and Pro in follow-up prompts.</p></div>
+        <div class="craft-mini__row cr-f"><span class="craft__badge">F</span><p><b>Format</b>&quot;Only new or changed files, complete, with their paths. No new libraries.&quot;</p></div>
+        <div class="craft-mini__row cr-t"><span class="craft__badge">T</span><p><b>Target</b>&quot;I'm in my first React week: explain props and key in two sentences.&quot;</p></div>
+      </div>
     </div>
     <div class="cw__side">
-      <div class="done-when"><p class="k">Done when</p><ul class="checks"><li>The products come from one data file</li><li>Every component has a props type</li><li>No key warning in the console</li><li>A change in the data file changes the page</li></ul></div>
-      <div class="hint" data-peek="click for a hint"><div><p class="k">Stuck?</p><pre>&lt;div className="grid-3"&gt;
-  {products.map((product) =&gt; (
-    &lt;ProductCard key={product.id}
-      product={product} /&gt;
-  ))}
-&lt;/div&gt;</pre></div></div>
+      <div class="done-when"><p class="k">Done when</p><ul class="checks"><li>The page shows your products from one data file</li><li>No key warning in the console</li><li>You read every line and can explain it</li><li>AI.md: your prompt and one thing you changed</li></ul></div>
+      <div class="hint" data-peek="click for a sample prompt"><div><p class="k">A sample prompt · Watch boutique</p><pre class="is-prompt">CONTEXT
+My shop &quot;Tempo&quot; sells watches. Vite + React 19 +
+TypeScript + Tailwind 4. Two products from
+dummyjson.com/products/category/mens-watches: (pasted)
+ROLE
+A React teacher who writes simple code for a beginner.
+ACTION
+A Product type with only the fields I need, 6 products
+in src/data/products.ts, a ProductCard with a typed prop
+and a ProductGrid with map and key.
+FORMAT
+Only new or changed files, complete, with their paths.
+No new libraries.
+TARGET
+I'm in my first React week: explain props and key in
+two sentences.</pre></div></div>
     </div>
   </div>
   <aside class="notes">
-    <p><b>Do:</b> Start the timer and walk around.</p>
-    <p><b>Watch for:</b> <code>id: string</code> in the type (DummyJSON ids are numbers), price passed in quotes, and the key on the wrong element (it goes on the component inside map, not on the div inside the card).</p>
-    <p>Full brief and a sample solution: <code>classwork.md</code>.</p>
+    <p><b>Say:</b> Same kind of task as always, a new tool: you write the prompt, the AI writes the code, and you check it. Use the five parts. Read every line before it goes into your project.</p>
+    <p><b>Do:</b> Start the timer. Any AI tool works (Claude, ChatGPT, Copilot Chat). Walk around and ask two students to explain one line the AI wrote. If the answer doesn't work, the next prompt is the exact error message.</p>
+    <p><b>Watch for:</b> <code>key={index}</code>, or the key on a <code>&lt;div&gt;</code> inside the card; Invented fields (<code>id: string</code>, <code>image</code>, <code>name</code>); <code>useState</code> or a fetch &quot;to make it better&quot;; A new library (a UI kit, an icon pack). The follow-up prompts that fix them are in <code>classwork.md</code>.</p>
+    <p><b>Then:</b> the Masterclass. The whole Le Bistro so far, in one prompt.</p>
+  </aside>
+</section>
+
+<!-- ============================== MASTERCLASS ============================== -->
+
+<section class="slide" data-phase="masterclass" data-title="Masterclass: Le Bistro in one prompt">
+  <p class="eyebrow"><b>Masterclass · LAB-27</b> Press next: the prompt opens part by part</p>
+  <h2 class="h2 mt-s">Le Bistro so far, in one prompt</h2>
+  <div class="craft mt-m" data-craft>
+    <div class="craft__bar"><span><i data-icon="message-square"></i>Prompt · LAB-27 · Le Bistro after L27</span><button type="button" class="copy-btn" data-craft-copy><i data-icon="copy"></i>Copy</button></div>
+    <div class="craft__part cr-c" data-step="1" data-fx="left" data-label="CONTEXT"><span class="craft__badge">C</span><p class="craft__name">Context<small>what exists and what we use</small></p><pre class="craft__text">Le Bistro, a French restaurant site (srms.stepacademy.ge).
+New Vite project: React 19, TypeScript, Tailwind CSS 4.
+Attached: src/data/dishes.ts (12 dishes) and src/data/categories.ts.
+A dish: { id, name, description, price, categorySlug, categoryName,
+          imageUrl: &quot;/images/coq-au-vin.jpg&quot;, isAvailable }
+Photos: https://srmsapi.stepacademy.ge + imageUrl</pre></div>
+    <div class="craft__part cr-r" data-step="2" data-fx="left" data-label="ROLE"><span class="craft__badge">R</span><p class="craft__name">Role<small>who answers</small></p><pre class="craft__text">You are a senior React developer who writes code for beginners to read.</pre></div>
+    <div class="craft__part cr-a" data-step="3" data-fx="left" data-label="ACTION"><span class="craft__badge">A</span><p class="craft__name">Action<small>what to build, step by step</small></p><pre class="craft__text">Build the static home page and menu from components:
+Header, Hero, Section (title + children), CategoryChips, DishCard, DishGrid, Footer.
+- DishGrid maps the dishes with key={dish.id}.
+- DishCard: photo, name, price in ₾, description,
+  &quot;Off the menu today&quot; when isAvailable is false.
+- &quot;Today's favourites&quot; (3 dishes), then the whole menu.
+No state and no effects yet: the buttons do nothing.</pre></div>
+    <div class="craft__part cr-f" data-step="4" data-fx="left" data-label="FORMAT"><span class="craft__badge">F</span><p class="craft__name">Format<small>what the answer looks like</small></p><pre class="craft__text">First the component tree, then every file in full with its path.
+Named exports and a props type for every component. Then the commands.</pre></div>
+    <div class="craft__part cr-t" data-step="5" data-fx="left" data-label="TARGET"><span class="craft__badge">T</span><p class="craft__name">Target<small>who reads it, when it's done</small></p><pre class="craft__text">Students in their first React week: short components, plain names.
+It must pass npm run build.</pre></div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> This one prompt rebuilds everything Le Bistro has so far, from L27 to today. It has the same five parts as your classwork prompts.</p>
+    <p><b>Do:</b> Press next five times. For each part, one sentence: what would go wrong without it?</p>
+    <p><b>Copy</b> copies the whole prompt with its five labels. Run it once before class: answers take a minute or two. The script is in <code>masterclass.md</code>.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="masterclass" data-title="Run it, then check it">
+  <p class="eyebrow"><b>Masterclass · LAB-27</b> The AI writes fast. You decide if it's right.</p>
+  <h2 class="h2 mt-s">Run it, then check it</h2>
+  <div class="mc-run">
+    <ol class="mc-steps" data-step="1">
+      <li><b>Copy</b> the prompt into an AI tool<span>Claude, ChatGPT, Copilot Chat: any of them; with the data files attached (from <code>code/after-L27/src/data/</code>)</span></li>
+      <li><b>Build</b> what it gives back<span>a new Vite project, every file pasted at its path</span></li>
+      <li><b>Run</b> <code>npm run dev</code> and <code>npm run build</code><span>an error message goes straight back into the chat</span></li>
+      <li><b>Compare</b> with <code>code/after-L27</code><span>the version we built by hand</span></li>
+    </ol>
+    <div class="mc-check">
+      <p class="k">Check it with what you learned today</p>
+      <ul class="checks"><li data-step="2">Every component has a props type, no <code>any</code></li><li data-step="3"><code>key={dish.id}</code> on the component inside <code>map</code>, not the index</li><li data-step="4">The dishes come from the data file, nothing hard-coded in JSX</li><li data-step="5">No <code>useState</code> or <code>useEffect</code> sneaked in</li><li data-step="6">Photos use the API address + <code>imageUrl</code></li></ul>
+      <div class="callout is-warn mt-m" data-step="7"><i data-icon="sparkles"></i><div><p class="small">AIs love <code>key={index}</code> and invented fields. Today you can spot both.</p></div></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Show the answer you got before class, or run it live if there's time. Go through the checks one by one, in the AI's code. Then open <code>code/after-L27</code> next to it.</p>
+    <p><b>Say:</b> Every check is something from today. Without today's lecture, you could not judge this code.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="masterclass" data-title="The short version">
+  <p class="eyebrow"><b>Masterclass · LAB-27</b> The same five parts, without the labels</p>
+  <h2 class="h2 mt-s">The short version</h2>
+  <div class="craft craft--short mt-m" data-craft data-on="1:show-parts">
+    <div class="craft__bar"><span><i data-icon="message-square"></i>Prompt · LAB-27 · the short version</span><button type="button" class="copy-btn" data-craft-copy><i data-icon="copy"></i>Copy</button></div>
+    <p class="craft__short"><span class="p-r">You're a senior React developer writing for beginners.</span> <span class="p-c">Create a Vite + React 19 + TypeScript + Tailwind 4 app for Le Bistro, a French restaurant: the dishes are in the attached data files, the photos at https://srmsapi.stepacademy.ge + imageUrl.</span> <span class="p-a">Build the static home page and menu from Header, Hero, Section (with children), CategoryChips, DishCard, DishGrid (map with key={dish.id}) and Footer: prices in ₾, an &quot;Off the menu today&quot; badge, 3 favourites, no state yet.</span> <span class="p-f">Answer with the component tree, then every file in full with its path, then the commands.</span> <span class="p-t">Keep it simple enough for first-week students, and make sure npm run build passes.</span></p>
+    <div class="craft__legend" data-step="1"><span class="cr-c">Context</span><span class="cr-r">Role</span><span class="cr-a">Action</span><span class="cr-f">Format</span><span class="cr-t">Target</span></div>
+  </div>
+  <div class="takeaway mt-m" data-step="2"><p class="k">How CRAFT works</p><p>The five parts are a checklist for your thinking, not a form to fill in. Once all five are there, the labels can go: the prompt reads like a message to a colleague.</p></div>
+  <aside class="notes">
+    <p><b>Do:</b> Read it aloud first. Press next: each part lights up in its colour. Ask: if we delete the last sentence, which part is missing? (Target: nobody says when it's done.)</p>
+    <p><b>Say:</b> Long or short, it's the same prompt. Use the labels while you learn; drop them when the five parts come naturally.</p>
   </aside>
 </section>
 
@@ -1239,7 +1342,7 @@
       { id: 'hello', label: 'Hello' }, { id: 'questions', label: 'Questions' },
       { id: 'problem', label: 'Problem 1' }, { id: 'solution', label: 'Solution 1' }, { id: 'classwork', label: 'Classwork 1' },
       { id: 'break', label: 'Break' },
-      { id: 'problem2', label: 'Problem 2' }, { id: 'solution2', label: 'Solution 2' }, { id: 'classwork2', label: 'Classwork 2' },
+      { id: 'problem2', label: 'Problem 2' }, { id: 'solution2', label: 'Solution 2' }, { id: 'classwork2', label: 'Classwork 2 · AI' }, { id: 'masterclass', label: 'Masterclass' },
       { id: 'wrap', label: 'Wrap-up' }
     ]
   });

@@ -8,11 +8,11 @@ Five React lectures (syllabus v2: L27–L31, from components to context), built 
 
 | Lecture | Deck | Theme | Le Bistro gets | Students' shop | Slides |
 |---|---|---|---|---|---|
-| L27 | [Mise en place](L27-components/index.html) | Components, JSX, props, lists and keys | A home page and a menu from components and a data file | v0.1 · a catalog from a data file | 41 |
-| L28 | [À la minute](L28-state/index.html) | `useState`, events, lifting state, derived values | A working cart, a stepper, filter chips, search | v0.2 · cart, filters, search | 41 |
-| L29 | [Le marché](L29-effects/index.html) | `useEffect`, fetching, race conditions, custom hooks, `useRef` | The real menu from the API, skeletons, a debounced search, a cart that survives F5 | v0.3 · real API, saved cart | 42 |
-| L30 | [La maison](L30-routing/index.html) | React Router, params, search params, login, guards | Pages, a page per dish, a login, staff-only doors | v0.4 · pages and a login | 38 |
-| L31 | [Le passe](L31-context/index.html) | Context, `useReducer`, compound components | One cart and one session for the whole site, an FAQ | v0.5 · context and a reducer | 43 |
+| L27 | [Mise en place](L27-components/index.html) | Components, JSX, props, lists and keys | A home page and a menu from components and a data file | v0.1 · a catalog from a data file | 45 |
+| L28 | [À la minute](L28-state/index.html) | `useState`, events, lifting state, derived values | A working cart, a stepper, filter chips, search | v0.2 · cart, filters, search | 44 |
+| L29 | [Le marché](L29-effects/index.html) | `useEffect`, fetching, race conditions, custom hooks, `useRef` | The real menu from the API, skeletons, a debounced search, a cart that survives F5 | v0.3 · real API, saved cart | 45 |
+| L30 | [La maison](L30-routing/index.html) | React Router, params, search params, login, guards | Pages, a page per dish, a login, staff-only doors | v0.4 · pages and a login | 41 |
+| L31 | [Le passe](L31-context/index.html) | Context, `useReducer`, compound components | One cart and one session for the whole site, an FAQ | v0.5 · context and a reducer | 46 |
 
 TypeScript (L26) comes before this track and is not part of it.
 
@@ -21,15 +21,17 @@ TypeScript (L26) comes before this track and is not part of it.
 | Block | Time | What happens |
 |---|---|---|
 | Hello | 3′ | Bonjour, today's menu, the road map (Le Bistro and the students' shop), the goal behind a curtain |
-| Questions | 9′ | Questions from last time (answers revealed on click), two students show their homework |
-| Problem 1 | 6′ | Something hurts before the new tool appears: a dark photo slide, then an interactive demo of the problem, then "What would we need?" |
+| Questions | 8′ | Questions from last time (answers revealed on click), two students show their homework |
+| Problem 1 | 5′ | Something hurts before the new tool appears: a dark photo slide, then an interactive demo of the problem, then "What would we need?" |
 | Solution 1 | 24′ | The new tool as schemas you reveal step by step, then recipe slides: the steps on the left, the code growing on the right. Mistakes with their real error messages, a quick quiz |
 | Classwork 1 | 15′ | On their own shop, in three tiers (Base, Plus, Pro), with a timer and a hidden hint |
 | Break | 10′ | The "Start the break" button: countdown, music, "Welcome back" |
-| Problem 2 → Solution 2 → Classwork 2 | 60′ | The same pattern for the second topic |
-| Wrap-up | 8′ | Recap, flip cards, homework, and a teaser that plants the next lecture's problem |
+| Problem 2 → Solution 2 | 27′ | The same pattern for the second topic |
+| Classwork 2 with AI | 15′ | The same kind of task, but the students write a prompt in five parts (**CRAFT**: Context, Role, Action, Format, Target), the AI writes the code, and they check it |
+| Masterclass | 8′ | One prompt rebuilds the whole Le Bistro so far: it opens part by part, gets run and checked against today's topics, then comes back as one short paragraph |
+| Wrap-up | 5′ | Recap, flip cards, homework, and a teaser that plants the next lecture's problem |
 
-The rail at the top of every slide shows where you are in this structure. Each lecture's problem is planted by the lecture before it: L30 ends with "count the props", and L31 starts by counting them.
+L27 is the exception: a 7-minute hello (the students' project brief) and a short CRAFT introduction before its Classwork 2. The rail at the top of every slide shows where you are in this structure. Each lecture's problem is planted by the lecture before it: L30 ends with "count the props", and L31 starts by counting them.
 
 ## Folders
 
@@ -44,6 +46,7 @@ bistro-track/
     guide.md              the lecturer guide: learn it first, the 120 minutes, the demos, the live build, fixes
     classwork.md          the two classworks with code hints and common problems
     homework.md           the homework brief and grading
+    masterclass.md        the Masterclass script: the prompt, the short version, what to check
   code/
     after-L27/ … after-L31/   Le Bistro at the end of each lecture: complete Vite projects (npm install && npm run dev)
   img/                    photos, screenshots, covers
@@ -72,6 +75,7 @@ Open a deck in **Chrome or Edge** and press `F` for fullscreen.
 Things to click in the decks:
 
 - **Copy** on a code block copies exactly the lines that are visible at that step: paste it into the editor while live-coding.
+- **Copy** on a Masterclass prompt copies the whole prompt (with its CRAFT labels on the first slide, as one paragraph on the last). The sample prompt on the Classwork 2 slide is blurred until clicked.
 - **"[ show answer ]"** on question cards, **"click for a hint"** on classwork slides, **flip cards** in the wrap-up.
 - **Demos** (a fake browser, a route matcher, a ticket rail, …): every one is described in the guide's "The demos" table and in the slide's notes.
 - **Timers** on classwork slides: press play.

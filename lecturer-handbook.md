@@ -33,7 +33,7 @@ Then, once:
 
 Every lecture is 120 minutes with the same shape, shown by the rail at the top of the slides:
 
-**Hello (3′) → Questions (9′) → Problem 1 (6′) → Solution 1 (24′) → Classwork 1 (15′) → Break (10′) → Problem 2 → Solution 2 (30′) → Classwork 2 (15′) → Wrap-up (8′)**
+**Hello (3′) → Questions (8′) → Problem 1 (5′) → Solution 1 (24′) → Classwork 1 (15′) → Break (10′) → Problem 2 → Solution 2 (27′) → Classwork 2 with AI (15′) → Masterclass (8′) → Wrap-up (5′)**
 
 - **The problem comes first.** Let the room feel it in the demo before you name the tool. Ask "What would we need?" and let them answer before you reveal the chips.
 - **Schemas before code.** Reveal them step by step with `→`; every step has a sentence in the notes.
@@ -41,6 +41,8 @@ Every lecture is 120 minutes with the same shape, shown by the rail at the top o
 - **Mistakes slides** show the real error text. When a student hits one, point back to the slide.
 - **Classwork:** start the timer, walk around. The "Common problems" table in `classwork.md` covers what you will see. The hint on the slide is blurred until clicked.
 - **Break:** press "Start the break" on the break slide (or `B`). Music, a countdown, and "Welcome back" at the end.
+- **Classwork 2 with AI:** the students build the task by prompting an AI, in five parts (CRAFT), and check what it wrote. See section 5.
+- **Masterclass:** one prompt rebuilds Le Bistro so far. Run it once before class and keep the answer open.
 - **Wrap-up:** the teaser plants the next lecture's problem. Don't skip it.
 
 Running late? Each guide names the slides you can skip.
@@ -54,7 +56,24 @@ Running late? Each guide names the slides you can skip.
 - **If the network fails** (L29–L31 use the real API): the deck demos work offline. Show the snapshot you ran earlier, or switch to a phone hotspot. The search endpoint allows 10 requests a minute per IP, and a classroom shares one IP: a 429 in class is part of the lesson.
 - **Tokens expire after 2 minutes** (L30). Sign in right before you show a protected page.
 
-## 5. Keys
+## 5. AI in class: Classwork 2 and the Masterclass
+
+**CRAFT** is the prompt structure used in every lecture. A good prompt answers five questions:
+
+| | Part | The question | Example |
+|---|---|---|---|
+| C | Context | What exists already? | Vite + React 19 + TypeScript. My shop sells watches. Two products: (pasted) |
+| R | Role | Who should answer? | A React teacher who writes code for beginners |
+| A | Action | What exactly to do? | A ProductCard with a typed prop and a ProductGrid with map and key |
+| F | Format | What should the answer look like? | Only new files, complete, with their paths |
+| T | Target | Who is it for, when is it done? | For me, first React week. It must pass npm run build |
+
+- **Classwork 2 with AI.** Same task as a normal classwork, but the students write the prompt and check the AI's code. The rules: read every line before it goes into the project; run it; a failing answer gets the exact error message as the next prompt; log everything in `AI.md`. Ask students to explain a line the AI wrote. Code they can't explain doesn't count.
+- **The Masterclass.** One CRAFT prompt rebuilds the whole Le Bistro so far. Slide 1: the parts open one by one. Slide 2: run it, then check the answer with what the lecture taught. Slide 3: the short version, the same five parts as one paragraph. Each lecture's `masterclass.md` has the exact texts.
+- **Why it works:** the students can only judge the AI's code because they learned the topic first. Every Masterclass check is something from the lecture.
+- **Tools:** any AI chat works (Claude, ChatGPT, Copilot Chat). Students without access pair up.
+
+## 6. Keys
 
 | In a deck | | In VS Code | |
 |---|---|---|---|
@@ -67,7 +86,7 @@ Running late? Each guide names the slides you can skip.
 | `F` | fullscreen | `Alt` `↑` `↓` | move a line |
 | `1`–`4` | answer a quiz | `Ctrl` `+` | bigger font |
 
-## 6. Students' projects
+## 7. Students' projects
 
 - The brief is [`student-project.md`](student-project.md). Put the link in the class chat at L27.
 - **Check the live link, not screenshots.** Open the Vercel link, click through, press F5 on an inner page, open DevTools → Console.
@@ -75,7 +94,7 @@ Running late? Each guide names the slides you can skip.
 - Read AI.md. Ask a student to explain one function they wrote. Code they can't explain doesn't count.
 - In "Questions", show two homeworks: one strong, one with a common mistake (with the student's permission).
 
-## 7. React in one page
+## 8. React in one page
 
 **Components.** A component is a function that returns JSX; React calls it. Names start with a capital letter. Props are its arguments: read-only, passed by the parent.
 

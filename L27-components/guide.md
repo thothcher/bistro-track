@@ -1,8 +1,8 @@
 # L27 · Mise en place — lecturer guide
 
 **Components and props.** Le Bistro track, lecture 1 of 5 (syllabus v2: L27, React lecture 2).
-**Deck:** [`index.html`](index.html), 41 slides. **Code after this lecture:** [`../code/after-L27`](../code/after-L27).
-**Students' sheets:** [`classwork.md`](classwork.md), [`homework.md`](homework.md), and the project brief [`../student-project.md`](../student-project.md).
+**Deck:** [`index.html`](index.html), 45 slides. **Code after this lecture:** [`../code/after-L27`](../code/after-L27).
+**Students' sheets:** [`classwork.md`](classwork.md), [`homework.md`](homework.md), and the project brief [`../student-project.md`](../student-project.md). **Masterclass script:** [`masterclass.md`](masterclass.md).
 
 ---
 
@@ -15,6 +15,7 @@
 | **Students' project** | Starts today. They pick a shop theme and build v0.1: a static catalog from a data file, deployed on Vercel |
 | **The two problems** | 1. 25 dishes as 25 copied cards: one change means 25 edits. 2. One DishCard component, but every card shows the same dish |
 | **The two answers** | 1. Components. 2. Props, `map` with `key`, and `children` |
+| **AI** | Classwork 2 is done with an AI: a CRAFT prompt (Context, Role, Action, Format, Target), then the students check the code. The Masterclass rebuilds Le Bistro after L27 with one prompt |
 
 ---
 
@@ -99,17 +100,37 @@ Further reading (react.dev, 10 minutes each): *Your First Component*, *Writing M
 | Time | Block | Slides | What happens |
 |---|---|---|---|
 | 0:00 | Hello | 1–6 | Greeting, today's menu, the five-lecture route, Le Bistro, **the students' project brief** |
-| 0:08 | Questions | 7–8 | TypeScript questions with backup answers, a warm-up quiz |
-| 0:15 | Problem 1 | 9–11 | The copy-paste kitchen demo: 12 copies, 2 forgotten |
-| 0:21 | Solution 1 | 12–20 | Boxes, the tree, anatomy, JSX rules, setup order, **live: Header, then App** |
-| 0:45 | Classwork 1 | 21 | Students: Header, Hero, Footer in their own project |
-| 1:00 | Break | 22 | Press "Start the break" |
-| 1:10 | Problem 2 | 23–25 | Six identical cards; functions take parameters |
-| 1:17 | Solution 2 | 26–36 | Props flow, both sides, **live: types, DishCard, data, DishGrid, Section** |
-| 1:37 | Classwork 2 | 37 | Students: ProductCard and ProductGrid from a data file |
-| 1:52 | Wrap-up | 38–41 | Recap, flip cards, homework, the next problem |
+| 0:07 | Questions | 7–8 | TypeScript questions with backup answers, a warm-up quiz |
+| 0:13 | Problem 1 | 9–11 | The copy-paste kitchen demo: 12 copies, 2 forgotten |
+| 0:18 | Solution 1 | 12–20 | Boxes, the tree, anatomy, JSX rules, setup order, **live: Header, then App** |
+| 0:42 | Classwork 1 | 21 | Students: Header, Hero, Footer in their own project |
+| 0:57 | Break | 22 | Press "Start the break" |
+| 1:07 | Problem 2 | 23–25 | Six identical cards; functions take parameters |
+| 1:13 | Solution 2 | 26–36 | Props flow, both sides, **live: types, DishCard, data, DishGrid, Section** |
+| 1:32 | Classwork 2 with AI | 37–38 | CRAFT in five cards (2′), then students prompt an AI for their catalog and check what it wrote |
+| 1:47 | Masterclass | 39–41 | One prompt rebuilds Le Bistro after L27: part by part, run and check, the short version |
+| 1:55 | Wrap-up | 42–45 | Recap, flip cards, homework, the next problem |
 
-Running late? Skip slide 15 (JSX rules: point students to it), slide 30 (playground) and slide 36 (quiz). Never skip the classworks.
+Running late? Skip slide 15 (JSX rules: point students to it), slide 30 (playground) and slide 36 (quiz). Never skip the classworks. In the Masterclass, show the parts (slide 39) and the short version (slide 41), and skip the live run.
+
+---
+
+## Classwork 2 with AI and the Masterclass
+
+From this track on, the second classwork is done with an AI, and the lecture ends with a Masterclass.
+
+**Classwork 2 with AI** (slides 37–38, 15 minutes). The task is a `ProductCard`, a `ProductGrid` and a data file for their own catalog, but the students don't type the code: they write a prompt in five parts (**CRAFT**: Context, Role, Action, Format, Target), the AI writes the code, and they check it against "Done when". Slide 37 introduces CRAFT in five cards, one per press.
+- Any AI tool works: Claude, ChatGPT, Copilot Chat. Students who have none can pair up.
+- Walk around and ask students to explain one line the AI wrote. Code they can't explain doesn't count.
+- When the answer doesn't work, the next prompt is the exact error message.
+- The template, a sample prompt (blurred on the slide until clicked) and the follow-up prompts for the AI's usual mistakes are in [`classwork.md`](classwork.md).
+
+**Masterclass** (slides 39–41, 8 minutes). One prompt rebuilds Le Bistro as it is after today:
+1. **The prompt, part by part.** Each press opens one part. For each, one sentence: what would the AI do without it?
+2. **Run it, then check it.** Show the answer, then go through the checks on the slide: each one is something from today.
+3. **The short version.** The same five parts as one paragraph; press next and each part lights up in its colour.
+
+**Before class:** run the Masterclass prompt once in the AI tool you'll use and keep the answer open: answers take a minute or two and vary a little. The full script, with the exact prompt texts, is [`masterclass.md`](masterclass.md).
 
 ---
 

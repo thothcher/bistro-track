@@ -168,14 +168,15 @@
     <div class="menu-card__head"><p class="eyebrow">Le Bistro · L30 · 120 minutes</p><h2>Today's menu</h2></div>
     <ol class="menu-card__list">
       <li class="course"><span class="course__k">Accueil</span><span class="course__name">Hello <small>where Le Bistro is today</small></span><span class="course__t">3′</span></li>
-      <li class="course"><span class="course__k">Apéritif</span><span class="course__name">Questions <small>and two homework demos</small></span><span class="course__t">9′</span></li>
-      <li class="course"><span class="course__k">Entrée</span><span class="course__name">Problem 1 <small>send me the link</small></span><span class="course__t">6′</span></li>
+      <li class="course"><span class="course__k">Apéritif</span><span class="course__name">Questions <small>and two homework demos</small></span><span class="course__t">8′</span></li>
+      <li class="course"><span class="course__k">Entrée</span><span class="course__name">Problem 1 <small>send me the link</small></span><span class="course__t">5′</span></li>
       <li class="course"><span class="course__k">Plat</span><span class="course__name">React Router <small>pages, layouts, params</small></span><span class="course__t">24′</span></li>
       <li class="course"><span class="course__k">Atelier</span><span class="course__name">Classwork 1 <small>your pages</small></span><span class="course__t">15′</span></li>
       <li class="course is-pause"><span class="course__k">Pause café</span><span class="course__name">Break <small>music on, screens off</small></span><span class="course__t">10′</span></li>
-      <li class="course"><span class="course__k">Second plat</span><span class="course__name">Problem 2, login and guards <small>staff only</small></span><span class="course__t">30′</span></li>
-      <li class="course"><span class="course__k">Atelier</span><span class="course__name">Classwork 2 <small>a login and a locked page</small></span><span class="course__t">15′</span></li>
-      <li class="course"><span class="course__k">Dessert</span><span class="course__name">Wrap-up <small>recap, homework, next time</small></span><span class="course__t">8′</span></li>
+      <li class="course"><span class="course__k">Second plat</span><span class="course__name">Problem 2, login and guards <small>staff only</small></span><span class="course__t">27′</span></li>
+      <li class="course"><span class="course__k">Atelier</span><span class="course__name">Classwork 2 with AI <small>prompt it, then check it</small></span><span class="course__t">15′</span></li>
+      <li class="course"><span class="course__k">Masterclass</span><span class="course__name">One prompt, the whole Le Bistro <small>CRAFT, then the short version</small></span><span class="course__t">8′</span></li>
+      <li class="course"><span class="course__k">Dessert</span><span class="course__name">Wrap-up <small>recap, homework, next time</small></span><span class="course__t">5′</span></li>
     </ol>
   </div>
 </section>
@@ -904,32 +905,119 @@
   </div>
 </section>
 
-<!-- ============================== CLASSWORK 2 ============================== -->
+<!-- ============================== CLASSWORK 2 · WITH AI ============================== -->
 
-<section class="slide" data-phase="classwork2" data-title="Classwork 2: a login and a locked page">
+<section class="slide" data-phase="classwork2" data-title="Classwork 2 with AI: a login and a locked page">
   <div class="row" style="justify-content:space-between;align-items:flex-end">
-    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Atelier · Classwork 2</b> 15 minutes, on your own project</p><h2 class="h1">A login and a locked page</h2></div>
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Atelier · Classwork 2 · with AI</b> 15 minutes, on your own project</p><h2 class="h1">Prompt it: a login and a guard</h2></div>
     <div class="timer" data-timer="900"></div>
   </div>
   <div class="cw">
-    <div class="tiers">
-      <div class="tier base"><div class="tier__k"><span>Base</span><span>everyone</span></div><h3>Login with DummyJSON</h3>
-        <ul><li>A <code>/login</code> page: POST <code>https://dummyjson.com/auth/login</code> with <code>{ username, password }</code>.</li><li>Save <code>{ token, user }</code> with <code>useLocalStorage</code>. The Header shows the name.</li><li>Test user: <code>emilys</code> / <code>emilyspass</code>.</li></ul></div>
-      <div class="tier"><div class="tier__k"><span>Plus</span><span>most of you</span></div><h3>A locked /profile</h3>
-        <ul><li><code>RequireAuth</code> around <code>/profile</code>. It shows <code>GET /auth/me</code> with the token.</li></ul></div>
-      <div class="tier"><div class="tier__k"><span>Pro</span><span>fast finishers</span></div><h3>An admin door</h3>
-        <ul><li><code>/admin</code> only for <code>role === "admin"</code> (DummyJSON users have a role).</li></ul></div>
+    <div class="stack" style="--gap:14px">
+      <div class="tier base"><div class="tier__k"><span>The task</span><span>the AI writes, you check</span></div>
+        <ul class="ai-levels"><li><b>Base</b>A <code>/login</code> page with DummyJSON (<code>/auth/login</code>, then <code>/auth/me</code> for the role); the session saved with <code>useLocalStorage</code>; the name in the Header.</li><li><b>Plus</b><code>RequireAuth</code> around <code>/profile</code>, and back to it after the login.</li><li><b>Pro</b>An <code>/admin</code> page only for the admin role.</li></ul></div>
+      <div class="craft-mini"><p class="craft-mini__k">Your prompt, in five parts (CRAFT)</p>
+        <div class="craft-mini__row cr-c"><span class="craft__badge">C</span><p><b>Context</b>Your shop, stack and react-router 8 (&quot;import from react-router&quot;). The two DummyJSON endpoints. Paste <code>App.tsx</code> and your layout.</p></div>
+        <div class="craft-mini__row cr-r"><span class="craft__badge">R</span><p><b>Role</b>&quot;A React teacher who writes simple, safe code.&quot;</p></div>
+        <div class="craft-mini__row cr-a"><span class="craft__badge">A</span><p><b>Action</b>The Base task, then Plus in a follow-up prompt.</p></div>
+        <div class="craft-mini__row cr-f"><span class="craft__badge">F</span><p><b>Format</b>&quot;Only the files that change, complete, with their paths.&quot;</p></div>
+        <div class="craft-mini__row cr-t"><span class="craft__badge">T</span><p><b>Target</b>&quot;Tell me which part only hides a page and which part really protects it.&quot;</p></div>
+      </div>
     </div>
     <div class="cw__side">
-      <div class="done-when"><p class="k">Done when</p><ul class="checks"><li>Login, then F5: still signed in</li><li>A guest on /profile lands on /login</li><li>After the login they go back to /profile</li><li>Sign out clears the session</li></ul></div>
-      <div class="hint" data-peek="click for a hint"><div><p class="k">Stuck?</p><pre>fetch("https://dummyjson.com/auth/login", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ username, password }),
-})</pre></div></div>
+      <div class="done-when"><p class="k">Done when</p><ul class="checks"><li>Log in, F5: still signed in</li><li>A guest on /profile lands on /login, then comes back</li><li>No password stored, imports from <code>react-router</code></li><li>AI.md: your prompt and one thing you changed</li></ul></div>
+      <div class="hint" data-peek="click for a sample prompt"><div><p class="k">A sample prompt · Fashion street</p><pre class="is-prompt">CONTEXT
+My shop &quot;Atelier&quot; sells clothes. Vite + React 19 +
+TypeScript + Tailwind 4, react-router 8 (import from
+&quot;react-router&quot;). DummyJSON: POST /auth/login
+{ username, password } -&gt; accessToken;
+GET /auth/me (Bearer) -&gt; the user.
+ROLE
+A React teacher who writes simple, safe code.
+ACTION
+A /login page that signs in and saves { token, user }
+with useLocalStorage, and shows the first name and
+&quot;Sign out&quot; in the Header.
+FORMAT
+Only the files that change, complete, with their paths.
+TARGET
+Tell me which part only hides a page and which part
+really protects it.</pre></div></div>
     </div>
   </div>
-  <aside class="notes"><p><b>DummyJSON auth:</b> the answer is <code>{ accessToken, refreshToken, id, username, firstName, … }</code>. <code>GET /auth/me</code> with <code>Authorization: Bearer &lt;token&gt;</code> returns the user, including <code>role</code> ("admin", "moderator" or "user"). Users with role "user": averyp / averyppass.</p></aside>
+  <aside class="notes">
+    <p><b>Say:</b> Same kind of task as always, a new tool: you write the prompt, the AI writes the code, and you check it. Use the five parts. Read every line before it goes into your project.</p>
+    <p><b>Do:</b> Start the timer. Any AI tool works (Claude, ChatGPT, Copilot Chat). Walk around and ask two students to explain one line the AI wrote. If the answer doesn't work, the next prompt is the exact error message.</p>
+    <p><b>Watch for:</b> <code>import … from &quot;react-router-dom&quot;</code> and version 6 code; The password saved in localStorage; <code>&lt;Navigate to=&quot;/login&quot; /&gt;</code> without <code>replace</code>; A hard-coded admin check (<code>if (password === …)</code>). The follow-up prompts that fix them are in <code>classwork.md</code>.</p>
+    <p><b>Then:</b> the Masterclass. The whole Le Bistro so far, in one prompt.</p>
+  </aside>
+</section>
+
+<!-- ============================== MASTERCLASS ============================== -->
+
+<section class="slide" data-phase="masterclass" data-title="Masterclass: Le Bistro in one prompt">
+  <p class="eyebrow"><b>Masterclass · LAB-30</b> Press next: the prompt opens part by part</p>
+  <h2 class="h2 mt-s">Le Bistro so far, in one prompt</h2>
+  <div class="craft mt-m" data-craft>
+    <div class="craft__bar"><span><i data-icon="message-square"></i>Prompt · LAB-30 · Le Bistro after L30</span><button type="button" class="copy-btn" data-craft-copy><i data-icon="copy"></i>Copy</button></div>
+    <div class="craft__part cr-c" data-step="1" data-fx="left" data-label="CONTEXT"><span class="craft__badge">C</span><p class="craft__name">Context<small>what exists and what we use</small></p><pre class="craft__text">Le Bistro, a French restaurant site. Vite + React 19 + TypeScript + Tailwind CSS 4,
+react-router 8 (import from &quot;react-router&quot;). API at /api through a Vite proxy:
+dishes, categories, search; POST /api/v1/auth/login { email, password } -&gt;
+accessToken (lives 2 minutes); GET /api/v1/auth/me -&gt; the role.</pre></div>
+    <div class="craft__part cr-r" data-step="2" data-fx="left" data-label="ROLE"><span class="craft__badge">R</span><p class="craft__name">Role<small>who answers</small></p><pre class="craft__text">You are a senior React developer who writes code for beginners to read.</pre></div>
+    <div class="craft__part cr-a" data-step="3" data-fx="left" data-label="ACTION"><span class="craft__badge">A</span><p class="craft__name">Action<small>what to build, step by step</small></p><pre class="craft__text">Build the site as it is so far (real menu, saved cart, debounced search), now as pages:
+- A layout with &lt;Outlet /&gt;: /, /menu (?category= and ?q= in the URL), /menu/:id,
+  /login, /account, /kitchen, /forbidden and a 404.
+- Login saves { token, user } with useLocalStorage; the Header shows the name.
+- RequireAuth: guests go to /login and come back after it; /kitchen is only for
+  the kitchen and waiter roles. A 401 shows &quot;Sign in again&quot;.
+- vercel.json: /api to the API, every other address to index.html.</pre></div>
+    <div class="craft__part cr-f" data-step="4" data-fx="left" data-label="FORMAT"><span class="craft__badge">F</span><p class="craft__name">Format<small>what the answer looks like</small></p><pre class="craft__text">The route table first, then every file in full with its path.</pre></div>
+    <div class="craft__part cr-t" data-step="5" data-fx="left" data-label="TARGET"><span class="craft__badge">T</span><p class="craft__name">Target<small>who reads it, when it's done</small></p><pre class="craft__text">Beginners will read it: one component per file. The guard is a sign, not
+a lock: no secrets in the code. It must pass npm run build.</pre></div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> This one prompt rebuilds everything Le Bistro has so far, from L27 to today. It has the same five parts as your classwork prompts.</p>
+    <p><b>Do:</b> Press next five times. For each part, one sentence: what would go wrong without it?</p>
+    <p><b>Copy</b> copies the whole prompt with its five labels. Run it once before class: answers take a minute or two. The script is in <code>masterclass.md</code>.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="masterclass" data-title="Run it, then check it">
+  <p class="eyebrow"><b>Masterclass · LAB-30</b> The AI writes fast. You decide if it's right.</p>
+  <h2 class="h2 mt-s">Run it, then check it</h2>
+  <div class="mc-run">
+    <ol class="mc-steps" data-step="1">
+      <li><b>Copy</b> the prompt into an AI tool<span>Claude, ChatGPT, Copilot Chat: any of them; nothing to attach: the data comes from the API</span></li>
+      <li><b>Build</b> what it gives back<span>a new Vite project, every file pasted at its path</span></li>
+      <li><b>Run</b> <code>npm run dev</code> and <code>npm run build</code><span>an error message goes straight back into the chat</span></li>
+      <li><b>Compare</b> with <code>code/after-L30</code><span>the version we built by hand</span></li>
+    </ol>
+    <div class="mc-check">
+      <p class="k">Check it with what you learned today</p>
+      <ul class="checks"><li data-step="2">Imports from <code>react-router</code>, not <code>react-router-dom</code></li><li data-step="3"><code>&lt;Link&gt;</code> inside the app, no <code>&lt;a href&gt;</code></li><li data-step="4"><code>Number(id)</code> before comparing a param</li><li data-step="5"><code>&lt;Navigate … replace /&gt;</code> in the guard, <code>state.from</code> for the way back</li><li data-step="6">The token is stored, never the password</li></ul>
+      <div class="callout is-warn mt-m" data-step="7"><i data-icon="sparkles"></i><div><p class="small">Most AIs still answer with <code>react-router-dom</code> and version 6 code. One look at the imports tells you.</p></div></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Show the answer you got before class, or run it live if there's time. Go through the checks one by one, in the AI's code. Then open <code>code/after-L30</code> next to it.</p>
+    <p><b>Say:</b> Every check is something from today. Without today's lecture, you could not judge this code.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="masterclass" data-title="The short version">
+  <p class="eyebrow"><b>Masterclass · LAB-30</b> The same five parts, without the labels</p>
+  <h2 class="h2 mt-s">The short version</h2>
+  <div class="craft craft--short mt-m" data-craft data-on="1:show-parts">
+    <div class="craft__bar"><span><i data-icon="message-square"></i>Prompt · LAB-30 · the short version</span><button type="button" class="copy-btn" data-craft-copy><i data-icon="copy"></i>Copy</button></div>
+    <p class="craft__short"><span class="p-r">You're a senior React developer writing for beginners.</span> <span class="p-c">Le Bistro is a Vite + React 19 + TypeScript + Tailwind 4 app with react-router 8 (import from &quot;react-router&quot;) and an API at /api through a Vite proxy: dishes, categories, search, POST /api/v1/auth/login (a 2-minute token) and GET /api/v1/auth/me for the role.</span> <span class="p-a">Build the real menu, the saved cart and the debounced search as pages in a layout with &lt;Outlet /&gt;: home, /menu with its filters in the URL, /menu/:id, login, /account, /kitchen for the kitchen and waiter roles only, /forbidden and a 404; RequireAuth sends guests to /login and back, a 401 shows &quot;Sign in again&quot;, and vercel.json rewrites /api and every other address.</span> <span class="p-f">Give the route table first, then every file in full with its path.</span> <span class="p-t">Keep one component per file and no secrets in the code, and make sure npm run build passes.</span></p>
+    <div class="craft__legend" data-step="1"><span class="cr-c">Context</span><span class="cr-r">Role</span><span class="cr-a">Action</span><span class="cr-f">Format</span><span class="cr-t">Target</span></div>
+  </div>
+  <div class="takeaway mt-m" data-step="2"><p class="k">How CRAFT works</p><p>The five parts are a checklist for your thinking, not a form to fill in. Once all five are there, the labels can go: the prompt reads like a message to a colleague.</p></div>
+  <aside class="notes">
+    <p><b>Do:</b> Read it aloud first. Press next: each part lights up in its colour. Ask: if we delete the last sentence, which part is missing? (Target: nobody says when it's done.)</p>
+    <p><b>Say:</b> Long or short, it's the same prompt. Use the labels while you learn; drop them when the five parts come naturally.</p>
+  </aside>
 </section>
 
 <!-- ============================== WRAP-UP ============================== -->
@@ -1029,7 +1117,7 @@
       { id: 'hello', label: 'Hello' }, { id: 'questions', label: 'Questions' },
       { id: 'problem', label: 'Problem 1' }, { id: 'solution', label: 'Solution 1' }, { id: 'classwork', label: 'Classwork 1' },
       { id: 'break', label: 'Break' },
-      { id: 'problem2', label: 'Problem 2' }, { id: 'solution2', label: 'Solution 2' }, { id: 'classwork2', label: 'Classwork 2' },
+      { id: 'problem2', label: 'Problem 2' }, { id: 'solution2', label: 'Solution 2' }, { id: 'classwork2', label: 'Classwork 2 · AI' }, { id: 'masterclass', label: 'Masterclass' },
       { id: 'wrap', label: 'Wrap-up' }
     ]
   });

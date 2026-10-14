@@ -1,6 +1,6 @@
 # L30 · Classwork
 
-Two classworks, 15 minutes each, on **your own shop**. Start with `npm install react-router` (not `react-router-dom`).
+Two classworks, 15 minutes each, on **your own shop**. The second one is done with an AI. Start with `npm install react-router` (not `react-router-dom`).
 
 ---
 
@@ -117,11 +117,78 @@ Delete the `useState` you had for the category.
 
 ---
 
-## Classwork 2 · A login and a locked page (slide 34)
+## Classwork 2 · Prompt it: a login and a guard (with AI, slide 34)
+
+The second classwork is done **with an AI**. You write the prompt, the AI writes the code, and you check it. Any AI tool works: Claude, ChatGPT, Copilot Chat.
+
+### The task
+
+- **Base:** A `/login` page with DummyJSON (`/auth/login`, then `/auth/me` for the role); the session saved with `useLocalStorage`; the name in the Header.
+- **Plus:** `RequireAuth` around `/profile`, and back to it after the login.
+- **Pro:** An `/admin` page only for the admin role.
+
+### Your prompt, in five parts (CRAFT)
+
+| | Part | What to write |
+|---|---|---|
+| C | **Context** | Your shop, stack and react-router 8 ("import from react-router"). The two DummyJSON endpoints. Paste `App.tsx` and your layout. |
+| R | **Role** | "A React teacher who writes simple, safe code." |
+| A | **Action** | The Base task, then Plus in a follow-up prompt. |
+| F | **Format** | "Only the files that change, complete, with their paths." |
+| T | **Target** | "Tell me which part only hides a page and which part really protects it." |
+
+### A sample prompt (Fashion street)
+
+```text
+CONTEXT
+My shop "Atelier" sells clothes. Vite + React 19 +
+TypeScript + Tailwind 4, react-router 8 (import from
+"react-router"). DummyJSON: POST /auth/login
+{ username, password } -> accessToken;
+GET /auth/me (Bearer) -> the user.
+ROLE
+A React teacher who writes simple, safe code.
+ACTION
+A /login page that signs in and saves { token, user }
+with useLocalStorage, and shows the first name and
+"Sign out" in the Header.
+FORMAT
+Only the files that change, complete, with their paths.
+TARGET
+Tell me which part only hides a page and which part
+really protects it.
+```
+
+### The rules
+
+1. Read every line before it goes into your project. You must be able to explain it.
+2. Run it. If something fails, the next prompt is the exact error message.
+3. One step at a time: Base first, then Plus and Pro as follow-up prompts.
+4. Log it in `AI.md`: your prompt, what you kept, what you changed and why.
+
+### Done when
+
+- [ ] Log in, F5: still signed in
+- [ ] A guest on /profile lands on /login, then comes back
+- [ ] No password stored, imports from `react-router`
+- [ ] AI.md: your prompt and one thing you changed
+
+### What the AI tends to get wrong here (for the lecturer)
+
+| The AI writes | The follow-up prompt |
+|---|---|
+| `import … from "react-router-dom"` and version 6 code | "React Router 8: import everything from react-router." |
+| The password saved in localStorage | "Save only the token and the user, never the password." |
+| `<Navigate to="/login" />` without `replace` | "Use replace, and pass state.from to come back." |
+| A hard-coded admin check (`if (password === …)`) | "Roles come from /auth/me; no secrets in the code." |
+
+### What a good answer looks like
+
+The hand-written solution, to check what the AI produced.
 
 DummyJSON has test users. **emilys / emilyspass** is an admin, **averyp / averyppass** is a normal user.
 
-### Base (everyone)
+#### Base (everyone)
 
 1. A session that survives F5, in `App.tsx` (copy `useLocalStorage` from L29 if you don't have it):
    ```tsx
@@ -163,7 +230,7 @@ DummyJSON has test users. **emilys / emilyspass** is an admin, **averyp / averyp
    `from` comes from the guard (Plus): `const from = (useLocation().state as { from?: string } | null)?.from ?? "/";`
 3. The Header shows "Log in" for guests, and the first name plus a "Sign out" button (`setSession(null)`) for users.
 
-### Plus
+#### Plus
 
 A guard, `src/routes/RequireAuth.tsx`:
 
@@ -190,19 +257,11 @@ export function RequireAuth({ session, roles }: RequireAuthProps) {
 
 `ProfilePage` loads `https://dummyjson.com/auth/me` with the `Authorization` header and shows the name, email and photo (`image`).
 
-### Pro
+#### Pro
 
 An `/admin` page only for `role === "admin"`: `<RequireAuth session={session} roles={["admin"]} />`. Test it with emilys (admin) and averyp (user).
 
-### Done when
-
-- [ ] Log in, press F5: still signed in
-- [ ] A guest who opens `/profile` lands on `/login`
-- [ ] After the login they go back to `/profile`
-- [ ] "Sign out" clears the session (DevTools → Application → Local Storage)
-- [ ] The password is not stored anywhere
-
-### Common problems (for the lecturer)
+#### Common problems (for the lecturer)
 
 | Problem | Fix |
 |---|---|

@@ -1,6 +1,6 @@
 # L31 · Classwork
 
-Two classworks, 15 minutes each, on **your own shop**. No new packages today: `createContext`, `useContext` and `useReducer` come with React.
+Two classworks, 15 minutes each, on **your own shop**. The second one is done with an AI. No new packages today: `createContext`, `useContext` and `useReducer` come with React.
 
 ---
 
@@ -90,9 +90,73 @@ The theme survives F5 (`useLocalStorage`) and, on the first visit, starts from t
 
 ---
 
-## Classwork 2 · One cart, one reducer (slide 38)
+## Classwork 2 · Prompt it: one cart, one reducer (with AI, slide 38)
 
-### Base (everyone)
+The second classwork is done **with an AI**. You write the prompt, the AI writes the code, and you check it. Any AI tool works: Claude, ChatGPT, Copilot Chat.
+
+### The task
+
+- **Base:** A `cartReducer` (`added`, `qtyChanged`, `removed`, `cleared`: no duplicates, never more than `stock`, gone at 0), used in `App` with `useReducer`.
+- **Plus:** A `CartProvider` + `useCart()`: no cart props left.
+- **Pro:** A compound `Accordion` on the product page.
+
+### Your prompt, in five parts (CRAFT)
+
+| | Part | What to write |
+|---|---|---|
+| C | **Context** | Your shop and stack. Paste the cart code from `App.tsx` and `types.ts`. |
+| R | **Role** | "A React teacher who writes pure, simple reducers." |
+| A | **Action** | The Base task with your rules, then Plus in a follow-up prompt. |
+| F | **Format** | "Context and hook in a .ts file, the provider in .tsx. Only changed files." |
+| T | **Target** | "Mark every rule in the reducer with a one-line comment." |
+
+### A sample prompt (Furniture house)
+
+```text
+CONTEXT
+My shop "Maison" sells furniture. Vite + React 19 +
+TypeScript + Tailwind 4. My cart is useState in
+App.tsx (pasted, with types.ts).
+ROLE
+A React teacher who writes pure, simple reducers.
+ACTION
+Replace it with cartReducer in src/cart/cartReducer.ts:
+added, qtyChanged, removed, cleared. No duplicate
+lines, never more than product.stock, gone at 0.
+FORMAT
+Only the files that change, complete, with their paths.
+TARGET
+Mark every rule in the reducer with a one-line comment.
+```
+
+### The rules
+
+1. Read every line before it goes into your project. You must be able to explain it.
+2. Run it. If something fails, the next prompt is the exact error message.
+3. One step at a time: Base first, then Plus and Pro as follow-up prompts.
+4. Log it in `AI.md`: your prompt, what you kept, what you changed and why.
+
+### Done when
+
+- [ ] The same product twice: one line, qty 2
+- [ ] Never more than in stock
+- [ ] No `push`, `splice` or `localStorage` in the reducer
+- [ ] AI.md: your prompt and one thing you changed
+
+### What the AI tends to get wrong here (for the lecturer)
+
+| The AI writes | The follow-up prompt |
+|---|---|
+| `localStorage.setItem` inside the reducer | "Keep the reducer pure; save in an effect in the provider." |
+| `state.push(…)` or `item.qty++` | "Return new arrays and objects; never change the old state." |
+| One context for the whole app | "One context per topic: the cart has its own." |
+| The context and the provider in one .tsx file | "Context and hook in CartContext.ts, the provider in CartProvider.tsx." |
+
+### What a good answer looks like
+
+The hand-written solution, to check what the AI produced.
+
+#### Base (everyone)
 
 `src/cart/cartReducer.ts`: every rule of your cart in one pure function. Your cart lines are `{ product, qty }` and DummyJSON tells you each product's `stock`.
 
@@ -140,7 +204,7 @@ const [cart, dispatch] = useReducer(cartReducer, []);
 // <ProductCard onAdd={() => dispatch({ type: "added", product })} … />
 ```
 
-### Plus
+#### Plus
 
 Move it into a provider, like Le Bistro (`code/after-L31/src/cart/`):
 
@@ -148,19 +212,11 @@ Move it into a provider, like Le Bistro (`code/after-L31/src/cart/`):
 - `CartProvider.tsx`: `useReducer(cartReducer, [], loadCart)`, an effect that saves to localStorage, the value with named actions.
 - Wrap the app in main.tsx, inside `AuthProvider`. Every component calls `useCart()`; delete every cart prop.
 
-### Pro
+#### Pro
 
 A compound `Accordion` on the product page with four items: description, shipping (`shippingInformation`), returns (`returnPolicy`) and reviews (`reviews`). Model it on `code/after-L31/src/components/Accordion.tsx`.
 
-### Done when
-
-- [ ] The same product twice: one line with qty 2
-- [ ] Never more than the product's stock
-- [ ] No `push`, `splice`, `localStorage` or `fetch` inside the reducer
-- [ ] F5 keeps the cart (Plus)
-- [ ] Searching for `cart=` finds nothing (Plus)
-
-### Common problems (for the lecturer)
+#### Common problems (for the lecturer)
 
 | Problem | Fix |
 |---|---|

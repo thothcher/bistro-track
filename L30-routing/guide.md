@@ -1,8 +1,8 @@
 # L30 · La maison — lecturer guide
 
 **React Router, login and protected pages.** Le Bistro track, lecture 4 of 5 (syllabus v2: L30, React lecture 5).
-**Deck:** [`index.html`](index.html), 38 slides. **Code:** starts from [`../code/after-L29`](../code/after-L29), ends at [`../code/after-L30`](../code/after-L30).
-**Students' sheets:** [`classwork.md`](classwork.md), [`homework.md`](homework.md).
+**Deck:** [`index.html`](index.html), 41 slides. **Code:** starts from [`../code/after-L29`](../code/after-L29), ends at [`../code/after-L30`](../code/after-L30).
+**Students' sheets:** [`classwork.md`](classwork.md), [`homework.md`](homework.md). **Masterclass script:** [`masterclass.md`](masterclass.md).
 
 ---
 
@@ -15,6 +15,7 @@
 | **Students' project** | v0.4: pages, a product page, a DummyJSON login, a locked `/profile` |
 | **The two problems** | 1. One address for everything: no link to a dish, Back leaves the site. 2. Anyone can type `/kitchen` or `/account` |
 | **The two answers** | 1. React Router. 2. A token login and a guard component |
+| **AI** | Classwork 2 is done with an AI: a CRAFT prompt (Context, Role, Action, Format, Target), then the students check the code. The Masterclass rebuilds Le Bistro after L30 with one prompt |
 
 ---
 
@@ -184,16 +185,36 @@ Further reading: reactrouter.com, *Declarative mode* → Installation, Routing, 
 |---|---|---|---|
 | 0:00 | Hello | 1–4 | Greeting, menu, route, the blind rolls up on `/menu/5` |
 | 0:03 | Questions | 5–6 | Backup questions; two v0.3 demos, each ending with "send me the link to one product" |
-| 0:12 | Problem 1 | 7–9 | The one-address demo: View dish, copy the link, Back, refresh |
-| 0:18 | Solution 1 | 10–19 | Route matcher, layout + Outlet, **install + routes (live)**, Link vs `<a>`, **DishPage (live)**, useSearchParams, Vercel rewrite, mistakes, quiz |
-| 0:42 | Classwork 1 | 20 | Routes, a layout, a product page |
-| 0:57 | Break | 21 | |
-| 1:07 | Problem 2 | 22–23 | Staff only; who may open which door |
-| 1:10 | Solution 2 | 24–33 | Login sequence, **LoginPage + session (live)**, the doorman demo, **RequireAuth (live)**, the 2-minute token, sign vs lock, result, mistakes, quiz |
-| 1:37 | Classwork 2 | 34 | DummyJSON login, a locked `/profile` |
-| 1:52 | Wrap-up | 35–38 | Recap, flip cards, homework, "count the props" |
+| 0:11 | Problem 1 | 7–9 | The one-address demo: View dish, copy the link, Back, refresh |
+| 0:16 | Solution 1 | 10–19 | Route matcher, layout + Outlet, **install + routes (live)**, Link vs `<a>`, **DishPage (live)**, useSearchParams, Vercel rewrite, mistakes, quiz |
+| 0:40 | Classwork 1 | 20 | Routes, a layout, a product page |
+| 0:55 | Break | 21 |  |
+| 1:05 | Problem 2 | 22–23 | Staff only; who may open which door |
+| 1:08 | Solution 2 | 24–33 | Login sequence, **LoginPage + session (live)**, the doorman demo, **RequireAuth (live)**, the 2-minute token, sign vs lock, result, mistakes, quiz |
+| 1:32 | Classwork 2 with AI | 34 | Students prompt an AI for a DummyJSON login and a locked `/profile`, then check it |
+| 1:47 | Masterclass | 35–37 | One prompt rebuilds Le Bistro after L30: part by part, run and check, the short version |
+| 1:55 | Wrap-up | 38–41 | Recap, flip cards, homework, "count the props" |
 
-Running late? Skip slides 16 (search params: say "filters can live in the URL, see the code"), 19 and 33 (quizzes). Copy `LoginPage.tsx` instead of typing it.
+Running late? Skip slides 16 (search params: say "filters can live in the URL, see the code"), 19 and 33 (quizzes). Copy `LoginPage.tsx` instead of typing it. In the Masterclass, show the parts (slide 35) and the short version (slide 37), and skip the live run.
+
+---
+
+## Classwork 2 with AI and the Masterclass
+
+From this track on, the second classwork is done with an AI, and the lecture ends with a Masterclass.
+
+**Classwork 2 with AI** (slide 34, 15 minutes). The task is a DummyJSON login and a locked `/profile`, but the students don't type the code: they write a prompt in five parts (**CRAFT**: Context, Role, Action, Format, Target), the AI writes the code, and they check it against "Done when".
+- Any AI tool works: Claude, ChatGPT, Copilot Chat. Students who have none can pair up.
+- Walk around and ask students to explain one line the AI wrote. Code they can't explain doesn't count.
+- When the answer doesn't work, the next prompt is the exact error message.
+- The template, a sample prompt (blurred on the slide until clicked) and the follow-up prompts for the AI's usual mistakes are in [`classwork.md`](classwork.md).
+
+**Masterclass** (slides 35–37, 8 minutes). One prompt rebuilds Le Bistro as it is after today:
+1. **The prompt, part by part.** Each press opens one part. For each, one sentence: what would the AI do without it?
+2. **Run it, then check it.** Show the answer, then go through the checks on the slide: each one is something from today.
+3. **The short version.** The same five parts as one paragraph; press next and each part lights up in its colour.
+
+**Before class:** run the Masterclass prompt once in the AI tool you'll use and keep the answer open: answers take a minute or two and vary a little. The full script, with the exact prompt texts, is [`masterclass.md`](masterclass.md).
 
 ---
 
@@ -209,6 +230,9 @@ Running late? Skip slides 16 (search params: say "filters can live in the URL, s
 | 24 | Login sequence | Press next five times: each message slides in from the side that sends it |
 | 27 | The doorman | Pick a visitor and a door, press Knock. Guest + /account → login. Student + /kitchen → forbidden. Kitchen + /kitchen → the page |
 | 30 | Sign vs lock | Steps 3–5 can be done live, see "The live build", step 13 |
+| 34 | The sample prompt | Click the blurred box on the Classwork 2 slide: a complete CRAFT prompt for one shop theme |
+| 35 | The prompt, part by part | Press next five times; **Copy** copies the whole prompt with its five labels |
+| 37 | The short version | Press next: each part lights up in its colour; **Copy** copies the paragraph |
 
 ---
 

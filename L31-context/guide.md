@@ -1,8 +1,8 @@
 # L31 · Le passe — lecturer guide
 
 **Context, useReducer and compound components.** Le Bistro track, lecture 5 of 5 (syllabus v2: L31, React lecture 6).
-**Deck:** [`index.html`](index.html), 43 slides. **Code:** starts from [`../code/after-L30`](../code/after-L30), ends at [`../code/after-L31`](../code/after-L31).
-**Students' sheets:** [`classwork.md`](classwork.md), [`homework.md`](homework.md).
+**Deck:** [`index.html`](index.html), 46 slides. **Code:** starts from [`../code/after-L30`](../code/after-L30), ends at [`../code/after-L31`](../code/after-L31).
+**Students' sheets:** [`classwork.md`](classwork.md), [`homework.md`](homework.md). **Masterclass script:** [`masterclass.md`](masterclass.md).
 
 ---
 
@@ -15,6 +15,7 @@
 | **Students' project** | v0.5: an auth context, a cart reducer in a provider, no cart or session props |
 | **The two problems** | 1. The cart and the session are passed hand to hand: 43 props in 8 files. 2. The cart's rules are spread over four files, and a new button breaks them |
 | **The two answers** | 1. Context. 2. useReducer (inside a provider). Bonus: compound components |
+| **AI** | Classwork 2 is done with an AI: a CRAFT prompt (Context, Role, Action, Format, Target), then the students check the code. The Masterclass rebuilds Le Bistro after L31 with one prompt |
 
 ---
 
@@ -156,16 +157,36 @@ Further reading (react.dev): *Passing Data Deeply with Context*, *Extracting Sta
 |---|---|---|---|
 | 0:00 | Hello | 1–4 | Greeting, menu, route, the blind rolls up on the new App.tsx |
 | 0:03 | Questions | 5–6 | Backup questions; two v0.4 demos, each ending with "count the props" |
-| 0:12 | Problem 1 | 7–9 | Follow the props: cart, onAdd, session |
-| 0:18 | Solution 1 | 10–18 | Hand to hand vs the pass, three parts, **AuthContext + AuthProvider (live)**, **remove the session props (live)**, who re-renders, the right tool, mistakes, quiz |
-| 0:42 | Classwork 1 | 19 | An auth context in their shop |
-| 0:57 | Break | 20 | |
-| 1:07 | Problem 2 | 21–23 | "Order the usual" breaks the cart; where the rules live |
-| 1:12 | Solution 2 | 24–37 | The ticket rail, a reducer in four parts, **run the tickets**, **cartReducer (live)**, CartContext + CartProvider, **remove the cart props (live)**, compound components and the FAQ, mistakes, the whole picture, quiz |
-| 1:37 | Classwork 2 | 38 | A cart reducer, a cart provider |
-| 1:52 | Wrap-up | 39–43 | Recap, flip cards, homework, the finished track, next time |
+| 0:11 | Problem 1 | 7–9 | Follow the props: cart, onAdd, session |
+| 0:16 | Solution 1 | 10–18 | Hand to hand vs the pass, three parts, **AuthContext + AuthProvider (live)**, **remove the session props (live)**, who re-renders, the right tool, mistakes, quiz |
+| 0:40 | Classwork 1 | 19 | An auth context in their shop |
+| 0:55 | Break | 20 |  |
+| 1:05 | Problem 2 | 21–23 | "Order the usual" breaks the cart; where the rules live |
+| 1:10 | Solution 2 | 24–37 | The ticket rail, a reducer in four parts, **run the tickets**, **cartReducer (live)**, CartContext + CartProvider, **remove the cart props (live)**, compound components and the FAQ, mistakes, the whole picture, quiz |
+| 1:32 | Classwork 2 with AI | 38 | Students prompt an AI for a cart reducer and a provider, then check it |
+| 1:47 | Masterclass | 39–41 | One prompt rebuilds Le Bistro after L31: part by part, run and check, the short version |
+| 1:55 | Wrap-up | 42–46 | Recap, flip cards, homework, the finished track, next time |
 
-Running late? Skip slides 16 (say: "context is for a few app-wide values"), 18 and 37 (quizzes), and copy `Accordion.tsx` without walking through slide 34.
+Running late? Skip slides 16 (say: "context is for a few app-wide values"), 18 and 37 (quizzes), and copy `Accordion.tsx` without walking through slide 34. In the Masterclass, show the parts (slide 39) and the short version (slide 41), and skip the live run.
+
+---
+
+## Classwork 2 with AI and the Masterclass
+
+From this track on, the second classwork is done with an AI, and the lecture ends with a Masterclass.
+
+**Classwork 2 with AI** (slide 38, 15 minutes). The task is a cart reducer and a cart provider, but the students don't type the code: they write a prompt in five parts (**CRAFT**: Context, Role, Action, Format, Target), the AI writes the code, and they check it against "Done when".
+- Any AI tool works: Claude, ChatGPT, Copilot Chat. Students who have none can pair up.
+- Walk around and ask students to explain one line the AI wrote. Code they can't explain doesn't count.
+- When the answer doesn't work, the next prompt is the exact error message.
+- The template, a sample prompt (blurred on the slide until clicked) and the follow-up prompts for the AI's usual mistakes are in [`classwork.md`](classwork.md).
+
+**Masterclass** (slides 39–41, 8 minutes). One prompt rebuilds Le Bistro as it is after today:
+1. **The prompt, part by part.** Each press opens one part. For each, one sentence: what would the AI do without it?
+2. **Run it, then check it.** Show the answer, then go through the checks on the slide: each one is something from today.
+3. **The short version.** The same five parts as one paragraph; press next and each part lights up in its colour.
+
+**Before class:** run the Masterclass prompt once in the AI tool you'll use and keep the answer open: answers take a minute or two and vary a little. The full script, with the exact prompt texts, is [`masterclass.md`](masterclass.md).
 
 ---
 
@@ -178,6 +199,9 @@ Running late? Skip slides 16 (say: "context is for a few app-wide values"), 18 a
 | 22 | Order the usual | Add Coq au Vin with its card, then press "Order the usual": Coq au Vin appears twice, Bouillabaisse (off the menu) gets in. Press it again: more lines |
 | 26 | Run the tickets | Each button puts a ticket on the rail; the reducer handles them one by one and the state on the right changes. Coq au Vin twice → qty 2. Bouillabaisse → refused. "Order the usual" → three tickets. +1 until 10 → it stops. −1 to 0 → the line disappears |
 | 33 | The FAQ | Click the questions. The dark panel shows what the two contexts hold |
+| 38 | The sample prompt | Click the blurred box on the Classwork 2 slide: a complete CRAFT prompt for one shop theme |
+| 39 | The prompt, part by part | Press next five times; **Copy** copies the whole prompt with its five labels |
+| 41 | The short version | Press next: each part lights up in its colour; **Copy** copies the paragraph |
 
 In the demos, Bouillabaisse plays "off the menu today". In the real API it is available; the reducer's rule matters whenever the kitchen switches a dish off (`isAvailable: false`).
 

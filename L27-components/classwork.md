@@ -1,6 +1,6 @@
 # L27 · Classwork
 
-Two classworks, 15 minutes each, on **your own project** (the shop you picked from [`../student-project.md`](../student-project.md)).
+Two classworks, 15 minutes each, on **your own project** (the shop you picked from [`../student-project.md`](../student-project.md)). The second one is done with an AI.
 Le Bistro is the lecturer's project: look at it for the pattern, don't copy it.
 
 ---
@@ -70,9 +70,75 @@ One more component from your drawing, for example a "Why shop with us" strip wit
 
 ---
 
-## Classwork 2 · Your catalog, from data (slide 37)
+## Classwork 2 · Prompt it: your catalog, from data (with AI, slides 37–38)
 
-### Base (everyone)
+Today's second classwork is done **with an AI**, for the first time. Slide 37 introduces CRAFT, the five parts of a good prompt. You write the prompt, the AI writes the code, and you check it. Any AI tool works: Claude, ChatGPT, Copilot Chat.
+
+### The task
+
+- **Base:** A `Product` type, 6 real products from your DummyJSON category in `src/data/products.ts`, a `ProductCard` with a typed prop and a `ProductGrid` with `map` and `key`.
+- **Plus:** The grid inside a `Section` with `children`; a "Low stock" badge when `stock < 10`.
+- **Pro:** A "Top rated" grid (rating ≥ 4.5) from the same `ProductGrid`.
+
+### Your prompt, in five parts (CRAFT)
+
+| | Part | What to write |
+|---|---|---|
+| C | **Context** | Your shop and stack: Vite, React 19, TypeScript, Tailwind 4. Paste two products from your DummyJSON category. |
+| R | **Role** | "A React teacher who writes simple code for a beginner." |
+| A | **Action** | The Base task in your own words. Plus and Pro in follow-up prompts. |
+| F | **Format** | "Only new or changed files, complete, with their paths. No new libraries." |
+| T | **Target** | "I'm in my first React week: explain props and key in two sentences." |
+
+### A sample prompt (Watch boutique)
+
+```text
+CONTEXT
+My shop "Tempo" sells watches. Vite + React 19 +
+TypeScript + Tailwind 4. Two products from
+dummyjson.com/products/category/mens-watches: (pasted)
+ROLE
+A React teacher who writes simple code for a beginner.
+ACTION
+A Product type with only the fields I need, 6 products
+in src/data/products.ts, a ProductCard with a typed prop
+and a ProductGrid with map and key.
+FORMAT
+Only new or changed files, complete, with their paths.
+No new libraries.
+TARGET
+I'm in my first React week: explain props and key in
+two sentences.
+```
+
+### The rules
+
+1. Read every line before it goes into your project. You must be able to explain it.
+2. Run it. If something fails, the next prompt is the exact error message.
+3. One step at a time: Base first, then Plus and Pro as follow-up prompts.
+4. Log it in `AI.md`: your prompt, what you kept, what you changed and why.
+
+### Done when
+
+- [ ] The page shows your products from one data file
+- [ ] No key warning in the console
+- [ ] You read every line and can explain it
+- [ ] AI.md: your prompt and one thing you changed
+
+### What the AI tends to get wrong here (for the lecturer)
+
+| The AI writes | The follow-up prompt |
+|---|---|
+| `key={index}`, or the key on a `<div>` inside the card | "Use the product id as the key, on the component inside map." |
+| Invented fields (`id: string`, `image`, `name`) | "Use exactly the fields of the JSON I pasted." |
+| `useState` or a fetch "to make it better" | "No state and no effects yet: data from the file only." |
+| A new library (a UI kit, an icon pack) | "No new dependencies." |
+
+### What a good answer looks like
+
+The hand-written solution, to check what the AI produced.
+
+#### Base (everyone)
 
 1. Open your category on DummyJSON, for example
    [dummyjson.com/products/category/mens-watches](https://dummyjson.com/products/category/mens-watches).
@@ -111,12 +177,12 @@ One more component from your drawing, for example a "Why shop with us" strip wit
    ```
 4. `ProductCard` with a typed prop, and `ProductGrid` with `map` and `key`.
 
-### Plus
+#### Plus
 
 - Wrap the grid in a `Section` component with a title, using `children`.
 - A "Low stock" badge when `product.stock < 10`: `{product.stock < 10 && <p>Low stock</p>}`.
 
-### Pro
+#### Pro
 
 A second grid, "Top rated", made from the same `ProductGrid`:
 ```tsx
@@ -124,14 +190,7 @@ const topRated = products.filter((p) => p.rating >= 4.5);
 <ProductGrid products={topRated} />
 ```
 
-### Done when
-
-- [ ] The products come from one data file
-- [ ] `ProductCard` and `ProductGrid` have props types
-- [ ] No "key" warning in the console
-- [ ] Changing a price in the data file changes the page
-
-### A sample solution (for the lecturer)
+#### A sample solution (for the lecturer)
 
 ```tsx
 // src/components/ProductCard.tsx
@@ -174,7 +233,7 @@ export function ProductGrid({ products }: ProductGridProps) {
 }
 ```
 
-### Common problems (for the lecturer)
+#### Common problems (for the lecturer)
 
 | Problem | Fix |
 |---|---|
