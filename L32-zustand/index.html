@@ -1,0 +1,1543 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Le garde-manger · L32</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Karla:ital,wght@0,400..800;1,400..800&family=JetBrains+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="../_shared/deck.css">
+<link rel="stylesheet" href="../track.css">
+<style>
+/* ---------- L32 only ---------- */
+.sofar { display: flex; align-items: center; gap: 12px; margin-top: 18px; font: 700 14px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+.sofar b { color: var(--good); }
+.sofar span { padding: 8px 12px; background: color-mix(in srgb, var(--good) 12%, transparent); color: var(--good); border-radius: 999px; }
+
+/* the render board: a header and twelve cards, each with a render counter */
+.bd-wrap { display: grid; grid-template-columns: minmax(0, 1fr) 470px; gap: 40px; margin-top: 22px; align-items: start; }
+.bd { display: flex; flex-direction: column; gap: 14px; padding: 18px; border-radius: 16px; border: 2px dashed var(--brass-soft); position: relative; }
+.bd__head { position: relative; display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; background: #efe7d8; font: 600 24px/1 var(--f-display); color: #5c1a23; }
+.bd__head .btn-o { font: 700 15px/1 var(--f-body); border: 1.5px solid #5c1a23; padding: 9px 14px; color: #5c1a23; }
+.bd__grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
+.bd .mcard { position: relative; }
+.bd .mcard img { aspect-ratio: 4 / 3; }
+.bd .mcard__body { padding: 8px 10px 10px; gap: 4px; }
+.bd .mcard__title { font-size: 16px; }
+.bd .mcard__foot { justify-content: space-between; align-items: center; }
+.bd .mcard .mbtn { padding: 5px 8px; font-size: 11px; cursor: pointer; }
+.bd .qtag { font: 700 13px/1 var(--f-mono); color: #5c1a23; }
+.rcnt { position: absolute; top: 8px; right: 8px; z-index: 2; min-width: 32px; text-align: center; padding: 5px 8px; border-radius: 999px; background: rgba(46, 42, 38, .8); color: #fff; font: 700 14px/1 var(--f-mono); }
+.bd__head .rcnt { position: static; margin-left: 12px; }
+.is-render { animation: rflash .9s ease; }
+@keyframes rflash { 0% { box-shadow: 0 0 0 5px #f3cd83; background: #fbe9c2; } 100% { box-shadow: 0 0 0 0 transparent; } }
+.bd__side { display: flex; flex-direction: column; gap: 16px; }
+.bigcount { padding: 22px 26px; background: var(--surface); border-radius: var(--card-r); box-shadow: var(--shadow-1); border-left: 5px solid var(--wine); }
+.bigcount b { display: block; font: 700 96px/1 var(--f-mono); color: var(--wine); }
+.bigcount span { font: 700 14px/1.3 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+.bigcount small { display: block; margin-top: 8px; font: 500 19px/1.4 var(--f-body); color: var(--ink-2); text-transform: none; letter-spacing: 0; }
+.bd__side .row { flex-wrap: wrap; }
+.seg.is-modes button { font-size: 16px; padding: 12px 14px; }
+
+.state { background: #1d1816; color: #e9dcc8; border-radius: 12px; padding: 16px 20px; font: 500 18px/1.55 var(--f-mono); white-space: pre; box-shadow: var(--shadow-1); overflow: hidden; }
+.state b { color: #f3cd83; font-weight: 600; }
+.state .k { color: #9c8f84; }
+.mini { background: #f6f1e7; border-radius: 12px; box-shadow: var(--shadow-2); overflow: hidden; min-width: 0; }
+.mini__head { display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; background: #efe7d8; font: 600 24px/1 var(--f-display); color: #5c1a23; }
+.mini__count { font: 700 15px/1 var(--f-body); background: #5c1a23; color: #fdfaf2; padding: 9px 12px; }
+.mini__body { padding: 12px 16px 14px; display: flex; flex-direction: column; gap: 6px; }
+.why3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 26px; }
+.why3 .takeaway { padding: 18px 22px; }
+.why3 .takeaway p { font-size: 21px; line-height: 1.4; }
+
+/* the store, drawn */
+.stor .node { min-width: 0; }
+.stor .node.is-sub { box-shadow: var(--shadow-1), 0 0 0 3px var(--good); background: color-mix(in srgb, var(--good) 12%, var(--surface)); }
+.stor .node.is-quiet { opacity: .5; }
+
+/* localStorage panel */
+.lsp { background: #1d1816; color: #e8dccb; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-2); font: 500 18px/1.5 var(--f-mono); }
+.lsp__head { display: flex; gap: 14px; padding: 10px 16px; background: #2a2320; font: 700 13px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: #9c8f84; }
+.lsp__head b { color: #f3cd83; }
+.lsp__row { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 14px; padding: 14px 16px; border-top: 1px solid rgba(255, 255, 255, .06); white-space: pre-wrap; word-break: break-word; }
+.lsp__row .k { color: #f3cd83; }
+.lsp__row .v { color: #b9d89a; min-height: 92px; }
+.lsp__row.is-gone .v { color: #ffb4a8; }
+.pers { display: grid; grid-template-columns: 560px minmax(0, 1fr); gap: 36px; align-items: start; margin-top: 22px; }
+.pers .mcard img { aspect-ratio: 16 / 9; }
+.cartline { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 8px 12px; background: #fdfaf2; border: 1px solid #ddd2bf; font: 600 17px/1.2 var(--f-body); color: #2e2a26; margin-top: 6px; }
+.cartline i { font: 700 15px/1 var(--f-mono); font-style: normal; color: #5c1a23; }
+
+/* the junk drawer */
+.junk { display: grid; grid-template-columns: minmax(0, 1fr) 90px minmax(0, 1fr); gap: 0; margin-top: 22px; align-items: stretch; }
+.junk__box { padding: 22px 24px; border-radius: 14px; background: var(--surface); box-shadow: var(--shadow-1); display: flex; flex-direction: column; gap: 12px; }
+.junk__box h4 { margin: 0; font: 700 14px/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--brass); }
+.junk__arrow { display: grid; place-items: center; color: var(--brass); }
+.junk__arrow svg { width: 44px; height: 44px; }
+.junk .state { font-size: 17px; }
+.junk .state .stale { color: #ffb4a8; }
+.dishrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 14px; background: #fdfaf2; border: 1px solid #ddd2bf; font: 600 19px/1.2 var(--f-body); color: #2e2a26; }
+.dishrow .tag { font: 700 12px/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; padding: 6px 9px; border-radius: 999px; color: #fff; background: var(--good); }
+.dishrow .tag.is-off { background: var(--bad); }
+.dishrow .tag.is-stale { background: var(--warn); }
+.junk__btns { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+.junk__btns .btn { height: 46px; font-size: 14px; padding: 0 16px; }
+.counters { display: flex; gap: 12px; }
+.counters div { flex: 1; padding: 12px 14px; background: var(--surface-2); border-radius: 10px; }
+.counters b { display: block; font: 700 34px/1 var(--f-mono); color: var(--wine); }
+.counters span { font: 700 12px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+
+/* the five homes of state */
+.homes { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; margin-top: 30px; }
+.home { position: relative; padding: 22px 20px 22px; border-radius: 14px; background: var(--surface); box-shadow: var(--shadow-1); display: flex; flex-direction: column; gap: 10px; border-top: 6px solid var(--part, var(--wine)); }
+.home h3 { margin: 0; font: 600 34px/1 var(--f-display); color: var(--part, var(--wine)); }
+.home .tool { font: 700 15px/1.3 var(--f-mono); color: var(--ink); }
+.home p { margin: 0; font-size: 19px; line-height: 1.4; color: var(--ink-2); }
+.home .ex { font: 500 17px/1.4 var(--f-mono); padding: 10px 12px; border-radius: 8px; background: color-mix(in srgb, var(--part, var(--wine)) 9%, transparent); color: var(--ink); }
+.home .when { margin-top: auto; font: 700 13px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+.home.h-local { --part: #8a7a63; } .home.h-url { --part: #2f5d7c; } .home.h-form { --part: #74508a; } .home.h-store { --part: #5c1a23; } .home.h-server { --part: #3f6b4a; }
+
+/* the sorting game */
+.sg { display: grid; grid-template-columns: 440px minmax(0, 1fr); gap: 28px; margin-top: 18px; align-items: start; }
+.sg__pool { display: flex; flex-direction: column; gap: 8px; max-height: 640px; }
+.sgc { padding: 11px 16px; border-radius: 10px; background: var(--surface); box-shadow: var(--shadow-1); font: 600 20px/1.25 var(--f-body); cursor: pointer; border: 2px solid transparent; transition: transform .2s ease, border-color .2s ease; }
+.sgc:hover { transform: translateX(4px); }
+.sgc.is-pick { border-color: var(--wine); background: #fff; transform: translateX(8px); }
+.sgc.is-shake { animation: shake .4s ease; }
+@keyframes shake { 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
+.sg__homes { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.sgh { min-height: 560px; padding: 12px 10px 14px; border-radius: 12px; background: color-mix(in srgb, var(--part) 7%, var(--surface)); border-top: 5px solid var(--part); cursor: pointer; display: flex; flex-direction: column; gap: 8px; transition: box-shadow .2s ease; }
+.sgh:hover, .sgh.is-ready { box-shadow: 0 0 0 3px color-mix(in srgb, var(--part) 55%, transparent); }
+.sgh h4 { margin: 0; font: 600 25px/1.05 var(--f-display); color: var(--part); }
+.sgh small { font: 700 12px/1.25 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+.sgh .placed { padding: 8px 10px; border-radius: 8px; background: #fff; font: 600 16px/1.25 var(--f-body); box-shadow: var(--shadow-1); animation: fadeUp .35s var(--ease-out); }
+.sgh .placed i { display: block; margin-top: 4px; font: 500 14px/1.35 var(--f-body); font-style: normal; color: var(--ink-2); }
+.sg__score { display: flex; align-items: center; gap: 16px; margin-top: 12px; font: 700 18px/1 var(--f-mono); color: var(--ink-2); }
+.sg__score b { font-size: 34px; color: var(--wine); }
+
+/* the token expires */
+.exp { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 24px; }
+.exp__box { padding: 20px 22px; border-radius: 14px; background: var(--surface); box-shadow: var(--shadow-1); display: flex; flex-direction: column; gap: 10px; transition: background-color .4s ease, box-shadow .4s ease; }
+.exp__box h4 { margin: 0; font: 700 14px/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--brass); }
+.exp__box .big { font: 600 34px/1.1 var(--f-display); color: var(--wine); }
+.exp__box p { margin: 0; font-size: 19px; line-height: 1.4; color: var(--ink-2); }
+.exp__box.is-flash { animation: rflash 1s ease; }
+.exp__log { margin-top: 18px; }
+.exp__btns { display: flex; gap: 12px; margin-top: 22px; flex-wrap: wrap; }
+
+/* Redux next to Zustand */
+.vs2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-top: 24px; }
+.glossary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 22px; }
+.glossary div { padding: 14px 16px; background: var(--surface); border-radius: 10px; box-shadow: var(--shadow-1); font-size: 18px; line-height: 1.35; }
+.glossary b { display: block; font: 700 14px/1.2 var(--f-mono); color: var(--wine); margin-bottom: 4px; }
+
+.flips.is-small .flip__face .code { --code-size: 17px; }
+.map2 { display: grid; grid-template-columns: 560px minmax(0, 1fr); gap: 44px; margin-top: 24px; align-items: start; }
+.statemap { width: 100%; border-collapse: collapse; font-size: 20px; }
+.statemap th { text-align: left; font: 700 13px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--brass); padding: 0 12px 10px 0; }
+.statemap td { padding: 10px 12px 10px 0; border-top: 1px solid var(--line); vertical-align: top; line-height: 1.35; }
+.statemap td:first-child { font-weight: 600; }
+.statemap code { font-size: 16px; }
+</style>
+</head>
+<body>
+<div class="deck">
+<div class="stage">
+
+<!-- ============================== HELLO ============================== -->
+
+<section class="slide" data-phase="hello" id="cover" data-title="Le garde-manger">
+  <div class="cover">
+    <div class="stack" style="--gap:24px">
+      <p class="cover__hello">Bonjour!</p>
+      <p class="eyebrow"><b>L32</b> React · lecture 7 · track 6 of 10 · syllabus L34</p>
+      <h1 class="display" style="font-size:150px">Le<br>garde-manger</h1>
+      <p class="lead" style="max-width:930px">The pantry is the cool room behind the kitchen where the stock waits. Any cook walks in, takes the one thing they need and walks out. Nobody carries the whole stock around, and nobody asks the waiters.</p>
+      <dl class="cover__meta">
+        <div><dt>Theme</dt><dd>Zustand, selectors, persist</dd></div>
+        <div><dt>Le Bistro today</dt><dd>A cart and a session in stores</dd></div>
+        <div><dt>Your project</dt><dd>v0.6 · a store</dd></div>
+        <div><dt>Length</dt><dd>2 hours · one break</dd></div>
+      </dl>
+    </div>
+    <div class="plate">
+      <div class="plate__rim"></div>
+      <div class="plate__food"><img src="../_shared/img/dishes/baguette.jpg" alt=""></div>
+      <div class="plate__tag"><small>le garde-manger</small>“a shelf for everything”</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Bonjour! Last time the cart and the session got their own pass: context. Today we find out what it costs, and we move them to a pantry. It is the first lecture of the second Le Bistro track.</p>
+    <p><b>The title:</b> "le garde-manger" is the pantry, the cool room where ingredients wait. The pass (last time) hands finished plates over. The pantry holds the stock: any cook can walk in and take exactly one thing. That is a store with selectors.</p>
+    <p><b>Numbers:</b> this deck is lecture L32 of the track and L34 in the syllabus. Your project is at v0.5 and moves to v0.6 today.</p>
+  </aside>
+</section>
+
+<section class="slide v-center" data-phase="hello" data-title="Today's menu">
+  <div class="menu-card">
+    <div class="menu-card__head"><p class="eyebrow">Le Bistro · L32 · 120 minutes</p><h2>Today's menu</h2></div>
+    <ol class="menu-card__list">
+      <li class="course"><span class="course__k">Accueil</span><span class="course__name">Hello <small>where Le Bistro is today</small></span><span class="course__t">3′</span></li>
+      <li class="course"><span class="course__k">Apéritif</span><span class="course__name">Questions <small>and two homework demos</small></span><span class="course__t">8′</span></li>
+      <li class="course"><span class="course__k">Entrée</span><span class="course__name">Problem 1 <small>25 cards flash for one click</small></span><span class="course__t">5′</span></li>
+      <li class="course"><span class="course__k">Plat</span><span class="course__name">Zustand <small>a store with selectors</small></span><span class="course__t">24′</span></li>
+      <li class="course"><span class="course__k">Atelier</span><span class="course__name">Classwork 1 <small>your cart in a store</small></span><span class="course__t">15′</span></li>
+      <li class="course is-pause"><span class="course__k">Pause café</span><span class="course__name">Break <small>music on, screens off</small></span><span class="course__t">10′</span></li>
+      <li class="course"><span class="course__k">Second plat</span><span class="course__name">Problem 2 and the state map <small>where does this live?</small></span><span class="course__t">27′</span></li>
+      <li class="course"><span class="course__k">Atelier</span><span class="course__name">Classwork 2 with AI <small>prompt it, then check it</small></span><span class="course__t">15′</span></li>
+      <li class="course"><span class="course__k">Masterclass</span><span class="course__name">One prompt, the whole Le Bistro <small>CRAFT, then the short version</small></span><span class="course__t">8′</span></li>
+      <li class="course"><span class="course__k">Dessert</span><span class="course__name">Wrap-up <small>recap, homework, what comes next</small></span><span class="course__t">5′</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-phase="hello" data-title="Le Bistro, lecture by lecture">
+  <p class="eyebrow"><b>Route</b> The second five lectures</p>
+  <h2 class="h2 mt-s">Le Bistro, lecture by lecture</h2>
+  <p class="sofar"><b>Done</b><span>L27 components</span><span>L28 state</span><span>L29 effects</span><span>L30 routing</span><span>L31 context</span></p>
+  <div class="road" style="margin-top:30px">
+    <div class="stop is-now"><div class="stop__shot"><img src="../img/l32-cart.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L32 · today</p><p class="stop__t">Stores</p><p class="stop__d">Zustand. One cart and one session, outside React.</p></div>
+    <div class="stop"><div class="stop__shot"><img src="../img/l33-register.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L33</p><p class="stop__t">Forms</p><p class="stop__d">React Hook Form and Zod. A sign-up and a table slip.</p></div>
+    <div class="stop"><div class="stop__shot"><img src="../img/l34-devtools.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L34</p><p class="stop__t">Cache</p><p class="stop__d">TanStack Query. The menu is fetched once.</p></div>
+    <div class="stop"><div class="stop__shot"><img src="../img/l35-kitchen.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L35</p><p class="stop__t">Changes</p><p class="stop__d">Mutations, optimistic updates, endless lists.</p></div>
+    <div class="stop"><div class="stop__shot"><img src="../img/l36-sheet.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L36</p><p class="stop__t">UI</p><p class="stop__d">Accessible dialogs and shadcn/ui.</p></div>
+  </div>
+  <div class="lane" style="margin-top:28px">
+    <span class="lane__k">Your project</span>
+    <span class="lane__v"><b>v0.6 · today</b>a store, not a provider</span>
+    <span class="lane__v"><b>v0.7</b>forms with a schema</span>
+    <span class="lane__v"><b>v0.8</b>a cache for the API</span>
+    <span class="lane__v"><b>v0.9</b>orders and optimistic UI</span>
+    <span class="lane__v"><b>v1.0</b>accessible components</span>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> The first five lectures built the house. The next five make it fast to build on and pleasant to use: stores, forms, a cache, changes that feel instant, and components that work with a keyboard.</p>
+    <p><b>Do:</b> Point at "Done": it is what you can already do. Then read the five stops in one breath, nothing more. Your project follows the same five steps.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="hello" id="goal" data-title="Before and after today">
+  <div class="split-4-8 fill items-center" style="gap:56px">
+    <div class="stack" style="--gap:22px">
+      <p class="eyebrow"><b>Today's goal</b> Press next to unveil it</p>
+      <h2 class="h2">The same site, with the wrapping gone</h2>
+      <p class="lead">Under the blind: <code>main.tsx</code> as it is now, with what disappears marked in red.</p>
+      <ul class="checks is-done" data-step="1"><li>No providers: two wrappers gone, four files deleted</li><li>Add one dish: <b>1</b> card draws again, not 25</li><li>The cart still survives F5</li><li>Even <code>api.ts</code>, not a component, can sign the guest out</li></ul>
+    </div>
+    <div data-step="1" data-fx="curtain" data-curtain="src/main.tsx · after today">
+      <script type="text/plain" data-lang="tsx" data-file="src/main.tsx (before: red = gone)" data-del="3,4,6,7" style="--code-size:26px">
+        <StrictMode>
+          <BrowserRouter>
+            <AuthProvider>
+              <CartProvider>
+                <App />
+              </CartProvider>
+            </AuthProvider>
+          </BrowserRouter>
+        </StrictMode>
+      </script>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Press next: the blind rolls up. Ask: how many wrappers does <code>App</code> sit in now? (Four: StrictMode, BrowserRouter and the two providers.) After today: two.</p><p><b>Say:</b> The cart and the session do not go away. They move out of the component tree, into a pantry that any file can walk into.</p></aside>
+</section>
+
+<!-- ============================== QUESTIONS ============================== -->
+
+<section class="slide" data-phase="questions" data-title="Questions from last time">
+  <div class="qa">
+    <div class="stack" style="--gap:26px">
+      <p class="eyebrow"><b>Apéritif</b> Before we start</p>
+      <h2 class="display">Questions from last time?</h2>
+      <p class="lead">Context, <code>useReducer</code>, compound components.</p>
+    </div>
+    <div class="qa-list">
+      <div class="qa-card" data-step="1"><span class="n">01</span><h3>Who can call <code>useAuth()</code>?</h3>
+        <div class="reveal-box" data-reveal><button class="reveal-box__cover">[ show answer ]</button><p>Any component inside <code>AuthProvider</code>, at any depth. Outside it the hook throws a clear error.</p></div></div>
+      <div class="qa-card" data-step="2"><span class="n">02</span><h3>Why must a reducer be pure?</h3>
+        <div class="reveal-box" data-reveal><button class="reveal-box__cover">[ show answer ]</button><p>The same cart and the same action must always give the same new cart. No fetch, no localStorage. StrictMode runs it twice to catch the ones that aren't.</p></div></div>
+      <div class="qa-card" data-step="3"><span class="n">03</span><h3>Why two contexts and not one?</h3>
+        <div class="reveal-box" data-reveal><button class="reveal-box__cover">[ show answer ]</button><p>Every reader re-renders when its context changes. Two small contexts keep a cart change from waking the session readers. Today we go one step further.</p></div></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Wait for real questions first. If nobody asks, press next for the backup questions, and ask the room before you reveal each answer.</p>
+    <p><b>Why these three:</b> question 3 is today's first problem in one sentence. Leave it open a moment: "one step further" means "what if even a split context re-renders too much?"</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="questions" data-title="Homework: show your v0.5">
+  <div class="split-7-5 fill items-center" style="gap:64px">
+    <div class="stack" style="--gap:22px">
+      <p class="eyebrow"><b>Homework check</b> Two volunteers, two minutes each</p>
+      <h2 class="h1">Show us your v0.5</h2>
+      <p class="lead">Open the page, add the same product twice, press F5. Then open React DevTools, switch on <b>Highlight updates when components render</b> and add one more product.</p>
+    </div>
+    <div class="done-when">
+      <p class="k">Look for</p>
+      <ul class="checks">
+        <li>One line for a product added twice</li>
+        <li>The cart is still there after F5</li>
+        <li>No <code>cart=</code> or <code>session=</code> props left</li>
+        <li>The reducer has no <code>localStorage</code> or <code>fetch</code></li>
+        <li>The live Vercel link works</li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> For each volunteer, switch on "Highlight updates" in the React DevTools settings (Components tab, the gear) and add a product. Count the blue flashes aloud. That number is today's first problem.</p><p><b>Expect:</b> Most of the cards on the page flash, because every card calls <code>useCart()</code>.</p></aside>
+</section>
+
+<!-- ============================== PROBLEM 1 ============================== -->
+
+<section class="slide" data-phase="problem" data-tone="dark" data-title="Twenty-five cards. One click.">
+  <div class="problem-cover">
+    <div class="problem-cover__text">
+      <p class="eyebrow"><b>Entrée · Problem 1</b> Before the new tool</p>
+      <h2 class="display">Twenty-five<br>cards.<br>One click.</h2>
+      <p class="lead">You press "Add to cart" on one espresso. How many cards did React draw again?</p>
+    </div>
+    <div class="problem-cover__photo"><img src="../img/photo-escargots.jpg" alt=""></div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Last time the cart moved into a context and the props disappeared. The code got cleaner. But a context has one rule that we skipped over: everybody who reads it re-renders when it changes.</p>
+    <p><b>Ask:</b> One dish was added. Which cards need to change? <b>Expect:</b> "only that one." Now let's count how many do.</p>
+  </aside>
+</section>
+
+<section class="slide" id="flash" data-phase="problem" data-title="Add one espresso, count the renders">
+  <p class="eyebrow"><b>Problem 1</b> Try it: click "Add to cart" on any card</p>
+  <h2 class="h2 mt-s">Add one espresso, count the renders</h2>
+  <div class="bd-wrap">
+    <div class="bd" id="fl-board"></div>
+    <div class="bd__side">
+      <div class="bigcount"><span>Renders caused by your clicks</span><b id="fl-total">0</b><small id="fl-last">Click a card's button.</small></div>
+      <div class="callout is-warn" data-step="1"><i data-icon="triangle-alert"></i><div><p class="h4">On the real menu: 25.</p><p class="small muted mt-s">We counted in the L31 app: one click, 25 <code>DishCard</code> renders. Only one of them changed.</p></div></div>
+      <div class="row" style="--gap:10px"><button class="btn is-ghost" type="button" id="fl-reset"><i data-icon="rotate-ccw"></i>Reset</button></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Click "Add to cart" on the Espresso. Header and all twelve cards flash, and the counters go up by one each. Click three more times, on different dishes: always everybody.</p>
+    <p><b>Say:</b> These cards are in a context. Each of them calls <code>useCart()</code> to ask "how many of me are in the order?", and the context answers every reader whenever anything in the cart changes. The cost is small for twelve cards. With a hundred cards, or a value that changes every second, it matters.</p>
+    <p><b>Step 1:</b> the real number from the L31 app, measured on the production build: 25 renders for one click.</p>
+  </aside>
+</section>
+
+<section class="slide v-center" data-phase="problem" data-title="What would we need?">
+  <p class="eyebrow"><b>Problem 1</b> Your turn</p>
+  <h2 class="display mt-m" style="font-size:112px;max-width:1500px;color:var(--wine)">What would we need?</h2>
+  <div class="need">
+    <span class="chip" data-step="1" data-fx="pop">A place outside the component tree</span>
+    <span class="chip" data-step="2" data-fx="pop">Ask for just one thing</span>
+    <span class="chip" data-step="3" data-fx="pop">Wake only those whose answer changed</span>
+    <span class="chip" data-step="4" data-fx="pop">No provider to wrap</span>
+    <span class="chip is-answer" data-step="5" data-fx="pop"><i data-icon="package-open"></i>That is a store</span>
+  </div>
+  <aside class="notes">
+    <p><b>Ask:</b> If you could design it, what would the cart be? Collect two or three answers before pressing next. "A global variable" is a fair first answer: it is almost right, except React would not know when it changes.</p>
+    <p><b>Step 5:</b> the name of today's tool. Zustand (German for "state") is a small library that does exactly these four things.</p>
+  </aside>
+</section>
+
+<!-- ============================== SOLUTION 1 ============================== -->
+
+<section class="slide" data-phase="solution" id="storeidea" data-title="A store lives outside React">
+  <div class="idea">
+    <div class="schema stor" data-wire-sides="r l" style="width:1040px;height:720px">
+      <div class="region" style="left:0;top:26px;width:610px;height:690px"></div>
+      <span class="box-label" style="left:20px;top:0">The component tree</span>
+      <div class="node" id="s-hd" style="left:40px;top:80px;width:260px" data-on="4-4:is-sub">Header<small>asks: how many in total?</small></div>
+      <div class="node" id="s-c1" style="left:40px;top:250px;width:260px" data-on="4-4:is-quiet">DishCard<small>Coq au Vin</small></div>
+      <div class="node" id="s-c2" style="left:40px;top:420px;width:260px" data-on="4-4:is-sub">DishCard<small>Espresso</small></div>
+      <div class="node" id="s-c3" style="left:40px;top:590px;width:260px" data-on="4-4:is-quiet">DishCard<small>Crème Brûlée</small></div>
+      <div class="node is-wine lg" id="s-store" style="left:690px;top:260px;width:310px;height:220px" data-step="1">useCartStore<small>items · add · remove · clear</small></div>
+      <span class="box-label" style="left:690px;top:230px" data-step="1">Outside React</span>
+      <b class="wire is-wine" data-from="s-hd" data-to="s-store" data-step="2" data-label="selectCount" data-lx="30" data-ly="-14"></b>
+      <b class="wire is-wine" data-from="s-c1" data-to="s-store" data-step="2"></b>
+      <b class="wire is-wine" data-id="sw-c2" data-from="s-c2" data-to="s-store" data-step="2" data-label="selectQtyOf(25)" data-lx="20" data-ly="22"></b>
+      <b class="wire is-wine" data-from="s-c3" data-to="s-store" data-step="2"></b>
+      <b class="packet is-wine" data-wire="sw-c2" data-on="3-3:go" style="--dur:1.5s">add(espresso)</b>
+      <b class="wire is-good" data-id="sn-hd" data-from="s-store" data-to="s-hd" data-sides="l r" data-step="4" data-nohead></b>
+      <b class="wire is-good" data-id="sn-c2" data-from="s-store" data-to="s-c2" data-sides="l r" data-step="4" data-nohead></b>
+      <b class="packet is-good" data-wire="sn-hd" data-on="4-4:go" style="--dur:1.5s">new answer</b>
+      <b class="packet is-good" data-wire="sn-c2" data-on="4-4:go" style="--dur:1.5s">new answer</b>
+    </div>
+    <div class="idea__side">
+      <p class="eyebrow"><b>Solution 1</b> The pantry</p>
+      <h2 class="h2">A store lives outside React</h2>
+      <div class="takeaway" data-step="1"><p class="k">Not a component</p><p>The store is a plain module: one object that holds the state and the actions. React does not own it, so it does not re-render it.</p></div>
+      <div class="takeaway" data-step="2"><p class="k">A selector is a question</p><p>A component subscribes with a small function: "how many Espressos are in the order?" No provider is needed.</p></div>
+      <div class="takeaway" data-step="4" style="border-color:var(--good)"><p class="k" style="color:var(--good)">Only changed answers render</p><p>After a change the store asks every selector again. Two answers changed, so two components render.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> One press per idea. Step 1: the store appears <i>outside</i> the dashed tree. Step 2: four wires, one per subscriber, each with the question it asks. Step 3: a click on the Espresso card sends <code>add</code> to the store. Step 4: the store asks the four questions again; only Header and Espresso get a different answer.</p>
+    <p><b>Say:</b> Compare with the pass from last time: the pass was a component that wrapped the tree and woke every reader. The pantry is outside the tree and wakes only the readers whose answer changed.</p>
+    <p><b>Remember:</b> "outside React" is also why you can call it from <code>api.ts</code>, from a test, from a timer. We use that in the second half.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="create() in one picture">
+  <p class="eyebrow"><b>Solution 1</b> What a store is made of</p>
+  <h2 class="h2 mt-s">Four ideas in one file</h2>
+  <div class="anatomy" style="margin-top:34px">
+    <div class="anatomy__code" style="display:block;font-size:31px;line-height:1.55"><span class="part" data-on="1:is-on">export const useCartStore = create&lt;CartState&gt;()(</span>
+  (set) =&gt; ({
+    <span class="part" data-on="2:is-on">items: [],</span>
+    <span class="part" data-on="3:is-on">add: (dish) =&gt; set((s) =&gt; ({ items: [...s.items, dish] })),</span>
+  }),
+);
+
+<span class="part" data-on="4:is-on">const qty = useCartStore((s) =&gt; s.items.length);</span></div>
+    <div class="anatomy__notes">
+      <div class="card" data-step="1"><span class="num">01</span><p><code>create()</code><br>Builds the store and returns a hook. The second pair of parentheses is not a typo: it is how TypeScript learns the state type.</p></div>
+      <div class="card" data-step="2"><span class="num">02</span><p><code>items: []</code><br>The state: plain data, here the cart. Nothing special, no hook.</p></div>
+      <div class="card" data-step="3"><span class="num">03</span><p><code>add: … set(…)</code><br>Actions live in the store. <code>set</code> merges what you give it into the state, like a mini <code>setState</code>.</p></div>
+      <div class="card" data-step="4"><span class="num">04</span><p><code>useCartStore(selector)</code><br>The hook the store gives back. The selector picks one piece; the component re-renders only when that piece changes.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> That is all of Zustand's core. Create a store, put state and actions in it, read it with a selector. Everything else (persist, devtools) is an add-on.</p>
+    <p><b>If asked "why not Redux?":</b> next lecture slide. Short answer: same idea, less ceremony.</p>
+    <p><b>Do:</b> One part per press. The sample in the picture is simplified; the real file is on the next slide.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" id="r-store" data-title="Recipe: the cart store">
+  <p class="eyebrow"><b>Solution 1 · Recipe</b> Type it with me, step by step</p>
+  <h2 class="h3 mt-s">The cart, in a store</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>Install and import</b><span>One small package. The rules stay in the <code>cartReducer</code> you wrote last time.</span><span class="file-chip"><i data-icon="terminal"></i>npm install zustand</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Describe the state</b><span>The data and the actions, as a type.</span><span class="file-chip"><i data-icon="file-code"></i>src/cart/cartStore.ts</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>create() and the first action</b><span>State first, then <code>add</code>: it calls the reducer with a ticket.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>The other actions</b><span>Same pattern. The rules did not change, only where they live.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/cart/cartStore.ts" data-copy data-build="1:1-3;2:4-11;3:12-16,24;4:17-23" style="--code-size:17px">
+        import { create } from "zustand";
+        import type { CartItem, Dish } from "../types";
+        import { cartReducer } from "./cartReducer";
+
+        type CartState = {
+          items: CartItem[];
+          add: (dish: Dish) => void;
+          changeQty: (dishId: number, delta: number) => void;
+          remove: (dishId: number) => void;
+          clear: () => void;
+        };
+
+        export const useCartStore = create<CartState>()((set) => ({
+          items: [],
+          add: (dish) =>
+            set((s) => ({ items: cartReducer(s.items, { type: "added", dish }) })),
+          changeQty: (dishId, delta) =>
+            set((s) => ({
+              items: cartReducer(s.items, { type: "qtyChanged", dishId, delta }),
+            })),
+          remove: (dishId) =>
+            set((s) => ({ items: cartReducer(s.items, { type: "removed", dishId }) })),
+          clear: () => set({ items: [] }),
+        }));
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Type along, or press Copy. Install Zustand first (<code>npm install zustand</code>). Each press adds the lines of one step in green.</p>
+    <p><b>Step 3:</b> <code>set((s) =&gt; ({ … }))</code> takes the old state <code>s</code> and returns the part that changes. Here it asks the same <code>cartReducer</code> as last time for the new items. The reducer is still pure.</p>
+    <p><b>Remember:</b> the L31 homework said "keep your reducer: only where the rules live changes". This is where.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" id="r-read" data-title="Recipe: components read the store">
+  <p class="eyebrow"><b>Solution 1 · Recipe</b> Replace useCart() everywhere</p>
+  <h2 class="h3 mt-s">Every component asks its own question</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>DishCard: how many of mine?</b><span><code>selectQtyOf(dish.id)</code> returns a number. The card renders only when that number changes.</span><span class="file-chip"><i data-icon="file-code"></i>DishCard.tsx</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Header: how many in total?</b><span>A selector may calculate. It still returns one number.</span><span class="file-chip"><i data-icon="file-code"></i>Header.tsx</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Actions, one by one</b><span>A function never changes, so selecting <code>s.add</code> never causes a render.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Several values at once</b><span>An object is new every time. <code>useShallow</code> compares the pieces instead.</span><span class="file-chip"><i data-icon="file-code"></i>CartPanel.tsx</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/components/DishCard.tsx" data-copy data-build="1:1;3:2-5" style="--code-size:17px">
+        const qty = useCartStore(selectQtyOf(dish.id));
+        const add = useCartStore((s) => s.add);
+        const changeQty = useCartStore((s) => s.changeQty);
+        // add(dish) and changeQty(dish.id, -1) in the click handlers
+        // as before: no props, no provider
+      </script>
+      <script type="text/plain" data-lang="tsx" data-file="src/components/Header.tsx" data-copy data-build="2:1-2" style="--code-size:17px">
+        const count = useCartStore(selectCount);
+        const session = useAuthStore((s) => s.session);
+      </script>
+      <script type="text/plain" data-lang="tsx" data-file="src/components/CartPanel.tsx" data-copy data-build="4:1-3" style="--code-size:17px">
+        const { changeQty, remove, clear } = useCartStore(
+          useShallow((s) => ({ changeQty: s.changeQty, remove: s.remove, clear: s.clear })),
+        );
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Open DishCard.tsx and replace the <code>useCart()</code> line. Save: TypeScript's red lines in the other files show what is left to change.</p>
+    <p><b>The selectors</b> live at the bottom of <code>cartStore.ts</code> (<code>selectCount</code>, <code>selectTotal</code>, <code>selectQtyOf</code>): copy them from <code>code/after-L32</code>.</p>
+    <p><b>Step 4:</b> import it with <code>import { useShallow } from "zustand/react/shallow"</code>. If a student asks "why not just destructure": next slide shows what that costs.</p>
+  </aside>
+</section>
+
+<section class="slide" id="sel" data-phase="solution" data-title="Who re-renders?">
+  <p class="eyebrow"><b>Solution 1</b> Click "Add to cart", watch the counters</p>
+  <h2 class="h2 mt-s">The same board, three ways to read the cart</h2>
+  <div class="bd-wrap">
+    <div class="bd" id="sel-board"></div>
+    <div class="bd__side">
+      <div class="seg is-modes" id="sel-mode"><button type="button" data-m="ctx">Context (L31)</button><button type="button" data-m="all">Store, no selector</button><button type="button" class="is-on" data-m="sel">Store + selector</button></div>
+      <div class="bigcount"><span>Renders caused by your clicks</span><b id="sel-total">0</b><small id="sel-last">Pick a way to read the cart, then click.</small></div>
+      <div class="takeaway" id="sel-rule" style="padding:18px 22px"><p class="k">The rule</p><p id="sel-rule-t" style="font-size:22px">A selector decides who wakes up. No selector means everybody.</p></div>
+      <div class="row" style="--gap:10px"><button class="btn is-ghost" type="button" id="sel-reset"><i data-icon="rotate-ccw"></i>Reset</button></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Start with "Store + selector" and click an Espresso: Header and that one card flash, 2 renders. Switch to "Context (L31)" (it resets) and repeat: 13. Then "Store, no selector": 13 again. <code>const { items } = useCartStore()</code> subscribes to the whole store.</p>
+    <p><b>Say:</b> The library is not what saves renders; the selector is. A store used without selectors is a context with extra steps.</p>
+    <p><b>Numbers on the real menu:</b> 25 cards. With the store and selectors: 1 card. We measured both on the production build.</p>
+  </aside>
+</section>
+
+<section class="slide" id="r-providers" data-phase="solution" data-title="Recipe: remove the providers">
+  <p class="eyebrow"><b>Solution 1 · Recipe</b> The best part: deleting</p>
+  <h2 class="h3 mt-s">Remove the providers</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>Delete the context files</b><span>The cart's context and provider. The reducer stays.</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>main.tsx loses its wrappers</b><span>Nothing wraps <code>&lt;App /&gt;</code> except the router.</span><span class="file-chip"><i data-icon="file-code"></i>src/main.tsx</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Follow TypeScript's red lines</b><span>Every <code>useCart()</code> becomes a selector. Then <code>npm run build</code>.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Test it</b><span>Add two dishes, press F5, empty the order. Open the cart panel: same lines.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="bash" data-file="src/cart" data-del="2,3" data-add="4" style="--code-size:19px" data-build="1:1-4">
+        cartReducer.ts            the rules (keep)
+        CartContext.ts            gone
+        CartProvider.tsx          gone
+        cartStore.ts              new
+      </script>
+      <script type="text/plain" data-lang="tsx" data-file="src/main.tsx" data-copy data-build="2:1-5" style="--code-size:19px">
+        <StrictMode>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </StrictMode>
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Delete <code>CartContext.ts</code> and <code>CartProvider.tsx</code> for the cart (the session follows in the second half). The <code>QuantityStepper</code> still imports <code>MAX_QTY</code> from the reducer: that is why we kept it.</p>
+    <p><b>Checkpoint:</b> <code>git commit -am "L32: the cart in a store"</code>.</p>
+  </aside>
+</section>
+
+<section class="slide" id="persist" data-phase="solution" data-title="Recipe: persist">
+  <p class="eyebrow"><b>Solution 1 · Recipe</b> Saved for free</p>
+  <h2 class="h3 mt-s">persist: the store remembers</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>Import the middleware</b><span>A middleware wraps the creator and adds a behaviour.</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Wrap the creator</b><span><code>persist(creator, options)</code>. The 20 lines of <code>loadCart</code> and the saving effect are gone.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Give it a key</b><span>The localStorage key. Same name as before.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Save the data, not the functions</b><span><code>partialize</code> picks what goes into localStorage.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/cart/cartStore.ts" data-copy data-walk="1:1;2:4,16;3:13;4:14" style="--code-size:18px">
+        import { persist } from "zustand/middleware";
+
+        export const useCartStore = create<CartState>()(
+          persist(
+            (set) => ({
+              items: [],
+              add: (dish) => set(/* … as before */),
+              changeQty: /* … */,
+              remove: /* … */,
+              clear: () => set({ items: [] }),
+            }),
+            {
+              name: "bistro.cart",
+              partialize: (s) => ({ items: s.items }),
+            },
+          ),
+        );
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Highlight steps: wrap the existing creator with <code>persist(</code> and add the options object as the second argument. Delete <code>loadCart</code> and the saving <code>useEffect</code> from the L31 provider: the middleware does both.</p>
+    <p><b>If asked:</b> changed the shape of your state? Add <code>version: 2</code> and a <code>migrate</code> function to the options. Old saved data will otherwise be merged into the new shape. Our new key format is <code>{"state":{"items":[…]},"version":0}</code>: carts saved by L31 are ignored, the cart starts empty once.</p>
+  </aside>
+</section>
+
+<section class="slide" id="saved" data-phase="solution" data-title="Watch it save">
+  <p class="eyebrow"><b>Solution 1</b> Add a dish, then press F5</p>
+  <h2 class="h2 mt-s">What persist writes, and reads back</h2>
+  <div class="pers">
+    <div class="stack" style="--gap:14px">
+      <div class="mgrid cols-2" id="ps-cards"></div>
+      <div class="row" style="--gap:10px"><button class="btn is-wine" type="button" id="ps-f5"><i data-icon="refresh-cw"></i>Press F5</button><button class="btn is-ghost" type="button" id="ps-clear"><i data-icon="trash-2"></i>Clear storage</button></div>
+    </div>
+    <div class="stack" style="--gap:18px">
+      <div class="lsp">
+        <div class="lsp__head"><span><b>Application</b> · Local storage · localhost:5173</span></div>
+        <div class="lsp__row" id="ps-row"><span class="k">bistro.cart</span><span class="v" id="ps-json"></span></div>
+      </div>
+      <div class="mini"><div class="mini__head"><span>Your order (the page)</span><span class="mini__count" id="ps-count">0</span></div><div class="mini__body" id="ps-lines"></div></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Add two dishes: the JSON on the right changes with every click, written by <code>persist</code>. Press F5: the page state is rebuilt from that JSON (the order comes back). "Clear storage" deletes the key: F5 now shows an empty order.</p>
+    <p><b>Say:</b> The key stores <code>{ state, version }</code>. The functions (<code>add</code>, <code>remove</code>) are not saved: they come from the code every time. That is what <code>partialize</code> is for.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="A store works outside React">
+  <p class="eyebrow"><b>Solution 1</b> The same hook is also an object</p>
+  <h2 class="h2 mt-s">A store works outside React</h2>
+  <div class="grid cols-3" style="margin-top:34px;--gap:24px">
+    <div class="card" data-step="1"><span class="num" style="font:700 14px/1 var(--f-mono);color:var(--brass);letter-spacing:.12em">IN A COMPONENT</span>
+      <script type="text/plain" data-lang="tsx" style="--code-size:14px">
+        const count = useCartStore(selectCount);
+      </script>
+      <p class="small muted mt-s">The hook subscribes. The component re-renders when the answer changes.</p></div>
+    <div class="card" data-step="2"><span class="num" style="font:700 14px/1 var(--f-mono);color:var(--brass);letter-spacing:.12em">ANYWHERE ELSE</span>
+      <script type="text/plain" data-lang="tsx" style="--code-size:14px">
+        const { session } = useAuthStore.getState();
+        useAuthStore.getState().logout();
+      </script>
+      <p class="small muted mt-s"><code>getState()</code> reads once and subscribes to nothing. For <code>api.ts</code>, a timer, a test. Never for the screen.</p></div>
+    <div class="card" data-step="3"><span class="num" style="font:700 14px/1 var(--f-mono);color:var(--brass);letter-spacing:.12em">WATCH IT</span>
+      <script type="text/plain" data-lang="tsx" style="--code-size:14px">
+        useAuthStore.subscribe((state, before) => {
+          if (before.session && !state.session) …
+        });
+      </script>
+      <p class="small muted mt-s"><code>subscribe()</code> runs a function on every change. In L34 it empties a cache when the guest signs out.</p></div>
+  </div>
+  <div class="callout mt-l" data-step="4"><i data-icon="lightbulb"></i><div><p class="h4">One rule: the screen uses the hook, everything else may use the object.</p><p class="small muted mt-s">A component that reads <code>getState()</code> in its body shows a number that never updates. That mistake is on the next slide.</p></div></div>
+  <aside class="notes">
+    <p><b>Say:</b> A context cannot do this: it exists only inside the tree, so <code>api.ts</code> could never read the session. A store is a plain object with a hook on top.</p>
+    <p><b>Preview:</b> in the second half <code>api.ts</code> signs the guest out by itself when the token expires. That is <code>getState().logout()</code>.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="When a store goes wrong">
+  <p class="eyebrow"><b>Solution 1</b> The four mistakes you will see today</p>
+  <h2 class="h2 mt-s">When a store goes wrong</h2>
+  <div class="mistakes">
+    <div class="mistake" data-step="1"><h4>A selector that builds an object</h4><div class="bad">useCartStore((s) =&gt; ({ count: s.items.length }))</div><div class="err">The result of getSnapshot should be cached to avoid an infinite loop · Maximum update depth exceeded</div><div class="good">useCartStore((s) =&gt; s.items.length), or wrap it in useShallow</div></div>
+    <div class="mistake" data-step="2"><h4>No selector at all</h4><div class="bad">const { items, add } = useCartStore();</div><div class="err">No error. It works, and re-renders on every change of anything.</div><div class="good">const add = useCartStore((s) =&gt; s.add);</div></div>
+    <div class="mistake" data-step="3"><h4>Changing the state in place</h4><div class="bad">set((s) =&gt; { s.items.push(dish); return s; })</div><div class="err">Nothing happens on screen: the same object, so no re-render.</div><div class="good">set((s) =&gt; ({ items: [...s.items, line] })), or the reducer</div></div>
+    <div class="mistake" data-step="4"><h4>getState() in a component</h4><div class="bad">const count = useCartStore.getState().items.length;</div><div class="err">The number never updates: getState() reads once and subscribes to nothing.</div><div class="good">const count = useCartStore((s) =&gt; s.items.length);</div></div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> The first one is the loudest and the others are silent. Silent bugs are the dangerous ones: number 2 is the reason we started the lecture.</p>
+    <p><b>Mistake 1:</b> a selector must return the same value for the same state. A new object is a new value every time, so React sees a change on every check and loops.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="Which line re-renders on every change?">
+  <div class="split-5-7 fill items-center">
+    <div class="stack" style="--gap:24px">
+      <p class="eyebrow"><b>Quick check</b> Vote, then click</p>
+      <h2 class="h1">Which line makes a card re-render when <i>any</i> dish is added?</h2>
+    </div>
+    <div class="quiz" data-quiz>
+      <div class="quiz__opts">
+        <button class="quiz__opt"><code>useCartStore(selectQtyOf(dish.id))</code></button>
+        <button class="quiz__opt" data-correct><code>useCartStore((s) =&gt; s.items)</code></button>
+        <button class="quiz__opt"><code>useCartStore((s) =&gt; s.add)</code></button>
+        <button class="quiz__opt"><code>useCartStore.getState().items.length</code></button>
+      </div>
+      <p class="quiz__explain">B: every change makes a new <code>items</code> array, so the answer is different every time. A changes only when this dish's number changes. C is a function that never changes. D never updates at all: no subscription.</p>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Fingers up for 1 to 4, then press the number of the most common answer. If many chose D: it doesn't re-render, it just shows an old number forever.</p></aside>
+</section>
+
+<!-- ============================== CLASSWORK 1 ============================== -->
+
+<section class="slide" data-phase="classwork" data-title="Classwork 1: your cart in a store">
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Atelier · Classwork 1</b> 15 minutes, on your own project</p><h2 class="h1">Your cart in a store</h2></div>
+    <div class="timer" data-timer="900"></div>
+  </div>
+  <div class="cw">
+    <div class="tiers">
+      <div class="tier base"><div class="tier__k"><span>Base</span><span>everyone</span></div><h3>A cart store with persist</h3>
+        <ul><li><code>npm install zustand</code>, then <code>cart/cartStore.ts</code> with <code>persist</code> and your reducer.</li><li>Header, cards and cart panel read it with selectors. Delete the cart's context and provider.</li><li>The cart survives F5.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Plus</span><span>most of you</span></div><h3>The session too</h3>
+        <ul><li><code>auth/authStore.ts</code>: <code>session</code>, <code>login</code>, <code>logout</code>, saved. Delete <code>AuthProvider</code>.</li><li>Several actions in one component: <code>useShallow</code>.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Pro</span><span>fast finishers</span></div><h3>A wishlist store</h3>
+        <ul><li>A heart on every card. A second store, saved, with <code>partialize</code>. React DevTools: only the clicked card flashes.</li></ul></div>
+    </div>
+    <div class="cw__side">
+      <div class="done-when"><p class="k">Done when</p><ul class="checks"><li>Searching the project for <code>Provider</code> finds none for the cart</li><li>No <code>useCart()</code> left</li><li>React DevTools: one card flashes when you add one product</li><li>The cart is still there after F5</li></ul></div>
+      <div class="hint" data-peek="click for a hint"><div><p class="k">Stuck?</p><pre>export const useCartStore = create&lt;CartState&gt;()(
+  persist(
+    (set) =&gt; ({
+      items: [],
+      add: (product) =&gt;
+        set((s) =&gt; ({ items: cartReducer(s.items, { type: "added", product }) })),
+    }),
+    { name: "shop.cart" },
+  ),
+);</pre></div></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Watch for:</b> <code>const { items, add } = useCartStore()</code> everywhere (works, but the point is lost: ask them to open "Highlight updates"), a selector that returns an object (the loop error), and the old localStorage key: the saved shape changed, so an old cart is simply ignored once.</p>
+    <p><b>Students without a reducer:</b> they can write the actions with <code>set</code> directly; the reducer is the better habit.</p>
+    <p>Full brief and solutions: <code>classwork.md</code>.</p>
+  </aside>
+</section>
+
+<!-- ============================== BREAK ============================== -->
+
+<section class="slide" data-phase="break" data-tone="dark" data-title="Pause café">
+  <div class="pause">
+    <div class="stack" style="--gap:28px">
+      <p class="eyebrow"><b>Pause café</b> 10 minutes</p>
+      <h2 class="display">Pause café</h2>
+      <p class="lead">Stand up, refill, rest your eyes. After the break: what goes in the pantry, and what must never.</p>
+      <button class="pause__btn" type="button" data-start-break><i data-icon="coffee"></i>Start the break</button>
+    </div>
+    <div class="cup" aria-hidden="true"><span class="cup__steam"></span><span class="cup__steam"></span><span class="cup__steam"></span><div class="cup__plate"></div><div class="cup__body"></div><div class="cup__coffee"></div><div class="cup__handle"></div></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Click "Start the break" (or press B). A 10-minute countdown starts with radio music. +1 / −1 minute adjusts it. When it ends, a chime plays and a "Welcome back" screen appears.</p>
+    <p><b>No internet?</b> The radio needs it. Put mp3 files in <code>_shared/music/</code> and list them in <code>tracks.js</code>.</p>
+  </aside>
+</section>
+
+<!-- ============================== PROBLEM 2 ============================== -->
+
+<section class="slide" data-phase="problem2" data-tone="dark" data-title="Everything goes in the store">
+  <div class="problem-cover">
+    <div class="problem-cover__text">
+      <p class="eyebrow"><b>Second plat · Problem 2</b> We have a pantry now</p>
+      <h2 class="display">Everything<br>goes in<br>the store.</h2>
+      <p class="lead">It is so easy to add a field. The menu, the loading flag, the search text, the form. What could go wrong?</p>
+    </div>
+    <div class="problem-cover__photo"><img src="../img/photo-salade-nicoise.jpg" alt=""></div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Welcome back. A store makes sharing so easy that the temptation is to share everything. Let's put the menu from the API into it and see what happens.</p>
+  </aside>
+</section>
+
+<section class="slide" id="junk" data-phase="problem2" data-title="The store that knows too much">
+  <p class="eyebrow"><b>Problem 2</b> Load the menu into the store, then let the kitchen change something</p>
+  <h2 class="h2 mt-s">A copy of the server, going stale</h2>
+  <div class="junk">
+    <div class="junk__box">
+      <h4>The server · the kitchen's truth</h4>
+      <div class="dishrow" id="jk-server"><span>Bouillabaisse · ₾42</span><span class="tag">available</span></div>
+      <div class="junk__btns"><button class="btn is-wine" type="button" id="jk-off"><i data-icon="ban"></i>Kitchen: switch it off</button><button class="btn is-ghost" type="button" id="jk-on"><i data-icon="rotate-ccw"></i>Back on</button></div>
+      <div class="counters"><div><b id="jk-req">0</b><span>requests sent</span></div></div>
+    </div>
+    <div class="junk__arrow"><i data-icon="arrow-right"></i></div>
+    <div class="junk__box">
+      <h4>Your store · a copy</h4>
+      <div class="state" id="jk-state"></div>
+      <div class="dishrow" id="jk-card"><span>Bouillabaisse · ₾42</span><span class="tag">available</span></div>
+      <div class="junk__btns"><button class="btn is-wine" type="button" id="jk-load"><i data-icon="download"></i>loadDishes()</button><button class="btn is-ghost" type="button" id="jk-second"><i data-icon="copy"></i>A second page loads it too</button></div>
+    </div>
+  </div>
+  <div class="why3">
+    <div class="takeaway" data-step="1"><p class="k">Flags by hand</p><p><code>loading</code>, <code>error</code>, <code>loadedAt</code>: you write and maintain every one of them.</p></div>
+    <div class="takeaway" data-step="2"><p class="k">A copy that gets old</p><p>Nothing tells the store that the kitchen changed the dish. The page keeps selling it.</p></div>
+    <div class="takeaway" data-step="3"><p class="k">Two pages, two requests</p><p>Nobody knows the data is already here, so every page asks again.</p></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Press <code>loadDishes()</code>: the flags flip by hand (<code>loading: true</code>, then false) and the store holds a copy. Press "Kitchen: switch it off": the server changes, the store's card still says available, and the copy gets older by the second. Press "A second page loads it too": two requests for the same data.</p>
+    <p><b>Ask:</b> Who refreshes the copy, and when? <b>Expect:</b> "we write more code": a timer, a refresh button, an <code>isStale</code> flag. Every project that stores server data in a client store ends up writing a bad cache by hand.</p>
+    <p><b>Say:</b> The cart is ours: nobody else changes it. The menu is the server's: it can change while we look. Different owners, different tools.</p>
+  </aside>
+</section>
+
+<section class="slide v-center" data-phase="problem2" data-title="What would we need now?">
+  <p class="eyebrow"><b>Problem 2</b> Your turn</p>
+  <h2 class="display mt-m" style="font-size:112px;max-width:1500px;color:var(--wine)">What would we need now?</h2>
+  <div class="need">
+    <span class="chip" data-step="1" data-fx="pop">Know whose state it is</span>
+    <span class="chip" data-step="2" data-fx="pop">Keep the store for what we own</span>
+    <span class="chip" data-step="3" data-fx="pop">A different tool for the server's data</span>
+    <span class="chip is-answer" data-step="4" data-fx="pop"><i data-icon="map"></i>A map: where does it live?</span>
+  </div>
+  <aside class="notes">
+    <p><b>Ask:</b> How would you decide where a piece of state goes? Collect answers: "if it comes from the API", "if many components need it", "if it should be in the link".</p>
+    <p><b>Step 4:</b> the second half of today is that map. The next two lectures give the server's data and the forms their own tools.</p>
+  </aside>
+</section>
+
+<!-- ============================== SOLUTION 2 ============================== -->
+
+<section class="slide" id="homes" data-phase="solution2" data-title="Five homes for state">
+  <p class="eyebrow"><b>Second plat · Solution 2</b> The map</p>
+  <h2 class="h2 mt-s">Five homes for state</h2>
+  <div class="homes">
+    <div class="home h-local" data-step="1"><h3>Local</h3><span class="tool">useState</span><p>One component owns it.</p><span class="ex">isCartOpen<br>which FAQ item is open</span><span class="when">L28</span></div>
+    <div class="home h-url" data-step="2"><h3>URL</h3><span class="tool">useSearchParams</span><p>It belongs in the link.</p><span class="ex">/menu?category=drinks<br>/menu/5</span><span class="when">L30</span></div>
+    <div class="home h-form" data-step="3"><h3>Form</h3><span class="tool">React Hook Form</span><p>The draft of a form.</p><span class="ex">the sign-up fields<br>the table notes</span><span class="when">next lecture</span></div>
+    <div class="home h-store" data-step="4"><h3>Store</h3><span class="tool">Zustand</span><p>The client's own data, used far apart.</p><span class="ex">the cart<br>the session</span><span class="when">L32 · today</span></div>
+    <div class="home h-server" data-step="5"><h3>Server</h3><span class="tool">TanStack Query</span><p>A cache of what the server owns.</p><span class="ex">the menu<br>the order queue</span><span class="when">L34 and L35</span></div>
+  </div>
+  <div class="callout mt-l" data-step="6"><i data-icon="map"></i><div><p class="h4">Most state bugs are state in the wrong home.</p><p class="small muted mt-s">The menu in a store goes stale. The category in <code>useState</code> is lost on F5. The cart in the URL is silly. Pick the home first, the tool follows.</p></div></div>
+  <aside class="notes">
+    <p><b>Do:</b> One home per press. For each, ask for another example from Le Bistro or from their shop before you read ours.</p>
+    <p><b>Say:</b> The tools are not rivals. A real page uses all five at once: the dish page has the id in the URL, the dish from the server, the quantity in the store and the "open" flag of a dialog in <code>useState</code>.</p>
+    <p><b>Form and Server</b> arrive in the next two lectures; today we draw the whole map and fill in the Store.</p>
+  </aside>
+</section>
+
+<section class="slide" id="qflow" data-phase="solution2" data-title="Ask four questions">
+  <p class="eyebrow"><b>Solution 2</b> Ask them in this order</p>
+  <h2 class="h2 mt-s">Where does this state live?</h2>
+  <div class="schema" data-wire-sides="r l" style="width:1632px;height:640px;margin-top:20px">
+    <div class="node lg" id="f1" style="left:0;top:0;width:640px" data-step="1">Does the server own it?</div>
+    <div class="node lg is-ghost" id="g1" style="left:960px;top:0;width:640px" data-step="1">Server cache<small>TanStack Query (L34, L35): the menu, the orders</small></div>
+    <div class="node lg" id="f2" style="left:0;top:125px;width:640px" data-step="2">Must it survive F5, or be shared?</div>
+    <div class="node lg is-ghost" id="g2" style="left:960px;top:125px;width:640px" data-step="2">The URL<small>search params and route params (L30)</small></div>
+    <div class="node lg" id="f3" style="left:0;top:250px;width:640px" data-step="3">Is it the draft of a form?</div>
+    <div class="node lg is-ghost" id="g3" style="left:960px;top:250px;width:640px" data-step="3">A form library<small>React Hook Form (L33)</small></div>
+    <div class="node lg" id="f4" style="left:0;top:375px;width:640px" data-step="4">Do far-apart components need it?</div>
+    <div class="node lg is-ghost" id="g4" style="left:960px;top:375px;width:640px" data-step="4">A store<small>Zustand (today): the cart, the session</small></div>
+    <div class="node lg is-good" id="g5" style="left:0;top:520px;width:640px" data-step="5">Local state ✓<small>useState, in the component that needs it</small></div>
+    <b class="wire is-good" data-from="f1" data-to="g1" data-label="yes" data-step="1"></b>
+    <b class="wire is-wine" data-from="f1" data-to="f2" data-sides="b t" data-label="no" data-lx="26" data-ly="4" data-step="2"></b>
+    <b class="wire is-good" data-from="f2" data-to="g2" data-label="yes" data-step="2"></b>
+    <b class="wire is-wine" data-from="f2" data-to="f3" data-sides="b t" data-label="no" data-lx="26" data-ly="4" data-step="3"></b>
+    <b class="wire is-good" data-from="f3" data-to="g3" data-label="yes" data-step="3"></b>
+    <b class="wire is-wine" data-from="f3" data-to="f4" data-sides="b t" data-label="no" data-lx="26" data-ly="4" data-step="4"></b>
+    <b class="wire is-good" data-from="f4" data-to="g4" data-label="yes" data-step="4"></b>
+    <b class="wire is-wine" data-from="f4" data-to="g5" data-sides="b t" data-label="no" data-lx="26" data-ly="4" data-step="5"></b>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> A decision list, in this order. The order matters: ownership first. If the server owns it, nothing else matters; the rest of the list is about data we own.</p>
+    <p><b>Do:</b> One question per press. Ask the room for a Le Bistro example of each "yes" before you move on.</p>
+    <p><b>Local is the default.</b> Start local, lift or move only when the cart (or the session) is needed far away. That is what last lecture's context list said too.</p>
+  </aside>
+</section>
+
+<section class="slide" id="cvs" data-phase="solution2" data-title="Client state and server state">
+  <p class="eyebrow"><b>Solution 2</b> Two kinds, two tools</p>
+  <h2 class="h2 mt-s">Client state and server state</h2>
+  <table class="ms" style="margin-top:30px">
+    <thead><tr><th></th><th>Client state</th><th>Server state</th></tr></thead>
+    <tbody>
+      <tr data-step="1"><td>Who owns it?</td><td><b>We do.</b> It lives in this browser.</td><td><b>The server.</b> We only hold a copy.</td></tr>
+      <tr data-step="2"><td>Can it get old?</td><td>No. Nobody else changes it.</td><td><b>Yes.</b> The kitchen can change it while we look.</td></tr>
+      <tr data-step="3"><td>When is it there?</td><td>Always, at once.</td><td>Later. It loads, it may fail, it may be empty.</td></tr>
+      <tr data-step="4"><td>What does it need?</td><td>A place to live and a few actions.</td><td>Caching, refetching, deduplication, invalidation.</td></tr>
+      <tr data-step="5"><td>In Le Bistro</td><td>The cart, the session, a dialog's open flag.</td><td>The menu, the profile, the order queue.</td></tr>
+      <tr data-step="6" class="is-now"><td>The tool</td><td><b>useState · Zustand</b></td><td><b>TanStack Query</b> (L34, L35)</td></tr>
+    </tbody>
+  </table>
+  <aside class="notes">
+    <p><b>Say:</b> "Global state" is a bad word: it mixes two things. Our cart and the kitchen's menu are both used all over the app, but one is ours and the other is a copy of somebody else's truth.</p>
+    <p><b>Link to the problem:</b> the stale Bouillabaisse before the break was server state kept in a client tool.</p>
+  </aside>
+</section>
+
+<section class="slide" id="sort" data-phase="solution2" data-title="Where does it live? The game">
+  <p class="eyebrow"><b>Solution 2</b> Click a card, then click its home</p>
+  <h2 class="h3 mt-s">Where does it live?</h2>
+  <div class="sg">
+    <div class="sg__pool" id="sg-pool"></div>
+    <div>
+      <div class="sg__homes" id="sg-homes"></div>
+      <div class="sg__score"><span>First-try score</span><b id="sg-score">0</b><span id="sg-msg"></span></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Pick a card, ask the room "where?", then click the home. A wrong choice shakes and says why; after two wrong tries the card finds its home by itself. At the end the first-try score shows.</p>
+    <p><b>Expect arguments:</b> "theme": a store is usual; a CSS class on <code>&lt;html&gt;</code> works too. "search text": the URL, so that the link can be shared. Both are fine to debate: the point is to <i>ask the questions</i>.</p>
+  </aside>
+</section>
+
+<section class="slide" id="r-auth" data-phase="solution2" data-title="Recipe: the session store">
+  <p class="eyebrow"><b>Solution 2 · Recipe</b> Same recipe, new store</p>
+  <h2 class="h3 mt-s">The session, in a store</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>The same three imports</b><span>Zustand, the persist middleware, the type.</span><span class="file-chip"><i data-icon="file-code"></i>src/auth/authStore.ts</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>State and actions</b><span>The session, and two actions to change it.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>create() with persist</b><span>The session starts as <code>null</code>. <code>login</code> and <code>logout</code> just set it.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Key and partialize</b><span>Saved under <code>bistro.session</code>.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/auth/authStore.ts" data-copy data-build="1:1-3;2:4-9;3:10-17,19-20;4:18" style="--code-size:18px">
+        import { create } from "zustand";
+        import { persist } from "zustand/middleware";
+        import type { Session } from "../types";
+
+        type AuthState = {
+          session: Session | null;
+          login: (session: Session) => void;
+          logout: () => void;
+        };
+
+        export const useAuthStore = create<AuthState>()(
+          persist(
+            (set) => ({
+              session: null,
+              login: (session) => set({ session }),
+              logout: () => set({ session: null }),
+            }),
+            { name: "bistro.session", partialize: (s) => ({ session: s.session }) },
+          ),
+        );
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Type it: it is the cart store with fewer lines. Then replace <code>useAuth()</code> in Header, LoginPage and RequireAuth with <code>useAuthStore((s) =&gt; s.session)</code> and <code>useAuthStore((s) =&gt; s.login)</code>. Delete <code>AuthContext.ts</code> and <code>AuthProvider.tsx</code>.</p>
+    <p><b>Honest note:</b> a token in localStorage can be read by any script on the page. We keep it there in this course; Security Day I (L41) shows the risk and the Next.js module moves sessions into httpOnly cookies.</p>
+  </aside>
+</section>
+
+<section class="slide" id="r-api" data-phase="solution2" data-title="Recipe: api.ts signs the guest out">
+  <p class="eyebrow"><b>Solution 2 · Recipe</b> A store used outside a component</p>
+  <h2 class="h3 mt-s">When the token expires, sign out, in one place</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>api.ts imports the store</b><span>A plain file, not a component. It may still call the store.</span><span class="file-chip"><i data-icon="file-code"></i>src/lib/api.ts</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>On 401 + X-Token-Expired: sign out</b><span><code>getState().logout()</code>. <code>RequireAuth</code> sees <code>session === null</code> and sends the guest to /login.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Delete the notices</b><span>Account and Kitchen no longer need a "sign in again" button.</span><span class="file-chip"><i data-icon="file-code"></i>AccountPage.tsx</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/lib/api.ts" data-copy data-build="1:1-2;2:3-6" style="--code-size:18px">
+        import { useAuthStore } from "../auth/authStore";
+
+        // inside api(), when the response is not ok:
+        const expired = res.status === 401 && res.headers.get("X-Token-Expired") === "true";
+        // not a component, yet it can reach the store
+        if (expired) useAuthStore.getState().logout();
+      </script>
+      <script type="text/plain" data-lang="tsx" data-file="src/pages/AccountPage.tsx" data-del="1-6" data-add="7" data-build="3:1-7" style="--code-size:18px">
+        {error?.status === 401 && (
+          <div className="notice">
+            <p>{error.message}</p>
+            <button type="button" className="btn" onClick={logout}>Sign in again</button>
+          </div>
+        )}
+        {error && <p className="error">{error.message}</p>}
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Add the import and the one line in <code>api.ts</code>. In AccountPage and KitchenPage delete the 401 notice (red) and keep the generic error line. Pass the token with a selector: <code>const token = useAuthStore((s) =&gt; s.session?.token)</code>.</p>
+    <p><b>Say:</b> One place now handles every expired token, whichever page made the request. With a context this was impossible: <code>api.ts</code> is not inside the tree.</p>
+  </aside>
+</section>
+
+<section class="slide" id="expire" data-phase="solution2" data-title="The token expires">
+  <p class="eyebrow"><b>Solution 2</b> Sign in, fast-forward two minutes, ask for the profile</p>
+  <h2 class="h2 mt-s">Who notices when the token expires?</h2>
+  <div class="exp">
+    <div class="exp__box" id="ex-header"><h4>&lt;Header /&gt;</h4><div class="big" id="ex-h">Log in</div><p>Reads <code>session</code> with a selector.</p></div>
+    <div class="exp__box" id="ex-api"><h4>api.ts · not a component</h4><div class="big" id="ex-a">idle</div><p>Calls <code>getState().logout()</code> on 401 + X-Token-Expired.</p></div>
+    <div class="exp__box" id="ex-page"><h4>&lt;RequireAuth /&gt; → /account</h4><div class="big" id="ex-p">/login</div><p>Redirects when <code>session</code> is <code>null</code>.</p></div>
+  </div>
+  <div class="exp__btns">
+    <button class="btn is-wine" type="button" id="ex-in"><i data-icon="log-in"></i>Sign in</button>
+    <button class="btn is-ghost" type="button" id="ex-ff"><i data-icon="history"></i>Fast-forward 2 minutes</button>
+    <button class="btn is-ghost" type="button" id="ex-get"><i data-icon="send"></i>GET /api/v1/profile</button>
+    <button class="btn is-ghost" type="button" id="ex-reset"><i data-icon="rotate-ccw"></i></button>
+  </div>
+  <div class="devtools exp__log" id="ex-log"><div class="devtools__head"><b>Console</b><span>what happens, in order</span></div><div class="devtools__body"></div></div>
+  <div class="why3">
+    <div class="takeaway"><p class="k">1 · Sign in</p><p>The session is saved in the store. The Header and the guard read it.</p></div>
+    <div class="takeaway"><p class="k">2 · Two minutes pass</p><p>The token expires, silently. Every screen still looks signed in.</p></div>
+    <div class="takeaway"><p class="k">3 · The next request</p><p>The server says 401. <code>api.ts</code> signs out, and everything that reads the session updates.</p></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Sign in: the Header shows the name and /account opens. Fast-forward: nothing changes yet, the token expired silently. Press GET /profile: the server answers 401, <code>api.ts</code> signs out, and the Header and the guard both change without a single prop.</p>
+    <p><b>In the real app:</b> the token lives two minutes (an API trap). Sign in, wait, click "My account".</p>
+  </aside>
+</section>
+
+<section class="slide" id="redux" data-phase="solution2" data-title="Redux Toolkit, the older sibling">
+  <p class="eyebrow"><b>Solution 2</b> What you will meet in job ads</p>
+  <h2 class="h2 mt-s">Redux Toolkit, the older sibling</h2>
+  <div class="vs2">
+    <div class="stack" style="--gap:10px" data-step="1">
+      <p class="eyebrow">Zustand</p>
+      <script type="text/plain" data-lang="tsx" style="--code-size:16px">
+        export const useCartStore = create<CartState>()((set) => ({
+          items: [],
+          add: (dish) =>
+            set((s) => ({ items: [...s.items, line(dish)] })),
+        }));
+
+        // main.tsx: nothing
+        const count = useCartStore(selectCount);
+        useCartStore.getState().add(dish);
+      </script>
+    </div>
+    <div class="stack" style="--gap:10px" data-step="2">
+      <p class="eyebrow">Redux Toolkit</p>
+      <script type="text/plain" data-lang="tsx" style="--code-size:16px">
+        const cartSlice = createSlice({
+          name: "cart",
+          initialState: { items: [] as CartItem[] },
+          reducers: {
+            added(state, action: PayloadAction<Dish>) {
+              state.items.push(line(action.payload));
+            },
+          },
+        });
+        export const store = configureStore({
+          reducer: { cart: cartSlice.reducer },
+        });
+
+        // main.tsx: <Provider store={store}>
+        const count = useSelector(selectCount);
+        dispatch(cartSlice.actions.added(dish));
+      </script>
+    </div>
+  </div>
+  <div class="glossary" data-step="3">
+    <div><b>store</b>both have one. Redux has exactly one for the whole app.</div>
+    <div><b>action + reducer</b>the idea you wrote by hand last lecture, with a toolbox.</div>
+    <div><b>Provider</b>Redux needs it. Zustand does not.</div>
+    <div><b>RTK Query</b>Redux's answer to TanStack Query: a cache for server data.</div>
+  </div>
+  <p class="small muted mt-m" data-step="4">Same ideas, more ceremony, excellent DevTools, huge codebases. Not part of this course: read <b>redux-toolkit.js.org</b> (the "Essentials" tutorial) when a job needs it.</p>
+  <aside class="notes">
+    <p><b>Say:</b> Redux was the standard for years; many companies still use it, and job ads list it. Redux Toolkit (RTK) is the modern way to write it. Inside a reducer RTK lets you write <code>state.items.push(…)</code>: it uses a library (Immer) to turn that into an immutable update. The mental model is the one you already have: state, actions, reducers, selectors.</p>
+    <p><b>If asked "should I learn it?":</b> know that it exists and what its words mean. Learn it the day a project needs it, it takes a day.</p>
+  </aside>
+</section>
+
+<section class="slide" id="end" data-phase="solution2" data-title="The page at the end of today">
+  <div class="map2">
+    <figure class="shot"><div class="shot__bar"><i></i><i></i><i></i><span class="shot__url"><i data-icon="globe"></i>localhost:5173/<b>menu</b></span></div><div class="shot__body" style="height:560px"><img src="../img/l32-cart.jpg" alt="Le Bistro with the cart open" style="width:100%;height:100%;object-fit:cover;object-position:top"></div></figure>
+    <div class="stack" style="--gap:16px">
+      <p class="eyebrow"><b>Solution 2</b> Le Bistro, version 0.6</p>
+      <h2 class="h2">Where everything lives now</h2>
+      <table class="statemap">
+        <thead><tr><th>State</th><th>Home</th></tr></thead>
+        <tbody>
+          <tr data-step="1"><td>Is the cart panel open?</td><td><code>useState</code> in Header</td></tr>
+          <tr data-step="2"><td>Category, search text</td><td>the URL</td></tr>
+          <tr data-step="3"><td>The cart</td><td>a store, saved</td></tr>
+          <tr data-step="4"><td>The session</td><td>a store, saved</td></tr>
+          <tr data-step="5"><td>Menu, profile, queue</td><td><code>useApi</code>, until L34</td></tr>
+          <tr data-step="6"><td>The login form</td><td><code>useState</code>, until L33</td></tr>
+        </tbody>
+      </table>
+      <p class="small muted" data-step="7">Full code: <code>bistro-track/code/after-L32</code>. Run it with <code>npm install</code> and <code>npm run dev</code>.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Show your live result if it works: add dishes, F5, open React DevTools with "Highlight updates", add one more: only one card flashes. Then step through the table.</p>
+    <p><b>Say:</b> This table is homework too: your README gets the same one for your shop.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Pantry mistakes">
+  <p class="eyebrow"><b>Solution 2</b> The four mistakes of the second half</p>
+  <h2 class="h2 mt-s">When the pantry gets messy</h2>
+  <div class="mistakes">
+    <div class="mistake" data-step="1"><h4>Server data in a client store</h4><div class="bad">loadDishes: async () =&gt; { set({ loading: true }); … }</div><div class="err">Old data, flags written by hand, a second page means a second request.</div><div class="good">The menu stays with the server's tool: TanStack Query (L34)</div></div>
+    <div class="mistake" data-step="2"><h4>One store for the whole app</h4><div class="bad">useAppStore with 30 fields and 40 actions</div><div class="err">Everything depends on everything. A change anywhere is a risk.</div><div class="good">One small store per topic: cart, session</div></div>
+    <div class="mistake" data-step="3"><h4>Storing what you can calculate</h4><div class="bad">{ items: […], count: 3, total: 91 }</div><div class="err">Two copies of the truth. They drift: count says 3, items has 2.</div><div class="good">A selector calculates it: selectCount, selectTotal</div></div>
+    <div class="mistake" data-step="4"><h4>Saving everything</h4><div class="bad">persist(…, { name: "bistro.cart" }) with no partialize</div><div class="err">Temporary flags are saved too: "cart open" comes back after F5.</div><div class="good">partialize: (s) =&gt; ({ items: s.items })</div></div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Number 1 is the one that matters most: it is today's second problem. Number 3 is last month's rule (derived values) in new clothes.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Where does the search text live?">
+  <div class="split-5-7 fill items-center">
+    <div class="stack" style="--gap:24px">
+      <p class="eyebrow"><b>Quick check</b> Vote, then click</p>
+      <h2 class="h1">Where should the text of the search box live?</h2>
+    </div>
+    <div class="quiz" data-quiz>
+      <div class="quiz__opts">
+        <button class="quiz__opt">In a Zustand store: every component can reach it</button>
+        <button class="quiz__opt" data-correct>In the URL: <code>/menu?q=soup</code></button>
+        <button class="quiz__opt">In TanStack Query's cache</button>
+        <button class="quiz__opt">In a form library</button>
+      </div>
+      <p class="quiz__explain">The URL: the link can be shared, F5 keeps it, Back works. The cache is for the server's answers, and a one-field search box is no form. A store would work, but it would lose all three things the URL gives for free.</p>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Fingers up for 1 to 4, then press the number key of the most common answer. If someone says "store": ask what happens when they paste the link to a friend.</p></aside>
+</section>
+
+<!-- ============================== CLASSWORK 2 · WITH AI ============================== -->
+
+<section class="slide" data-phase="classwork2" data-title="Classwork 2 with AI: a store and a state map">
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Atelier · Classwork 2 · with AI</b> 15 minutes, on your own project</p><h2 class="h1">Prompt it: a store and the state map</h2></div>
+    <div class="timer" data-timer="900"></div>
+  </div>
+  <div class="cw">
+    <div class="stack" style="--gap:14px">
+      <div class="tier base"><div class="tier__k"><span>The task</span><span>the AI writes, you check</span></div>
+        <ul class="ai-levels"><li><b>Base</b>A <code>cartStore</code> with Zustand, <code>persist</code> and your reducer, plus <code>selectCount</code> and <code>selectQtyOf</code>. Header and cards use them.</li><li><b>Plus</b>An <code>authStore</code>, and <code>api.ts</code> signs the guest out on an expired token.</li><li><b>Pro</b>A table in <code>README.md</code>: every piece of state in your shop, and its home.</li></ul></div>
+      <div class="craft-mini"><p class="craft-mini__k">Your prompt, in five parts (CRAFT)</p>
+        <div class="craft-mini__row cr-c"><span class="craft__badge">C</span><p><b>Context</b>Your shop and stack. Paste your cart provider, reducer and <code>types.ts</code>.</p></div>
+        <div class="craft-mini__row cr-r"><span class="craft__badge">R</span><p><b>Role</b>&quot;A React teacher who writes small Zustand stores for a beginner.&quot;</p></div>
+        <div class="craft-mini__row cr-a"><span class="craft__badge">A</span><p><b>Action</b>The Base task. Plus and Pro in follow-up prompts.</p></div>
+        <div class="craft-mini__row cr-f"><span class="craft__badge">F</span><p><b>Format</b>&quot;Only the files that change, complete, with paths. Zustand 5, no other library.&quot;</p></div>
+        <div class="craft-mini__row cr-t"><span class="craft__badge">T</span><p><b>Target</b>&quot;Every component selects only what it needs: no useCartStore() without a selector.&quot;</p></div>
+      </div>
+    </div>
+    <div class="cw__side">
+      <div class="done-when"><p class="k">Done when</p><ul class="checks"><li>No provider and no <code>useCart()</code> left</li><li>Every <code>useCartStore(…)</code> has a selector</li><li>The reducer is still pure; <code>persist</code> saves</li><li>AI.md: your prompt and one thing you changed</li></ul></div>
+      <div class="hint" data-peek="click for a sample prompt"><div><p class="k">A sample prompt · Tech store</p><pre class="is-prompt">CONTEXT
+Shop &quot;Volt&quot; (phones, laptops). Vite + React 19 + TypeScript
++ Tailwind 4. The cart is useReducer in CartProvider
+(pasted, with cartReducer.ts and types.ts).
+ROLE
+A React teacher who writes small Zustand stores.
+ACTION
+Replace CartProvider with cartStore.ts (Zustand 5, persist,
+key &quot;volt.cart&quot;) that calls my cartReducer. Add selectCount
+and selectQtyOf(id); show Header and ProductCard using them.
+FORMAT
+Only changed files, complete, with paths. No new library.
+TARGET
+Every component selects only what it needs.</pre></div></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Same kind of task as always, with an AI: you write the prompt, it writes the code, you check it. The five CRAFT parts again.</p>
+    <p><b>Do:</b> Start the timer. Walk around and ask two students to explain one line the AI wrote. If the answer does not build, the next prompt is the exact error message.</p>
+    <p><b>Watch for:</b> <code>const { items, add } = useCartStore()</code>; Zustand 4 syntax; the products and a <code>loading</code> flag in the store; <code>persist</code> without <code>partialize</code>. The follow-up prompts are in <code>classwork.md</code>.</p>
+    <p><b>Then:</b> the Masterclass: the whole Le Bistro so far, in one prompt.</p>
+  </aside>
+</section>
+
+<!-- ============================== MASTERCLASS ============================== -->
+
+<section class="slide" data-phase="masterclass" data-title="Masterclass: Le Bistro in one prompt">
+  <p class="eyebrow"><b>Masterclass · LAB-32</b> Press next: the prompt opens part by part</p>
+  <h2 class="h2 mt-s">Le Bistro so far, in one prompt</h2>
+  <div class="craft mt-m" data-craft>
+    <div class="craft__bar"><span><i data-icon="message-square"></i>Prompt · LAB-32 · Le Bistro after L32</span><button type="button" class="copy-btn" data-craft-copy><i data-icon="copy"></i>Copy</button></div>
+    <div class="craft__part cr-c" data-step="1" data-fx="left" data-label="CONTEXT"><span class="craft__badge">C</span><p class="craft__name">Context<small>what exists and what we use</small></p><pre class="craft__text" style="--craft-size:16px">Le Bistro, a French restaurant site. Vite + React 19 + TypeScript + Tailwind CSS 4,
+react-router 8 (import from &quot;react-router&quot;), Zustand 5. API at /api through a Vite
+proxy: dishes, categories, search; POST /api/v1/auth/login { email, password } ->
+accessToken (lives 2 minutes); GET /api/v1/auth/me -> the role.</pre></div>
+    <div class="craft__part cr-r" data-step="2" data-fx="left" data-label="ROLE"><span class="craft__badge">R</span><p class="craft__name">Role<small>who answers</small></p><pre class="craft__text" style="--craft-size:16px">You are a senior React developer who writes code for beginners to read.</pre></div>
+    <div class="craft__part cr-a" data-step="3" data-fx="left" data-label="ACTION"><span class="craft__badge">A</span><p class="craft__name">Action<small>what to build, step by step</small></p><pre class="craft__text" style="--craft-size:16px">Build the site as it is so far (real menu, search, pages, login, role guards), with no providers:
+- cartStore (Zustand, persist, key &quot;bistro.cart&quot;): items, add, changeQty, remove, clear.
+  Every rule in a pure cartReducer (no duplicates, max 10, nothing off the menu).
+- authStore (persist, key &quot;bistro.session&quot;): session, login, logout.
+- selectCount, selectTotal, selectQtyOf(id). Components select only what they use;
+  several actions together use useShallow.
+- api.ts calls useAuthStore.getState().logout() on 401 with X-Token-Expired.
+- The menu, the profile and the queue stay in a useApi hook, NOT in a store.</pre></div>
+    <div class="craft__part cr-f" data-step="4" data-fx="left" data-label="FORMAT"><span class="craft__badge">F</span><p class="craft__name">Format<small>what the answer looks like</small></p><pre class="craft__text" style="--craft-size:16px">First a table: each piece of state and where it lives. Then every file in full with its
+path. Selectors are named selectX and live in the store file.</pre></div>
+    <div class="craft__part cr-t" data-step="5" data-fx="left" data-label="TARGET"><span class="craft__badge">T</span><p class="craft__name">Target<small>who reads it, when it's done</small></p><pre class="craft__text" style="--craft-size:16px">Beginners will read it: small stores, no providers, App.tsx only lists routes.
+It must pass npm run build.</pre></div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> One prompt rebuilds everything Le Bistro has so far, from L27 to today. Same five parts as your classwork prompt.</p>
+    <p><b>Do:</b> Press next five times. For each part, one sentence: what would go wrong without it? (No context: Zustand 4 or Redux. No role: code for experts. No action: a provider again. No format: a wall of text. No target: nobody checks the build.)</p>
+    <p><b>Copy</b> copies the whole prompt with its five labels. Run it once before class. The script is in <code>masterclass.md</code>.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="masterclass" data-title="Run it, then check it">
+  <p class="eyebrow"><b>Masterclass · LAB-32</b> The AI writes fast. You decide if it's right.</p>
+  <h2 class="h2 mt-s">Run it, then check it</h2>
+  <div class="mc-run">
+    <ol class="mc-steps" data-step="1">
+      <li><b>Copy</b> the prompt into an AI tool<span>Claude, ChatGPT, Copilot Chat: any of them. Nothing to attach: the API is named in the prompt</span></li>
+      <li><b>Build</b> what it gives back<span>a new Vite project, every file pasted at its path, plus <code>npm install zustand</code></span></li>
+      <li><b>Run</b> <code>npm run dev</code> and <code>npm run build</code><span>an error message goes straight back into the chat</span></li>
+      <li><b>Compare</b> with <code>code/after-L32</code><span>the version we built by hand</span></li>
+    </ol>
+    <div class="mc-check">
+      <p class="k">Check it with what you learned today</p>
+      <ul class="checks"><li data-step="2">No <code>Provider</code> for the cart or the session; <code>main.tsx</code> has only the router</li><li data-step="3">Every <code>useCartStore(…)</code> has a selector: no <code>useCartStore()</code> alone</li><li data-step="4">No selector returns a new object or array (or it uses <code>useShallow</code>)</li><li data-step="5">The reducer is still pure; <code>persist</code> does the saving, with <code>partialize</code></li><li data-step="6">The menu is <b>not</b> in a store</li></ul>
+      <div class="callout is-warn mt-m" data-step="7"><i data-icon="sparkles"></i><div><p class="small">AIs love to put everything in one store, fetched data and loading flags included. Today you can say why not.</p></div></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Show the answer you got before class, or run it live if there is time. Go through the checks one by one, in the AI's code. Then open <code>code/after-L32</code> next to it.</p>
+    <p><b>Say:</b> Every check is something from today. Without today's lecture you could not judge this code.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="masterclass" data-title="The short version">
+  <p class="eyebrow"><b>Masterclass · LAB-32</b> The same five parts, without the labels</p>
+  <h2 class="h2 mt-s">The short version</h2>
+  <div class="craft craft--short mt-m" data-craft data-on="1:show-parts">
+    <div class="craft__bar"><span><i data-icon="message-square"></i>Prompt · LAB-32 · the short version</span><button type="button" class="copy-btn" data-craft-copy><i data-icon="copy"></i>Copy</button></div>
+    <p class="craft__short"><span class="p-r">You're a senior React developer writing for beginners.</span> <span class="p-c">Le Bistro is a Vite + React 19 + TypeScript + Tailwind 4 app with react-router 8, Zustand 5 and an API at /api through a Vite proxy (dishes, categories, search, a 2-minute token login, /auth/me for the role).</span> <span class="p-a">Build the site as it is so far with no providers: a cartStore (persist, key bistro.cart, every rule in a pure cartReducer: no duplicates, max 10, nothing off the menu), an authStore (persist, key bistro.session), selectors (selectCount, selectTotal, selectQtyOf) that components use instead of reading the whole store, useShallow for several actions, and api.ts signing the guest out on a 401 with X-Token-Expired; the menu, the profile and the queue stay in a useApi hook, not in a store.</span> <span class="p-f">Answer with a table of where each piece of state lives, then every file in full with its path.</span> <span class="p-t">Keep it simple for beginners, App.tsx only lists routes, and make sure npm run build passes.</span></p>
+    <div class="craft__legend" data-step="1"><span class="cr-c">Context</span><span class="cr-r">Role</span><span class="cr-a">Action</span><span class="cr-f">Format</span><span class="cr-t">Target</span></div>
+  </div>
+  <div class="takeaway mt-m" data-step="2"><p class="k">How CRAFT works</p><p>The five parts are a checklist for your thinking, not a form to fill in. Once all five are there, the labels can go.</p></div>
+  <aside class="notes">
+    <p><b>Do:</b> Read it aloud first. Press next: each part lights up in its colour. Ask: if we delete "the menu stays in useApi", which part is poorer? (Action: the AI may put the menu in a store.)</p>
+    <p><b>Say:</b> Long or short, it is the same prompt.</p>
+  </aside>
+</section>
+
+<!-- ============================== WRAP-UP ============================== -->
+
+<section class="slide" data-phase="wrap" data-title="Two problems, two answers">
+  <p class="eyebrow"><b>Dessert</b> What we solved today</p>
+  <h2 class="h2 mt-s">Two problems, two answers</h2>
+  <div class="recap">
+    <div class="recap__row" data-step="1">
+      <div class="recap__p"><p class="k">Problem 1</p><p>One click, 25 cards drawn again, and a provider around everything.</p></div>
+      <div class="recap__arrow"><i data-icon="arrow-right"></i></div>
+      <div class="recap__s"><p class="k">A store</p><p><code>create</code>, a selector for every component, <code>persist</code> for F5. No provider, and it works outside React.</p></div>
+    </div>
+    <div class="recap__row" data-step="2">
+      <div class="recap__p"><p class="k">Problem 2</p><p>Server data in the store: a copy that goes stale, flags written by hand.</p></div>
+      <div class="recap__arrow"><i data-icon="arrow-right"></i></div>
+      <div class="recap__s"><p class="k">The state map</p><p>Local, URL, form, store, server. Ask whose state it is first. The server's data gets its own tool.</p></div>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Ask:</b> Before each press, ask the room what the solution was. Then reveal.</p></aside>
+</section>
+
+<section class="slide" data-phase="wrap" data-title="What does this do?">
+  <p class="eyebrow"><b>Dessert</b> Click a card to check yourself</p>
+  <h2 class="h2 mt-s">What does this do?</h2>
+  <div class="flips is-small">
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">01 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">create<CartState>()(persist(…))</script></div><div class="flip__face flip__back"><span class="flip__k">01</span><p>Builds the store, and the middleware keeps it in localStorage.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">02 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">useCartStore((s) => s.items.length)</script></div><div class="flip__face flip__back"><span class="flip__k">02</span><p>Subscribes to one number. The component re-renders only when it changes.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">03 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">useShallow((s) => ({ a: s.a, b: s.b }))</script></div><div class="flip__face flip__back"><span class="flip__k">03</span><p>Compares the pieces of the object, not the new object, so it doesn't loop.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">04 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">useAuthStore.getState().logout()</script></div><div class="flip__face flip__back"><span class="flip__k">04</span><p>Uses the store outside a component, once. It reads and changes, it does not subscribe.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">05 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">partialize: (s) => ({ items: s.items })</script></div><div class="flip__face flip__back"><span class="flip__k">05</span><p>Saves the data and leaves out the functions and the temporary flags.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">06 <i data-icon="refresh-cw"></i></span><p style="font:600 28px/1.3 var(--f-display)">“Does the server own it?”</p></div><div class="flip__face flip__back"><span class="flip__k">06</span><p>The first question of the map. If yes, it is not for the store: TanStack Query (L34).</p></div></div></div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Point at a student for each card. They explain, then you click to flip.</p></aside>
+</section>
+
+<section class="slide" data-phase="wrap" data-title="Homework: v0.6">
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Homework</b> Before L33</p><h2 class="h1">Your shop, version 0.6</h2></div>
+    <span class="sticker">Live link required</span>
+  </div>
+  <div class="hw">
+    <div class="tiers">
+      <div class="tier base"><div class="tier__k"><span>Base</span><span>required</span></div><h3>Stores, no providers</h3>
+        <ul><li>A <code>cartStore</code> (Zustand, <code>persist</code>, your reducer) and an <code>authStore</code>.</li><li>Selectors everywhere: no <code>useCartStore()</code> without one.</li><li>No context and no provider left for the cart or the session.</li><li><code>api.ts</code> signs the guest out when the token has expired.</li><li>A "where does it live?" table in the README.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Plus</span><span>recommended</span></div><h3>Finer selectors</h3>
+        <ul><li><code>useShallow</code> where a component needs several values; <code>partialize</code> in both stores.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Pro</span><span>fast finishers</span></div><h3>A wishlist</h3>
+        <ul><li>A third store with hearts on the cards, saved; only the clicked card re-renders.</li></ul></div>
+    </div>
+    <div class="cw__side">
+      <div class="done-when"><p class="k">Before you submit</p><ul class="checks"><li>Search for <code>Provider</code>: nothing for the cart or session</li><li>React DevTools: one card flashes per click</li><li>F5 keeps the cart; the token expiry signs out</li><li><code>npm run build</code> passes, the Vercel link works</li></ul></div>
+      <p class="small muted">Full brief and grading: <code>homework.md</code>.</p>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Say:</b> Submit the GitHub link and the Vercel link. In the README, the table is part of the grade.</p></aside>
+</section>
+
+<section class="slide" data-phase="wrap" data-tone="dark" data-title="Merci">
+  <div class="merci">
+    <div class="stack" style="--gap:22px">
+      <p class="eyebrow"><b>L32</b> Le garde-manger</p>
+      <h2 class="display">Merci!</h2>
+      <p class="lead">Questions now, or in the class chat. See you at L33.</p>
+    </div>
+    <div class="teaser" data-step="1">
+      <p class="k">Next time · L33</p>
+      <h3>Seventeen letters, seventeen renders.</h3>
+      <p>Our login form is five lines of state for two fields. The sign-up has six fields, six errors and a phone number the server must check. Type a name and watch React draw the whole form for every letter. We'll give the form a schema.</p>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Step 1 shows the next problem. Open your login page with "Highlight updates" on and type your email: the form flashes at every key. That is the hook for L33.</p></aside>
+</section>
+
+</div>
+</div>
+
+<script src="../_shared/vendor/icons.js"></script>
+<script src="../_shared/vendor/prism/prism.min.js" data-manual></script>
+<script src="../_shared/vendor/prism/prism-jsx.min.js"></script>
+<script src="../_shared/vendor/prism/prism-typescript.min.js"></script>
+<script src="../_shared/vendor/prism/prism-tsx.min.js"></script>
+<script src="../_shared/vendor/prism/prism-bash.min.js"></script>
+<script src="../_shared/vendor/prism/prism-json.min.js"></script>
+<script src="../_shared/music/tracks.js"></script>
+<script src="../_shared/bistro-data.js"></script>
+<script src="../_shared/deck.js"></script>
+<script src="../track.js"></script>
+<script>
+(function () {
+  'use strict';
+  Track.init();
+  Deck.init({
+    code: 'L32',
+    lecture: 32,
+    title: 'Le garde-manger',
+    footer: 'Le Bistro track · L32 · Zustand and where state lives',
+    shared: '../_shared/',
+    breakMinutes: 10,
+    breakLine: 'Pause café. Stand up, refill, rest your eyes. Back in',
+    phases: [
+      { id: 'hello', label: 'Hello' }, { id: 'questions', label: 'Questions' },
+      { id: 'problem', label: 'Problem 1' }, { id: 'solution', label: 'Solution 1' }, { id: 'classwork', label: 'Classwork 1' },
+      { id: 'break', label: 'Break' },
+      { id: 'problem2', label: 'Problem 2' }, { id: 'solution2', label: 'Solution 2' }, { id: 'classwork2', label: 'Classwork 2 · AI' }, { id: 'masterclass', label: 'Masterclass' },
+      { id: 'wrap', label: 'Wrap-up' }
+    ]
+  });
+
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = Track.esc;
+  document.querySelectorAll('[data-start-break]').forEach(function (b) { b.addEventListener('click', function () { Deck.openBreak(); }); });
+
+  /* ---------- the render board: a header and twelve cards, each with a render counter ---------- */
+  var BOARD = [1, 2, 3, 5, 6, 7, 9, 15, 17, 21, 24, 25];
+  function makeBoard(rootId, onChange) {
+    var root = $(rootId), api = { mode: 'ctx', total: 0 }, cnt = {}, qty = {};
+    function build() {
+      root.innerHTML = '<div class="bd__head"><span>Header</span><span style="display:flex;align-items:center"><span class="btn-o">Your order · <b data-h>0</b></span><span class="rcnt" data-c="h">0</span></span></div><div class="bd__grid">' +
+        BOARD.map(function (id) {
+          return Track.card(Track.byId(id), { desc: false, foot: '<button type="button" class="mbtn" data-add="' + id + '">Add to cart</button><span class="qtag" data-q="' + id + '"></span>' });
+        }).join('') + '</div>';
+      root.querySelectorAll('.mcard').forEach(function (el) {
+        el.insertAdjacentHTML('afterbegin', '<span class="rcnt" data-c="' + el.getAttribute('data-dish') + '">0</span>');
+      });
+    }
+    function bump(k) {
+      cnt[k] = (cnt[k] || 0) + 1;
+      var badge = root.querySelector('[data-c="' + k + '"]');
+      if (badge) badge.textContent = cnt[k];
+      var host = k === 'h' ? root.querySelector('.bd__head') : root.querySelector('.mcard[data-dish="' + k + '"]');
+      if (host) Track.replay(host, 'is-render');
+    }
+    api.reset = function () { cnt = {}; qty = {}; api.total = 0; build(); if (onChange) onChange(null, api); };
+    api.add = function (id) {
+      var before = qty[id] || 0;
+      if (before >= 10) return;
+      qty[id] = before + 1;
+      var count = Object.keys(qty).reduce(function (s, k) { return s + qty[k]; }, 0);
+      root.querySelector('[data-h]').textContent = count;
+      root.querySelector('[data-q="' + id + '"]').textContent = '× ' + qty[id];
+      // who renders: a context or a bare store wakes everybody; a selector wakes only the changed answers
+      var who = api.mode === 'sel' ? ['h', String(id)] : ['h'].concat(BOARD.map(String));
+      who.forEach(bump);
+      api.total += who.length;
+      if (onChange) onChange({ id: id, n: who.length }, api);
+    };
+    root.addEventListener('click', function (e) { var b = e.target.closest('[data-add]'); if (b) api.add(Number(b.getAttribute('data-add'))); });
+    api.reset();
+    return api;
+  }
+
+  var fl = makeBoard('fl-board', function (ev, b) {
+    $('fl-total').textContent = b.total;
+    $('fl-last').innerHTML = ev ? '<b>' + ev.n + ' renders</b> for this click: the header and every card.' : 'Click a card\'s button.';
+  });
+  $('fl-reset').addEventListener('click', function () { fl.reset(); });
+  Deck.onSlide('flash', { leave: function () { fl.reset(); } });
+
+  var SEL_TEXT = {
+    ctx: 'Every reader of a context renders when its value changes.',
+    all: 'A store read without a selector is a context with extra steps.',
+    sel: 'A selector decides who wakes up: only changed answers render.'
+  };
+  var sel = makeBoard('sel-board', function (ev, b) {
+    $('sel-total').textContent = b.total;
+    $('sel-last').innerHTML = ev
+      ? '<b>' + ev.n + ' renders</b> for this click' + (b.mode === 'sel' ? ': the header and the one card whose answer changed.' : ': the header and every card.')
+      : 'Pick a way to read the cart, then click.';
+  });
+  sel.mode = 'sel';
+  $('sel-mode').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-m]'); if (!b) return;
+    sel.mode = b.getAttribute('data-m');
+    Array.prototype.forEach.call($('sel-mode').children, function (x) { x.classList.toggle('is-on', x === b); });
+    $('sel-rule-t').textContent = SEL_TEXT[sel.mode];
+    sel.reset();
+  });
+  $('sel-reset').addEventListener('click', function () { sel.reset(); });
+
+  /* ---------- persist: what is written, and what comes back ---------- */
+  var PS = [5, 25, 15, 24];
+  var ps = { items: [{ id: 5, qty: 1 }], saved: undefined, reloading: false };
+  function psJson(items) {
+    if (!items.length) return '{"state":{"items":[]},"version":0}';
+    return '{"state":{"items":[\n' + items.map(function (l) {
+      var d = Track.byId(l.id);
+      return '  {"dish":{"id":' + d.id + ',"name":"' + d.name + '","price":' + d.price + ',…},"qty":' + l.qty + '}';
+    }).join(',\n') + '\n]},"version":0}';
+  }
+  function psRender() {
+    var row = $('ps-row');
+    row.classList.toggle('is-gone', ps.saved === undefined);
+    $('ps-json').textContent = ps.saved === undefined ? '(the key is not there)' : ps.saved;
+    var count = ps.items.reduce(function (s, l) { return s + l.qty; }, 0);
+    $('ps-count').textContent = count;
+    $('ps-lines').innerHTML = ps.reloading ? '<p class="small muted">The page is reloading…</p>' : ps.items.length
+      ? ps.items.map(function (l) { return '<div class="cartline"><span>' + esc(Track.byId(l.id).name) + '</span><i>× ' + l.qty + '</i><i>' + Track.price(Track.byId(l.id).price * l.qty) + '</i></div>'; }).join('')
+      : '<p class="small muted">Nothing here yet.</p>';
+  }
+  $('ps-cards').innerHTML = PS.map(function (id) { return Track.card(Track.byId(id), { desc: false, foot: '<button type="button" class="mbtn" data-add="' + id + '">Add to cart</button>' }); }).join('');
+  $('ps-cards').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-add]'); if (!b || ps.reloading) return;
+    var id = Number(b.getAttribute('data-add')), line = ps.items.filter(function (l) { return l.id === id; })[0];
+    if (line) line.qty = Math.min(10, line.qty + 1); else ps.items.push({ id: id, qty: 1 });
+    ps.saved = psJson(ps.items); // persist writes after every change
+    psRender();
+  });
+  $('ps-f5').addEventListener('click', function () {
+    if (ps.reloading) return;
+    ps.reloading = true; ps.items = []; psRender();
+    setTimeout(function () {
+      // on start-up the store reads the key back
+      if (ps.saved !== undefined) {
+        var counts = {};
+        (ps.saved.match(/"id":(\d+)[^}]*\},"qty":(\d+)/g) || []).forEach(function (m) { var p = m.match(/"id":(\d+)[^}]*\},"qty":(\d+)/); counts[p[1]] = Number(p[2]); });
+        ps.items = Object.keys(counts).map(function (k) { return { id: Number(k), qty: counts[k] }; });
+      }
+      ps.reloading = false; psRender();
+    }, 800);
+  });
+  $('ps-clear').addEventListener('click', function () { ps.saved = undefined; psRender(); });
+  ps.saved = psJson(ps.items);
+  psRender();
+
+  /* ---------- the junk drawer: server data copied into a client store ---------- */
+  var jk = { server: true, copy: null, loading: false, req: 0, at: 0, timer: null };
+  function jkRender() {
+    $('jk-server').innerHTML = '<span>Bouillabaisse · ₾42</span><span class="tag' + (jk.server ? '' : ' is-off') + '">' + (jk.server ? 'available' : 'off the menu') + '</span>';
+    var age = jk.copy === null ? null : Math.round((Date.now() - jk.at) / 1000);
+    $('jk-state').innerHTML = '<span class="k">// the store</span>\ndishes: ' + (jk.copy === null ? '<b>null</b>' : '<b>[25 dishes]</b>') +
+      '\nloading: ' + (jk.loading ? '<b>true</b>' : 'false') + '\nerror: null\nloadedAt: ' + (age === null ? '<b>null</b>' : '<b>' + age + ' s ago</b>') +
+      '\nsearch: ""\nisCartOpen: false';
+    var stale = jk.copy !== null && jk.copy !== jk.server;
+    $('jk-card').innerHTML = jk.copy === null
+      ? '<span>(nothing loaded yet)</span><span class="tag is-stale">empty</span>'
+      : '<span>Bouillabaisse · ₾42</span><span class="tag' + (stale ? ' is-stale' : '') + '">' + (jk.copy ? 'available' : 'off the menu') + (stale ? ' · stale!' : '') + '</span>';
+    $('jk-req').textContent = jk.req;
+  }
+  function jkLoad() {
+    jk.req++; jk.loading = true; jkRender();
+    setTimeout(function () { jk.copy = jk.server; jk.at = Date.now(); jk.loading = false; jkRender(); }, 900);
+  }
+  $('jk-load').addEventListener('click', jkLoad);
+  $('jk-second').addEventListener('click', jkLoad);
+  $('jk-off').addEventListener('click', function () { jk.server = false; jkRender(); });
+  $('jk-on').addEventListener('click', function () { jk.server = true; jkRender(); });
+  Deck.onSlide('junk', {
+    enter: function () { clearInterval(jk.timer); jk.timer = setInterval(jkRender, 1000); jkRender(); },
+    leave: function () { clearInterval(jk.timer); jk.server = true; jk.copy = null; jk.loading = false; jk.req = 0; jkRender(); }
+  });
+  jkRender();
+
+  /* ---------- where does it live? ---------- */
+  var HOMES = [
+    { id: 'local', name: 'Local', tool: 'useState', part: '#8a7a63' },
+    { id: 'url', name: 'URL', tool: 'search params', part: '#2f5d7c' },
+    { id: 'form', name: 'Form', tool: 'React Hook Form', part: '#74508a' },
+    { id: 'store', name: 'Store', tool: 'Zustand', part: '#5c1a23' },
+    { id: 'server', name: 'Server', tool: 'TanStack Query', part: '#3f6b4a' }
+  ];
+  var HINT = { server: 'Does the server own it?', url: 'Should it survive F5 or sit in a link?', form: 'Is it the draft of a form?', store: 'Do far-apart components need it?', local: 'Does only one component need it?' };
+  var ITEMS = [
+    { t: 'Is the cart panel open?', h: 'local', why: 'Only the Header cares.' },
+    { t: 'The selected category', h: 'url', why: 'In the link: shareable, survives F5.' },
+    { t: 'The cart', h: 'store', why: 'Far-apart components read it; it is saved.' },
+    { t: 'The menu from the API', h: 'server', why: 'The server owns it, and it gets old.' },
+    { t: 'The login form\'s fields', h: 'form', why: 'A draft with rules and a submit.' },
+    { t: 'The text in the search box', h: 'url', why: 'In the link too: a friend sees the same results.' },
+    { t: 'The session (token)', h: 'store', why: 'The Header, the guards and api.ts all need it.' },
+    { t: 'Which FAQ question is open', h: 'local', why: 'One component, nobody else.' },
+    { t: 'The kitchen\'s order queue', h: 'server', why: 'The server owns it, and it changes all the time.' },
+    { t: 'A toast ("order sent")', h: 'store', why: 'Any code can show one: no component owns it.' }
+  ];
+  var sg = { pick: null, tries: {}, first: 0, placed: 0 };
+  function sgBuild() {
+    sg = { pick: null, tries: {}, first: 0, placed: 0 };
+    $('sg-pool').innerHTML = ITEMS.map(function (it, i) { return '<div class="sgc" data-i="' + i + '">' + esc(it.t) + '</div>'; }).join('');
+    $('sg-homes').innerHTML = HOMES.map(function (h) { return '<div class="sgh" data-h="' + h.id + '" style="--part:' + h.part + '"><h4>' + h.name + '</h4><small>' + h.tool + '</small></div>'; }).join('');
+    $('sg-score').textContent = '0'; $('sg-msg').textContent = '';
+  }
+  function sgPlace(i, homeId, auto) {
+    var card = $('sg-pool').querySelector('[data-i="' + i + '"]');
+    var home = $('sg-homes').querySelector('[data-h="' + homeId + '"]');
+    if (card) card.remove();
+    home.insertAdjacentHTML('beforeend', '<div class="placed">' + esc(ITEMS[i].t) + '<i>' + esc(ITEMS[i].why) + (auto ? ' (we helped)' : '') + '</i></div>');
+    sg.placed++;
+    if (sg.placed === ITEMS.length) { $('sg-msg').textContent = 'Done! ' + sg.first + ' of ' + ITEMS.length + ' on the first try.'; Deck.chime(true); }
+  }
+  $('sg-pool').addEventListener('click', function (e) {
+    var c = e.target.closest('.sgc'); if (!c) return;
+    sg.pick = Number(c.getAttribute('data-i'));
+    Array.prototype.forEach.call($('sg-pool').children, function (x) { x.classList.toggle('is-pick', x === c); });
+    Array.prototype.forEach.call($('sg-homes').children, function (x) { x.classList.add('is-ready'); });
+    $('sg-msg').textContent = 'Now click its home.';
+  });
+  $('sg-homes').addEventListener('click', function (e) {
+    var h = e.target.closest('.sgh'); if (!h) return;
+    if (sg.pick === null) { $('sg-msg').textContent = 'Pick a card first.'; return; }
+    var i = sg.pick, it = ITEMS[i], homeId = h.getAttribute('data-h'), card = $('sg-pool').querySelector('[data-i="' + i + '"]');
+    Array.prototype.forEach.call($('sg-homes').children, function (x) { x.classList.remove('is-ready'); });
+    if (homeId === it.h) {
+      if (!sg.tries[i]) { sg.first++; $('sg-score').textContent = sg.first; }
+      sg.pick = null; sgPlace(i, homeId, false);
+      if (sg.placed < ITEMS.length) $('sg-msg').textContent = 'Yes. ' + it.why;
+    } else {
+      sg.tries[i] = (sg.tries[i] || 0) + 1;
+      if (card) Track.replay(card, 'is-shake');
+      if (sg.tries[i] >= 2) { $('sg-msg').textContent = 'It lives in ' + HOMES.filter(function (x) { return x.id === it.h; })[0].name + '. ' + it.why; sg.pick = null; sgPlace(i, it.h, true); }
+      else $('sg-msg').textContent = 'Not there. Ask: ' + HINT[it.h];
+    }
+  });
+  Deck.onSlide('sort', { enter: sgBuild });
+  sgBuild();
+
+  /* ---------- the token expires ---------- */
+  var ex = { signed: false, expired: false };
+  function exLog(t, k) { Track.log($('ex-log'), t, k); }
+  function exRender() {
+    $('ex-h').textContent = ex.signed ? 'Student Guest · Sign out' : 'Log in';
+    $('ex-p').textContent = ex.signed ? 'My account' : '/login';
+    $('ex-a').textContent = ex.signed ? (ex.expired ? 'token expired' : 'token ok') : 'idle';
+  }
+  function exFlash(id) { Track.replay($(id), 'is-flash'); }
+  $('ex-in').addEventListener('click', function () {
+    ex.signed = true; ex.expired = false;
+    exLog('POST /api/v1/auth/login → 200 { accessToken, expiresIn: 120 }', 'ok');
+    exLog('useAuthStore.getState().login(session) → saved in localStorage', 'ok');
+    exRender(); exFlash('ex-header'); exFlash('ex-page');
+  });
+  $('ex-ff').addEventListener('click', function () {
+    if (!ex.signed) { Deck.toast('Sign in first.'); return; }
+    ex.expired = true;
+    exLog('… two minutes pass. The token has expired. Nothing is visible yet.', 'dim');
+    exRender();
+  });
+  $('ex-get').addEventListener('click', function () {
+    if (!ex.signed) { exLog('GET /api/v1/profile → not sent: RequireAuth already sent the guest to /login', 'warn'); return; }
+    if (!ex.expired) { exLog('GET /api/v1/profile → 200 OK', 'ok'); return; }
+    exLog('GET /api/v1/profile → 401 + X-Token-Expired: true', 'err');
+    exFlash('ex-api');
+    setTimeout(function () {
+      exLog('api.ts: useAuthStore.getState().logout()', 'warn');
+      ex.signed = false; ex.expired = false; exRender();
+      exLog('Header: session is null → "Log in"', 'ok');
+      exLog('RequireAuth: session === null → <Navigate to="/login" />', 'ok');
+      exFlash('ex-header'); exFlash('ex-page');
+    }, 450);
+  });
+  $('ex-reset').addEventListener('click', function () { ex.signed = false; ex.expired = false; Track.clear($('ex-log')); exRender(); });
+  exRender();
+})();
+</script>
+</body>
+</html>

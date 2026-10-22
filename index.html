@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Le Bistro track · L27–L31</title>
+<title>Le Bistro track · L27–L37</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Karla:wght@400..700&family=JetBrains+Mono:wght@400..600&display=swap">
 <style>
-/* The start page of the Le Bistro track: five deck covers, each with its documents. */
+/* The start page of the Le Bistro track: eleven deck covers, each with its documents. */
 :root {
   --bg: #f4efe6;
   --surface: #fdfaf3;
@@ -30,6 +30,8 @@ h1 { font: 600 clamp(44px, 7vw, 84px)/.95 var(--f-display); color: var(--wine); 
 header p { max-width: 560px; margin: 0; color: var(--ink-2); }
 .docs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 30px; }
 .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr)); gap: 22px; }
+.part { grid-column: 1 / -1; margin: 18px 0 0; font: 600 13px/1.4 var(--f-mono); letter-spacing: .16em; text-transform: uppercase; color: var(--brass); }
+.part:first-child { margin-top: 0; }
 .deck { background: var(--surface); box-shadow: 0 1px 2px rgba(46, 42, 38, .06), 0 18px 40px -24px rgba(46, 42, 38, .35); display: flex; flex-direction: column; min-width: 0; }
 .deck > a { display: block; overflow: hidden; }
 .deck img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; transition: transform .6s cubic-bezier(.2, .7, .2, 1); }
@@ -51,10 +53,10 @@ kbd { font: 600 12px/1 var(--f-mono); padding: 4px 6px; background: var(--surfac
 <div class="wrap">
   <header>
     <div>
-      <p class="kicker">IT Step · React · syllabus v2 L27–L31</p>
+      <p class="kicker">IT Step · React · track L27–L37 · syllabus v2 L29–L39</p>
       <h1>The Le Bistro track</h1>
     </div>
-    <p>Five lectures from components to context, for lecturers who are new to React. The lecturer builds Le Bistro live; the students build their own shop. Open a deck, press <kbd>F</kbd> for fullscreen, <kbd>N</kbd> for notes and <kbd>B</kbd> for the coffee break.</p>
+    <p>Eleven lectures from components to tests, for lecturers who are new to React. The lecturer builds Le Bistro live; the students build their own shop. Open a deck, press <kbd>F</kbd> for fullscreen, <kbd>N</kbd> for notes and <kbd>B</kbd> for the coffee break.</p>
   </header>
 
   <nav class="docs" aria-label="Documents">
@@ -65,6 +67,7 @@ kbd { font: 600 12px/1 var(--f-mono); padding: 4px 6px; background: var(--surfac
   </nav>
 
   <main class="grid">
+    <p class="part">The first five · L27–L31 (syllabus L29–L33): from components to context</p>
     <article class="deck">
       <a href="L27-components/index.html" aria-label="Open the Mise en place deck"><img src="img/covers/L27.jpg" alt="Cover of the Mise en place deck"></a>
       <div class="body">
@@ -108,6 +111,71 @@ kbd { font: 600 12px/1 var(--f-mono); padding: 4px 6px; background: var(--surfac
         <h2>Le passe</h2>
         <p>Context, useReducer, compound components. One cart and one session for the whole site, and an FAQ (v0.5).</p>
         <div class="links"><a class="primary" href="L31-context/index.html">Deck</a><a href="L31-context/guide.md">Guide</a><a href="L31-context/classwork.md">Classwork</a><a href="L31-context/homework.md">Homework</a><a href="L31-context/masterclass.md">Masterclass</a><a href="code/after-L31/">Code</a></div>
+      </div>
+    </article>
+    <p class="part">The second five · L32–L36 (syllabus L34–L38): from stores to accessible UI</p>
+    <article class="deck">
+      <a href="L32-zustand/index.html" aria-label="Open the Le garde-manger deck"><img src="img/covers/L32.jpg" alt="Cover of the Le garde-manger deck"></a>
+      <div class="body">
+        <span class="num">L32 · 44 slides</span>
+        <h2>Le garde-manger</h2>
+        <p>Zustand: stores, selectors, persist, getState. The cart and the session leave the providers, and "where does this state live?" gets an answer (v0.6).</p>
+        <div class="links"><a class="primary" href="L32-zustand/index.html">Deck</a><a href="L32-zustand/guide.md">Guide</a><a href="L32-zustand/classwork.md">Classwork</a><a href="L32-zustand/homework.md">Homework</a><a href="L32-zustand/masterclass.md">Masterclass</a><a href="code/after-L32/">Code</a></div>
+      </div>
+    </article>
+    <article class="deck">
+      <a href="L33-forms/index.html" aria-label="Open the Le bon de commande deck"><img src="img/covers/L33.jpg" alt="Cover of the Le bon de commande deck"></a>
+      <div class="body">
+        <span class="num">L33 · 44 slides</span>
+        <h2>Le bon de commande</h2>
+        <p>React Hook Form and Zod: schemas, error messages, dynamic lists, a form in steps. A sign-up, a login and table notes (v0.7).</p>
+        <div class="links"><a class="primary" href="L33-forms/index.html">Deck</a><a href="L33-forms/guide.md">Guide</a><a href="L33-forms/classwork.md">Classwork</a><a href="L33-forms/homework.md">Homework</a><a href="L33-forms/masterclass.md">Masterclass</a><a href="code/after-L33/">Code</a></div>
+      </div>
+    </article>
+    <article class="deck">
+      <a href="L34-query/index.html" aria-label="Open the La chambre froide deck"><img src="img/covers/L34.jpg" alt="Cover of the La chambre froide deck"></a>
+      <div class="body">
+        <span class="num">L34 · 43 slides</span>
+        <h2>La chambre froide</h2>
+        <p>TanStack Query, reading data: keys, fresh and stale, prefetching, polling. The menu is fetched once, and the cache has a window (v0.8).</p>
+        <div class="links"><a class="primary" href="L34-query/index.html">Deck</a><a href="L34-query/guide.md">Guide</a><a href="L34-query/classwork.md">Classwork</a><a href="L34-query/homework.md">Homework</a><a href="L34-query/masterclass.md">Masterclass</a><a href="code/after-L34/">Code</a></div>
+      </div>
+    </article>
+    <article class="deck">
+      <a href="L35-mutations/index.html" aria-label="Open the Le serveur deck"><img src="img/covers/L35.jpg" alt="Cover of the Le serveur deck"></a>
+      <div class="body">
+        <span class="num">L35 · 41 slides</span>
+        <h2>Le serveur</h2>
+        <p>TanStack Query, changing data: mutations, invalidation, optimistic updates, infinite lists. Orders and the kitchen's buttons that answer first (v0.9).</p>
+        <div class="links"><a class="primary" href="L35-mutations/index.html">Deck</a><a href="L35-mutations/guide.md">Guide</a><a href="L35-mutations/classwork.md">Classwork</a><a href="L35-mutations/homework.md">Homework</a><a href="L35-mutations/masterclass.md">Masterclass</a><a href="code/after-L35/">Code</a></div>
+      </div>
+    </article>
+    <article class="deck">
+      <a href="L36-ui/index.html" aria-label="Open the Le couvert deck"><img src="img/covers/L36.jpg" alt="Cover of the Le couvert deck"></a>
+      <div class="body">
+        <span class="num">L36 · 45 slides</span>
+        <h2>Le couvert</h2>
+        <p>Accessible UI and shadcn/ui: focus, dialogs, design tokens, Radix. A cart you can use with a keyboard, a quick look, a menu (v1.0).</p>
+        <div class="links"><a class="primary" href="L36-ui/index.html">Deck</a><a href="L36-ui/guide.md">Guide</a><a href="L36-ui/classwork.md">Classwork</a><a href="L36-ui/homework.md">Homework</a><a href="L36-ui/masterclass.md">Masterclass</a><a href="code/after-L36/">Code</a></div>
+      </div>
+    </article>
+    <p class="part">The third five · L37– (syllabus L39–): tests, speed, security, the admin dashboard. Every deck has its own look</p>
+    <article class="deck">
+      <a href="L37-testing/index.html" aria-label="Open the Le goûteur deck"><img src="img/covers/L37.jpg" alt="Cover of the Le goûteur deck"></a>
+      <div class="body">
+        <span class="num">L37 · 48 slides</span>
+        <h2>Le goûteur</h2>
+        <p>Testing React: Vitest, Testing Library, MSW, what jsdom cannot see, coverage, a robot on every pull request. 115 tests for Le Bistro (v1.1).</p>
+        <div class="links"><a class="primary" href="L37-testing/index.html">Deck</a><a href="L37-testing/guide.md">Guide</a><a href="L37-testing/classwork.md">Classwork</a><a href="L37-testing/homework.md">Homework</a><a href="L37-testing/masterclass.md">Masterclass</a><a href="code/after-L37/">Code</a></div>
+      </div>
+    </article>
+    <article class="deck">
+      <a href="L38-performance/index.html" aria-label="Open the Le coup de feu deck"><img src="img/covers/L38.jpg" alt="Cover of the Le coup de feu deck"></a>
+      <div class="body">
+        <span class="num">L38 · 54 slides</span>
+        <h2>Le coup de feu</h2>
+        <p>Speed and resilience: what makes a page render, the React Compiler, lazy pages, error boundaries, a kitchen with 800 orders, a size budget. A search box that does not lose letters (v1.2).</p>
+        <div class="links"><a class="primary" href="L38-performance/index.html">Deck</a><a href="L38-performance/guide.md">Guide</a><a href="L38-performance/classwork.md">Classwork</a><a href="L38-performance/homework.md">Homework</a><a href="L38-performance/masterclass.md">Masterclass</a><a href="code/after-L38/">Code</a></div>
       </div>
     </article>
   </main>

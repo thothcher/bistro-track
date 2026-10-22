@@ -1,0 +1,1692 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Le bon de commande · L33</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Karla:ital,wght@0,400..800;1,400..800&family=JetBrains+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="../_shared/deck.css">
+<link rel="stylesheet" href="../track.css">
+<style>
+/* ---------- L33 only ---------- */
+.sofar { display: flex; align-items: center; gap: 12px; margin-top: 18px; font: 700 14px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+.sofar b { color: var(--good); }
+.sofar span { padding: 8px 12px; background: color-mix(in srgb, var(--good) 12%, transparent); color: var(--good); border-radius: 999px; }
+
+.state { background: #1d1816; color: #e9dcc8; border-radius: 12px; padding: 16px 20px; font: 500 18px/1.55 var(--f-mono); white-space: pre; box-shadow: var(--shadow-1); overflow: hidden; }
+.state b { color: #f3cd83; font-weight: 600; }
+.state .k { color: #9c8f84; }
+.state .bad { color: #ffb4a8; }
+.state .ok { color: #b9d89a; }
+.why3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 24px; }
+.why3 .takeaway { padding: 16px 22px; }
+.why3 .takeaway p { font-size: 21px; line-height: 1.4; }
+.idea__side.is-tight .takeaway { padding: 16px 22px; }
+.idea__side.is-tight .takeaway p { font-size: 21px; line-height: 1.4; }
+.ph__verdict:empty { display: none; }
+.is-render { animation: rflash .9s ease; }
+@keyframes rflash { 0% { box-shadow: 0 0 0 5px #f3cd83; background: #fbe9c2; } 100% { box-shadow: 0 0 0 0 transparent; } }
+.counters { display: flex; gap: 12px; }
+.counters div { flex: 1; padding: 12px 14px; background: var(--surface-2); border-radius: 10px; }
+.counters b { display: block; font: 700 34px/1 var(--f-mono); color: var(--wine); }
+.counters span { font: 700 12px/1.3 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+.seg.is-modes button { font-size: 17px; padding: 12px 16px; }
+
+/* diagrams */
+.stor .node { min-width: 0; }
+.stor .node.is-sub { box-shadow: var(--shadow-1), 0 0 0 3px var(--good); background: color-mix(in srgb, var(--good) 12%, var(--surface)); }
+.stor .node.is-quiet { opacity: .45; }
+
+/* the little Le Bistro form used in the demos: the same look as the real one */
+.fm { position: relative; display: flex; flex-direction: column; gap: 12px; padding: 22px 26px 24px; background: #fdfaf2; border: 1px solid #ddd2bf; border-radius: 6px; box-shadow: var(--shadow-1); color: #2e2a26; font-family: var(--f-body); }
+.fm--wide { min-height: 440px; }
+.fm__field { display: flex; flex-direction: column; gap: 6px; font: 600 16px/1.2 var(--f-body); color: #2e2a26; }
+.fm__input { width: 100%; box-sizing: border-box; padding: 11px 13px; border: 1px solid #ddd2bf; border-radius: 0; background: #f6f1e7; font: 400 20px/1.2 var(--f-body); color: #2e2a26; outline: none; }
+.fm__input:focus { border-color: #2e2a26; box-shadow: 0 0 0 3px rgba(46, 42, 38, .12); }
+.fm__input.is-bad { border-color: #a93b2c; }
+.fm__slot { min-height: 22px; font: 400 16px/1.35 var(--f-body); color: #a93b2c; }
+.fm__slot.is-hint { color: #6e645a; }
+.fm__slot.is-ok { color: #3f6b4a; }
+.fm__btn { appearance: none; border: 0; cursor: pointer; padding: 15px 18px; border-radius: 0; background: #5c1a23; color: #fdfaf2; font: 700 17px/1 var(--f-body); }
+.fm__ghost { appearance: none; cursor: pointer; padding: 13px 18px; background: transparent; border: 1px solid #5c1a23; color: #5c1a23; font: 700 16px/1 var(--f-body); border-radius: 0; }
+.fm__step { margin: 0; font: 700 14px/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: #a98545; }
+.fm__done { margin: 0; min-height: 20px; font: 600 16px/1.3 var(--f-body); color: #3f6b4a; }
+.fm__actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: auto; padding-top: 10px; }
+.fm__stepper { display: inline-flex; align-items: center; align-self: flex-start; border: 1px solid #ddd2bf; background: #f6f1e7; }
+.fm__stepper button { appearance: none; border: 0; background: transparent; cursor: pointer; padding: 8px 16px; font: 700 22px/1 var(--f-body); color: #2e2a26; }
+.fm__stepper output { min-width: 40px; text-align: center; font: 700 22px/1 var(--f-body); }
+.fm__guests { display: flex; flex-direction: column; gap: 10px; }
+.fm__guest { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+.fm__guest .fm__input { font-size: 18px; padding: 9px 11px; }
+.fm__x { appearance: none; border: 0; background: transparent; cursor: pointer; padding: 6px 10px; font: 400 20px/1 var(--f-body); color: #6e645a; }
+.fm__review { padding: 14px 16px; background: #f6f1e7; border: 1px solid #ddd2bf; }
+.fm__review p { margin: 0; font: 500 20px/1.4 var(--f-body); }
+.fm__review .fm__k { font: 700 13px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: #a98545; margin-bottom: 8px; }
+.fm.is-render { animation: rflash .9s ease; }
+
+/* problem 1: type, count the renders */
+.kd { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 430px; gap: 34px; margin-top: 20px; align-items: start; }
+.kd__col { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.kd__h { margin: 0; display: flex; flex-direction: column; gap: 4px; }
+.kd__h b { font: 700 24px/1.1 var(--f-body); color: var(--wine); }
+.kd__h span { font: 500 17px/1.2 var(--f-mono); color: var(--ink-3); }
+.kd__num { display: flex; align-items: baseline; gap: 16px; padding: 12px 22px; background: var(--surface); border-radius: var(--card-r); box-shadow: var(--shadow-1); border-left: 5px solid var(--wine); }
+.kd__num b { font: 700 84px/1 var(--f-mono); color: var(--wine); }
+.kd__num.is-good { border-left-color: var(--good); }
+.kd__num.is-good b { color: var(--good); }
+.kd__num span { font: 700 14px/1.3 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+.kd__side { display: flex; flex-direction: column; gap: 16px; }
+.kd .state { font-size: 17px; min-height: 126px; }
+
+/* solution 1: when does the error show / the click that disappears */
+.md, .sl, .wz, .ph { display: grid; grid-template-columns: 600px minmax(0, 1fr); gap: 40px; margin-top: 20px; align-items: start; }
+.wz { grid-template-columns: 640px minmax(0, 1fr); }
+.md__left, .sl__left, .wz__left, .ph__left { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.md__right, .sl__right, .wz__right, .ph__right { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.md .state { font-size: 19px; }
+.md .devtools__body, .sl .devtools__body, .ph .devtools__body { min-height: 290px; max-height: 290px; }
+#sl-msg { min-height: 0; }
+#sl-msg.is-open, .sl.is-slot #sl-msg { min-height: 56px; }
+.sl .fm { gap: 10px; }
+
+/* problem 2: the wizard and the phone number */
+.wz .state { font-size: 19px; min-height: 150px; }
+.ph__opts { display: flex; flex-direction: column; gap: 8px; }
+.ph__opt { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: var(--surface); border-radius: 10px; box-shadow: var(--shadow-1); font: 600 19px/1.25 var(--f-body); cursor: pointer; }
+.ph__opt input { width: 22px; height: 22px; accent-color: var(--wine); flex: none; }
+.ph__opt code { font-size: 16px; }
+.ph__verdict { margin: 0; padding: 12px 16px; border-radius: 10px; font: 600 19px/1.35 var(--f-body); background: var(--surface); box-shadow: var(--shadow-1); min-height: 30px; color: var(--ink-2); }
+.ph__verdict.is-bad { color: var(--bad); }
+.ph__verdict.is-good { color: var(--good); }
+
+/* the page at the end */
+.map2 { display: grid; grid-template-columns: 560px minmax(0, 1fr); gap: 44px; margin-top: 24px; align-items: start; }
+.statemap { width: 100%; border-collapse: collapse; font-size: 20px; }
+.statemap th { text-align: left; font: 700 13px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--brass); padding: 0 12px 10px 0; }
+.statemap td { padding: 10px 12px 10px 0; border-top: 1px solid var(--line); vertical-align: top; line-height: 1.35; }
+.statemap td:first-child { font-weight: 600; }
+.statemap code { font-size: 16px; }
+.flips.is-small .flip__face .code { --code-size: 17px; }
+</style>
+</head>
+<body>
+<div class="deck">
+<div class="stage">
+
+<!-- ============================== HELLO ============================== -->
+
+<section class="slide" data-phase="hello" id="cover" data-title="Le bon de commande">
+  <div class="cover">
+    <div class="stack" style="--gap:24px">
+      <p class="cover__hello">Bonjour!</p>
+      <p class="eyebrow"><b>L33</b> React · lecture 8 · track 7 of 10 · syllabus L35</p>
+      <h1 class="display" style="font-size:150px">Le bon<br>de commande</h1>
+      <p class="lead" style="max-width:930px">The order slip is the small paper a waiter fills in at the table: how many guests, who cannot eat nuts, what time. The kitchen cannot call back to ask, so the slip must be complete before it leaves the table. A form is a slip that tells you what is missing while the guest is still there.</p>
+      <dl class="cover__meta">
+        <div><dt>Theme</dt><dd>React Hook Form, Zod</dd></div>
+        <div><dt>Le Bistro today</dt><dd>A sign-up and a table slip</dd></div>
+        <div><dt>Your project</dt><dd>v0.7 · forms with a schema</dd></div>
+        <div><dt>Length</dt><dd>2 hours · one break</dd></div>
+      </dl>
+    </div>
+    <div class="plate">
+      <div class="plate__rim"></div>
+      <div class="plate__food"><img src="../_shared/img/dishes/macarons.jpg" alt=""></div>
+      <div class="plate__tag"><small>le bon de commande</small>“complete before it leaves the table”</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Bonjour! Last time the cart and the session moved into stores. Today the guests type something into Le Bistro: an account, and a note for the kitchen. Every form is a small order slip, and today it gets a proper one.</p>
+    <p><b>The title:</b> "le bon de commande" is the order slip. It is filled in once, at the table, and it must be right: nobody can call the guest back from the kitchen. That is what validation is for.</p>
+    <p><b>Numbers:</b> this deck is lecture L33 of the track and L35 in the syllabus. Your project is at v0.6 and moves to v0.7 today.</p>
+  </aside>
+</section>
+
+<section class="slide v-center" data-phase="hello" data-title="Today's menu">
+  <div class="menu-card">
+    <div class="menu-card__head"><p class="eyebrow">Le Bistro · L33 · 120 minutes</p><h2>Today's menu</h2></div>
+    <ol class="menu-card__list">
+      <li class="course"><span class="course__k">Accueil</span><span class="course__name">Hello <small>where Le Bistro is today</small></span><span class="course__t">3′</span></li>
+      <li class="course"><span class="course__k">Apéritif</span><span class="course__name">Questions <small>and two homework demos</small></span><span class="course__t">8′</span></li>
+      <li class="course"><span class="course__k">Entrée</span><span class="course__name">Problem 1 <small>seventeen letters, seventeen renders</small></span><span class="course__t">5′</span></li>
+      <li class="course"><span class="course__k">Plat</span><span class="course__name">A form with a schema <small>React Hook Form and Zod</small></span><span class="course__t">24′</span></li>
+      <li class="course"><span class="course__k">Atelier</span><span class="course__name">Classwork 1 <small>your login with a schema</small></span><span class="course__t">15′</span></li>
+      <li class="course is-pause"><span class="course__k">Pause café</span><span class="course__name">Break <small>music on, screens off</small></span><span class="course__t">10′</span></li>
+      <li class="course"><span class="course__k">Second plat</span><span class="course__name">Problem 2 and a form that grows <small>a list, steps, a question for the server</small></span><span class="course__t">27′</span></li>
+      <li class="course"><span class="course__k">Atelier</span><span class="course__name">Classwork 2 with AI <small>prompt it, then check it</small></span><span class="course__t">15′</span></li>
+      <li class="course"><span class="course__k">Masterclass</span><span class="course__name">One prompt, the whole Le Bistro <small>CRAFT, then the short version</small></span><span class="course__t">8′</span></li>
+      <li class="course"><span class="course__k">Dessert</span><span class="course__name">Wrap-up <small>recap, homework, what comes next</small></span><span class="course__t">5′</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-phase="hello" data-title="Le Bistro, lecture by lecture">
+  <p class="eyebrow"><b>Route</b> The second five lectures</p>
+  <h2 class="h2 mt-s">Le Bistro, lecture by lecture</h2>
+  <p class="sofar"><b>Done</b><span>L27 components</span><span>L28 state</span><span>L29 effects</span><span>L30 routing</span><span>L31 context</span><span>L32 stores</span></p>
+  <div class="road" style="margin-top:30px">
+    <div class="stop is-done"><div class="stop__shot"><img src="../img/l32-cart.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L32 · done</p><p class="stop__t">Stores</p><p class="stop__d">Zustand. One cart and one session, outside React.</p></div>
+    <div class="stop is-now"><div class="stop__shot"><img src="../img/l33-register.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L33 · today</p><p class="stop__t">Forms</p><p class="stop__d">React Hook Form and Zod. A sign-up and a table slip.</p></div>
+    <div class="stop"><div class="stop__shot"><img src="../img/l34-devtools.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L34</p><p class="stop__t">Cache</p><p class="stop__d">TanStack Query. The menu is fetched once.</p></div>
+    <div class="stop"><div class="stop__shot"><img src="../img/l35-kitchen.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L35</p><p class="stop__t">Changes</p><p class="stop__d">Mutations, optimistic updates, endless lists.</p></div>
+    <div class="stop"><div class="stop__shot"><img src="../img/l36-sheet.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L36</p><p class="stop__t">UI</p><p class="stop__d">Accessible dialogs and shadcn/ui.</p></div>
+  </div>
+  <div class="lane" style="margin-top:28px">
+    <span class="lane__k">Your project</span>
+    <span class="lane__v"><b>v0.6 ✓</b>a store, not a provider</span>
+    <span class="lane__v"><b>v0.7 · today</b>forms with a schema</span>
+    <span class="lane__v"><b>v0.8</b>a cache for the API</span>
+    <span class="lane__v"><b>v0.9</b>orders and optimistic UI</span>
+    <span class="lane__v"><b>v1.0</b>accessible components</span>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Last time we gave the cart and the session a pantry. Today the guest finally writes something: an account and a note for the kitchen. Both are forms, and both give us a first taste of "what does the server think of this?".</p>
+    <p><b>Do:</b> Point at today's picture: the sign-up with its red messages. By the end of the lecture that page is yours, with six fields, a confirm-password rule and a phone number the server checks.</p>
+  </aside>
+</section>
+
+<section class="slide" id="goal" data-phase="hello" data-title="Before and after today">
+  <div class="split-4-8 fill items-center" style="gap:56px">
+    <div class="stack" style="--gap:22px">
+      <p class="eyebrow"><b>Today's goal</b> Press next to unveil it</p>
+      <h2 class="h2">The same login form, and half of it is gone</h2>
+      <p class="lead">Under the blind: the login page as it is now. Red is what goes, green is what comes.</p>
+      <ul class="checks is-done" data-step="1"><li>No <code>useState</code> for the fields, and no <code>onChange</code></li><li>The rules live in one schema, with their messages</li><li>Typing does not render the form: <b>0</b> renders</li><li>The same schema gives the TypeScript type</li></ul>
+    </div>
+    <div data-step="1" data-fx="curtain" data-curtain="LoginPage.tsx · after today">
+      <script type="text/plain" data-lang="tsx" data-file="src/pages/LoginPage.tsx (red = gone, green = new)" data-del="1-4,6-10,12" data-add="14-16" style="--code-size:22px">
+        const [email, setEmail] = useState("");
+        const [password, setPassword] = useState("");
+        const [error, setError] = useState("");
+        const [busy, setBusy] = useState(false);
+
+        async function handleSubmit(e: SubmitEvent) {
+          e.preventDefault();
+          setBusy(true); setError("");
+          // … the request …
+        }
+
+        <input value={email} onChange={(e) => setEmail(e.target.value)} />
+
+        const { register, handleSubmit } = useForm<LoginValues>({ … });
+        async function onSubmit(values: LoginValues) { /* the request */ }
+        <input {...register("email")} />
+      </script>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Press next: the blind rolls up. This is the real <code>LoginPage</code> from the end of last lecture. Count the red lines aloud: four <code>useState</code>, the bookkeeping at the top of <code>handleSubmit</code> (<code>preventDefault</code>, busy, error) and a controlled <code>&lt;input&gt;</code>.</p><p><b>Say:</b> The green lines replace all of it. The error and the busy flag do not vanish: they come back from the form (<code>setError("root")</code> and <code>isSubmitting</code>), and we do not write them by hand.</p></aside>
+</section>
+
+<!-- ============================== QUESTIONS ============================== -->
+
+<section class="slide" data-phase="questions" data-title="Questions from last time">
+  <div class="qa">
+    <div class="stack" style="--gap:26px">
+      <p class="eyebrow"><b>Apéritif</b> Before we start</p>
+      <h2 class="display">Questions from last time?</h2>
+      <p class="lead">Zustand, selectors, persist, where state lives.</p>
+    </div>
+    <div class="qa-list">
+      <div class="qa-card" data-step="1"><span class="n">01</span><h3>Why does <code>useCartStore()</code> re-render so much?</h3>
+        <div class="reveal-box" data-reveal><button class="reveal-box__cover">[ show answer ]</button><p>With no selector it subscribes to the whole store, so any change wakes it. A selector is a question: the component renders only when its answer changes.</p></div></div>
+      <div class="qa-card" data-step="2"><span class="n">02</span><h3>What does <code>partialize</code> do?</h3>
+        <div class="reveal-box" data-reveal><button class="reveal-box__cover">[ show answer ]</button><p>It picks what <code>persist</code> writes to localStorage: the data, not the functions and not the temporary flags.</p></div></div>
+      <div class="qa-card" data-step="3"><span class="n">03</span><h3>Where does a form's draft live?</h3>
+        <div class="reveal-box" data-reveal><button class="reveal-box__cover">[ show answer ]</button><p>Not in the store and not in the URL: it is the third home on the map, "a form". It has its own tool. That is today.</p></div></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Wait for real questions first. If nobody asks, press next for the backup questions, and ask the room before you reveal each answer.</p>
+    <p><b>Why these three:</b> question 3 is the bridge. Last time the map had five homes and "Form" was a gap with an arrow saying "next lecture". Today we fill it.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="questions" data-title="Homework: show your v0.6">
+  <div class="split-7-5 fill items-center" style="gap:64px">
+    <div class="stack" style="--gap:22px">
+      <p class="eyebrow"><b>Homework check</b> Two volunteers, two minutes each</p>
+      <h2 class="h1">Show us your v0.6</h2>
+      <p class="lead">Add a product twice, press F5, then open React DevTools with <b>Highlight updates</b> on and add one more. Then open the login page and type your email: <b>does the form flash at every key?</b></p>
+    </div>
+    <div class="done-when">
+      <p class="k">Look for</p>
+      <ul class="checks">
+        <li>No <code>Provider</code> left for the cart or the session</li>
+        <li>One card flashes per click</li>
+        <li>The cart survives F5; an expired token signs out</li>
+        <li>The README has the "where does it live?" table</li>
+        <li>The live Vercel link works</li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> For each volunteer, open their login page with "Highlight updates" on and type an email. Count the flashes aloud. That number is today's first problem.</p><p><b>Expect:</b> The whole login card flashes at every key, because the email and password live in <code>useState</code> at the top of the page. Nobody did anything wrong: that is how every form is written until today.</p></aside>
+</section>
+
+<!-- ============================== PROBLEM 1 ============================== -->
+
+<section class="slide" data-phase="problem" data-tone="dark" data-title="Seventeen letters. Seventeen renders.">
+  <div class="problem-cover">
+    <div class="problem-cover__text">
+      <p class="eyebrow"><b>Entrée · Problem 1</b> Before the new tool</p>
+      <h2 class="display">Seventeen<br>letters.<br>Seventeen<br>renders.</h2>
+      <p class="lead">You type your email in the login form. How many times does React draw the form while you type?</p>
+    </div>
+    <div class="problem-cover__photo"><img src="../img/photo-quiche-lorraine.jpg" alt=""></div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Look at the form you wrote. An email is seventeen characters. Before I show you, guess: how many times does React draw this form while the guest types?</p>
+    <p><b>Ask:</b> Collect two or three numbers. "Once, when I press Send" is the answer people expect; "once per letter" is what happens.</p>
+  </aside>
+</section>
+
+<section class="slide" id="keys" data-phase="problem" data-title="Type an email, count the renders">
+  <p class="eyebrow"><b>Problem 1</b> Type in both forms, or press the button</p>
+  <h2 class="h2 mt-s">Type an email, count the renders</h2>
+  <div class="kd">
+    <div class="kd__col">
+      <p class="kd__h"><b>A · one useState per field</b><span>value={email} onChange={…}</span></p>
+      <div class="fm" id="kd-a-card">
+        <label class="fm__field">Email<input class="fm__input" id="kd-a-email" autocomplete="off" spellcheck="false" placeholder="type here"></label>
+        <label class="fm__field">Password<input class="fm__input" id="kd-a-pass" type="password" autocomplete="off" spellcheck="false" placeholder="and here"></label>
+      </div>
+      <div class="kd__num"><b id="kd-a-n">0</b><span>renders of the form</span></div>
+      <div class="state" id="kd-a-state"></div>
+    </div>
+    <div class="kd__col">
+      <p class="kd__h"><b>B · register</b><span>{...register("email")}</span></p>
+      <div class="fm" id="kd-b-card">
+        <label class="fm__field">Email<input class="fm__input" id="kd-b-email" autocomplete="off" spellcheck="false" placeholder="type here"></label>
+        <label class="fm__field">Password<input class="fm__input" id="kd-b-pass" type="password" autocomplete="off" spellcheck="false" placeholder="and here"></label>
+      </div>
+      <div class="kd__num is-good"><b id="kd-b-n">0</b><span>renders of the form</span></div>
+      <div class="state" id="kd-b-state"></div>
+    </div>
+    <div class="kd__side">
+      <div class="callout is-warn" data-step="1"><i data-icon="triangle-alert"></i><div><p class="h4">On the real app: 17 and 0.</p><p class="small muted mt-s">17 letters in the email, 17 renders. In dev, StrictMode draws each twice: 34. With <code>register</code>: none.</p></div></div>
+      <div class="row" style="--gap:10px"><button class="btn is-wine" type="button" id="kd-type"><i data-icon="keyboard"></i>Type for me</button><button class="btn is-ghost" type="button" id="kd-reset"><i data-icon="rotate-ccw"></i>Reset</button></div>
+    </div>
+  </div>
+  <div class="why3">
+    <div class="takeaway" data-step="2"><p class="k">A · React owns the text</p><p>Every letter is a state change, and every state change draws the form again.</p></div>
+    <div class="takeaway" data-step="3"><p class="k">B · the browser owns the text</p><p>The input keeps what you type. React reads it once, when the guest presses Send.</p></div>
+    <div class="takeaway" data-step="4"><p class="k">The price grows with the form</p><p>Six fields, an error under each and a list of guests: every key redraws all of it.</p></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Press "Type for me": the same email, <code>maia.k@example.ge</code>, goes into both forms letter by letter. A counts one render per letter and its card flashes; B stays at 0. Then type by hand into each form.</p>
+    <p><b>Say:</b> A is how every form is written with <code>useState</code>: React owns the text, so each letter is a state change and a render of the whole component. In B the text stays in the input, where the browser keeps it; React reads it once, when the guest presses Send.</p>
+    <p><b>Honest detail:</b> the demo simulates both. The numbers are the ones we measured in the real Le Bistro: 17 renders for 17 letters, 34 in development (StrictMode renders twice), and 0 with <code>register</code> until the first blur shows an error.</p>
+    <p><b>Step 1:</b> the measured numbers. <b>Steps 2 to 4:</b> who owns the text, and why the cost grows with the form.</p>
+  </aside>
+</section>
+
+<section class="slide" id="byhand" data-phase="problem" data-title="A sign-up by hand">
+  <p class="eyebrow"><b>Problem 1</b> The sign-up form, written with what we know</p>
+  <h2 class="h3 mt-s">Six fields, written by hand</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>A state for every value</b><span>Six fields, six <code>useState</code> calls.</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>…and for what we know about them</b><span>Errors, which fields were touched, and "sending". Three more.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>A function that checks everything</b><span>Every rule is code, and every message is a string in it.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Per field: again and again</b><span>A value, a change, a blur and an error line. Six times.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="SignUpPage.tsx · by hand" data-build="1:1-6;2:7-9;3:10-20;4:21-25" style="--code-size:16px">
+        const [name, setName] = useState("");
+        const [email, setEmail] = useState("");
+        const [phone, setPhone] = useState("");
+        const [password, setPassword] = useState("");
+        const [confirm, setConfirm] = useState("");
+        const [terms, setTerms] = useState(false);
+        const [errors, setErrors] = useState<Record<string, string>>({});
+        const [touched, setTouched] = useState<Record<string, boolean>>({});
+        const [sending, setSending] = useState(false);
+
+        function validate() {
+          const e: Record<string, string> = {};
+          if (name.trim().length < 2) e.name = "Tell us your name";
+          if (!/^\S+@\S+\.\S+$/.test(email)) e.email = "Enter a valid email";
+          if (!/^5\d{8}$/.test(phone.replace(/\D/g, ""))) e.phone = "A Georgian mobile";
+          if (password.length < 8) e.password = "At least 8 characters";
+          if (confirm !== password) e.confirm = "The passwords don't match";
+          if (!terms) e.terms = "Accept the house rules";
+          return e;
+        }
+
+        <input value={email} onChange={(e) => setEmail(e.target.value)}
+          onBlur={() => setTouched({ ...touched, email: true })} />
+        {touched.email && errors.email && <p>{errors.email}</p>}
+        // … the same three lines, five more times
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> This is the sign-up we want, written the way we write everything today. It works. Read it as a reviewer: nine pieces of state, one long function, and the same three lines six times.</p>
+    <p><b>Step 3:</b> every rule is an <code>if</code>, and the TypeScript type of the form is a second thing we would have to write and keep in sync with these rules. Nobody tells the compiler that <code>errors</code> has keys <code>name</code> and <code>email</code>: it is a <code>Record&lt;string, string&gt;</code>.</p>
+    <p><b>Step 4:</b> and it still lacks the hard parts: the phone number the server must check, two fields that depend on each other (<code>confirm</code> and <code>password</code>), and a guest list that grows.</p>
+    <p><b>Ask:</b> what would you delete if you could? <b>Expect:</b> "all the repeated lines". That is a form library.</p>
+  </aside>
+</section>
+
+<section class="slide v-center" data-phase="problem" data-title="What would we need?">
+  <p class="eyebrow"><b>Problem 1</b> Your turn</p>
+  <h2 class="display mt-m" style="font-size:112px;max-width:1500px;color:var(--wine)">What would we need?</h2>
+  <div class="need">
+    <span class="chip" data-step="1" data-fx="pop">Read a field without a render</span>
+    <span class="chip" data-step="2" data-fx="pop">The rules written once, in one place</span>
+    <span class="chip" data-step="3" data-fx="pop">Every message next to its field</span>
+    <span class="chip" data-step="4" data-fx="pop">Know: touched? valid? sending?</span>
+    <span class="chip is-answer" data-step="5" data-fx="pop"><i data-icon="clipboard-list"></i>That is a form library</span>
+  </div>
+  <aside class="notes">
+    <p><b>Ask:</b> If you could design the tool, what would it do for you? Collect two or three answers before pressing next. "Check the rules for me" and "stop me copying the same lines" are both right.</p>
+    <p><b>Step 5:</b> two tools, in fact. <b>React Hook Form</b> is the form: it keeps the values and the state of each field out of React's way. <b>Zod</b> is the rulebook: it describes what is valid, with the messages, and gives us the type. A small package connects them.</p>
+  </aside>
+</section>
+
+<!-- ============================== SOLUTION 1 ============================== -->
+
+<section class="slide" data-phase="solution" id="formidea" data-title="The form keeps the values, not React">
+  <div class="idea">
+    <div class="schema stor" data-wire-sides="r l" style="width:1040px;height:720px">
+      <div class="region" style="left:0;top:26px;width:330px;height:690px"></div>
+      <span class="box-label" style="left:20px;top:0">The page · the browser</span>
+      <div class="node" id="fi-e" style="left:30px;top:96px;width:270px" data-on="2-2:is-sub">&lt;input&gt; email<small>the browser holds the text</small></div>
+      <div class="node" id="fi-p" style="left:30px;top:276px;width:270px" data-on="2-2:is-sub">&lt;input&gt; phone<small>the browser holds the text</small></div>
+      <div class="node" id="fi-w" style="left:30px;top:456px;width:270px" data-on="2-2:is-sub">&lt;input&gt; password<small>the browser holds the text</small></div>
+      <div class="node is-wine lg" id="fi-f" style="left:500px;top:250px;width:220px;height:200px" data-step="1">useForm()<small>refs · values · errors</small></div>
+      <span class="box-label" style="left:500px;top:215px" data-step="1">Outside the render</span>
+      <div class="node is-brass lg" id="fi-z" style="left:870px;top:250px;width:170px;height:200px" data-step="3">Zod schema<small>the rules</small></div>
+      <div class="node is-bad" id="fi-err" style="left:470px;top:570px;width:270px" data-step="4">errors<small>one message per field</small></div>
+      <div class="node is-good" id="fi-ok" style="left:800px;top:570px;width:240px" data-step="4">onSubmit(values)<small>valid, and typed</small></div>
+      <b class="wire is-wine" data-from="fi-e" data-to="fi-f" data-step="1" data-label="register" data-lx="32" data-ly="-34"></b>
+      <b class="wire is-wine" data-from="fi-p" data-to="fi-f" data-step="1"></b>
+      <b class="wire is-wine" data-from="fi-w" data-to="fi-f" data-step="1"></b>
+      <b class="wire is-wine" data-id="fi-w3" data-from="fi-f" data-to="fi-z" data-step="3" data-label="handleSubmit" data-lx="0" data-ly="-14"></b>
+      <b class="packet is-wine" data-wire="fi-w3" data-on="3-3:go" style="--dur:1.5s">all the values</b>
+      <b class="wire is-bad" data-id="fi-w4" data-from="fi-z" data-to="fi-err" data-sides="b t" data-step="4" data-label="issues" data-lx="-30" data-ly="-10"></b>
+      <b class="wire is-good" data-id="fi-w5" data-from="fi-z" data-to="fi-ok" data-sides="b t" data-step="4" data-label="valid" data-lx="34" data-ly="10"></b>
+    </div>
+    <div class="idea__side is-tight">
+      <p class="eyebrow"><b>Solution 1</b> The order slip</p>
+      <h2 class="h2">The form holds the values</h2>
+      <div class="takeaway" data-step="1"><p class="k">register</p><p>Gives each input a name and hands the form a reference to it. The text never has to pass through React.</p></div>
+      <div class="takeaway" data-step="2"><p class="k">Typing runs nothing</p><p>The browser keeps what the guest types. No state, no render, no <code>onChange</code> of ours.</p></div>
+      <div class="takeaway" data-step="3"><p class="k">Send: one question</p><p><code>handleSubmit</code> reads every field once and gives the whole form to the schema.</p></div>
+      <div class="takeaway" data-step="4" style="border-color:var(--good)"><p class="k" style="color:var(--good)">Two ways out</p><p>Wrong: messages next to the fields, and <code>onSubmit</code> never runs. Right: <code>onSubmit</code> gets typed values.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> One press per idea. Step 1: the form object appears <i>outside the render</i> and the three inputs connect to it. Step 2: the inputs light up: typing runs nothing. Step 3: the schema appears, a packet carries all the values to it. Step 4: two ways out.</p>
+    <p><b>Say:</b> Compare with the form from last week: there, React held every letter. Here the browser holds the text, and the form object holds a reference to each input. When the guest presses Send, the form reads them all at once.</p>
+    <p><b>Remember:</b> this is why 0 renders while typing. We pay for a render only when something the screen shows changes: an error appears, the button becomes "Sending…".</p>
+  </aside>
+</section>
+
+<section class="slide" id="schema3" data-phase="solution" data-title="One schema, three jobs">
+  <p class="eyebrow"><b>Solution 1</b> The rulebook</p>
+  <h2 class="h2 mt-s">One schema, three jobs</h2>
+  <div class="anatomy" style="margin-top:34px">
+    <div class="anatomy__code" style="display:block;font-size:30px;line-height:1.6"><span class="part" data-on="1:is-on">const loginSchema = z.object({</span>
+  <span class="part" data-on="2:is-on">email: z.email("Enter your email address"),</span>
+  <span class="part" data-on="2:is-on">password: z.string().min(1, "Enter your password"),</span>
+<span class="part" data-on="1:is-on">});</span>
+
+<span class="part" data-on="3:is-on">type LoginValues = z.infer&lt;typeof loginSchema&gt;;</span>
+<span class="muted">// { email: string; password: string }</span></div>
+    <div class="anatomy__notes">
+      <div class="card" data-step="1"><span class="num">01</span><p><code>z.object({…})</code><br>The rules: what a valid form looks like, field by field. Plain data, written once, in one file.</p></div>
+      <div class="card" data-step="2"><span class="num">02</span><p><code>z.email("…")</code> and <code>.min(1, "…")</code><br>Every rule carries the message the guest reads. The rule and its message cannot drift apart.</p></div>
+      <div class="card" data-step="3"><span class="num">03</span><p><code>z.infer</code><br>The TypeScript type of the values, read from the schema. No second definition to keep in sync.</p></div>
+      <div class="card" data-step="4"><span class="num">04</span><p>Zod 4 spelling<br><code>z.email()</code> replaces <code>z.string().email()</code>, and one option, <code>error</code>, replaces <code>message</code> and <code>required_error</code>.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Zod is a library for describing data. Today we use it for form data; later, for API answers too. A schema is <i>data about data</i>: it can check a value, explain what is wrong, and tell TypeScript what the value is.</p>
+    <p><b>Do:</b> One part per press. For job 3, hover over <code>LoginValues</code> in your editor if you can: the type appears as <code>{ email: string; password: string }</code>, and nobody wrote it.</p>
+    <p><b>Zod 4:</b> <code>z.email()</code> is the new way; the old <code>z.string().email()</code> still works but is deprecated. Many tutorials still show Zod 3: the mistakes slide has the differences.</p>
+  </aside>
+</section>
+
+<section class="slide" id="useform" data-phase="solution" data-title="useForm in one picture">
+  <p class="eyebrow"><b>Solution 1</b> What you get from useForm</p>
+  <h2 class="h2 mt-s">One hook, four things to know</h2>
+  <div class="anatomy" style="margin-top:34px">
+    <div class="anatomy__code" style="display:block;font-size:29px;line-height:1.6">const {
+  <span class="part" data-on="3:is-on">register,</span>
+  <span class="part" data-on="3:is-on">handleSubmit,</span>
+  <span class="part" data-on="4:is-on">formState: { errors, isSubmitting },</span>
+<span class="part" data-on="1:is-on">} = useForm&lt;LoginValues&gt;({</span>
+  <span class="part" data-on="2:is-on">resolver: zodResolver(loginSchema),</span>
+  <span class="part" data-on="1:is-on">defaultValues: { email: "", password: "" },
+});</span></div>
+    <div class="anatomy__notes">
+      <div class="card" data-step="1"><span class="num">01</span><p><code>useForm&lt;LoginValues&gt;</code><br>Makes the form object. The type comes from the schema, and <code>defaultValues</code> gives every field a starting value.</p></div>
+      <div class="card" data-step="2"><span class="num">02</span><p><code>resolver</code><br>The plug: <code>zodResolver(schema)</code>. The form asks Zod, not the browser, whether the values are valid.</p></div>
+      <div class="card" data-step="3"><span class="num">03</span><p><code>register</code> · <code>handleSubmit</code><br>What you call: <code>register</code> for each input, <code>handleSubmit</code> for the form.</p></div>
+      <div class="card" data-step="4"><span class="num">04</span><p><code>formState</code><br>What the form knows: <code>errors</code>, <code>isSubmitting</code>, and more. Read only what the screen shows.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> That is the whole API we need today. There are more things in the box (<code>watch</code>, <code>reset</code>, <code>setValue</code>), and the documentation is good, but these four pieces build the whole lecture.</p>
+    <p><b>Remember:</b> <code>formState</code> is a proxy: the form re-renders for a property only if you read it. Reading <code>errors</code> subscribes to errors; if you never read <code>isDirty</code>, changes to it cost nothing. That is how register keeps the renders down.</p>
+    <p><b>defaultValues</b> matter: without them a field starts as <code>undefined</code>, and the schema says "expected string, received undefined".</p>
+  </aside>
+</section>
+
+<section class="slide" id="r-schema" data-phase="solution" data-title="Recipe: the schema first">
+  <p class="eyebrow"><b>Solution 1 · Recipe</b> Type it with me, step by step</p>
+  <h2 class="h3 mt-s">The rules, written once</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>Install three packages</b><span>The form, the rulebook, and the plug between them. Pin the plug to version 5.</span><span class="file-chip"><i data-icon="terminal"></i>npm install</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Write the rules and their messages</b><span>One <code>z.object</code>. The message is the last argument of the rule.</span><span class="file-chip"><i data-icon="file-code"></i>src/schemas/auth.ts</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Get the type for free</b><span><code>z.infer</code> reads it from the schema. Export it next to the schema.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="bash" data-file="terminal" data-copy data-build="1:1" style="--code-size:19px">
+        npm install react-hook-form zod @hookform/resolvers@5
+      </script>
+      <script type="text/plain" data-lang="tsx" data-file="src/schemas/auth.ts" data-copy data-build="2:1-7;3:8" style="--code-size:19px">
+        import { z } from "zod";
+
+        // One schema = the rules, the error messages and the type of the form.
+        export const loginSchema = z.object({
+          email: z.email("Enter your email address"),
+          password: z.string().min(1, "Enter your password"),
+        });
+        export type LoginValues = z.infer<typeof loginSchema>;
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Type along, or press Copy. Install first. Each press adds the lines of one step in green.</p>
+    <p><b>Why <code>@5</code>?</b> The newest <code>@hookform/resolvers</code> (6) refuses to install next to our other packages right now (an <code>ERESOLVE</code> error on npm 11). Version 5 works with Zod 4 and React Hook Form 7. If a student already installed 6: <code>npm install @hookform/resolvers@5</code> fixes it.</p>
+    <p><b>Students with DummyJSON:</b> the login takes <code>username</code> and <code>password</code>, so the schema has those two fields (<code>z.string().min(1, "Enter your username")</code>).</p>
+  </aside>
+</section>
+
+<section class="slide" id="r-login" data-phase="solution" data-title="Recipe: the login form">
+  <p class="eyebrow"><b>Solution 1 · Recipe</b> Replace every useState</p>
+  <h2 class="h3 mt-s">The login, with useForm</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>Make the form object</b><span>Type, schema, starting values.</span><span class="file-chip"><i data-icon="file-code"></i>src/pages/LoginPage.tsx</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Say what happens when it is valid</b><span>Typed values in. The server may still say no: <code>setError("root")</code>.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>The gate and the fields</b><span><code>handleSubmit(onSubmit)</code> on the form, <code>{...register("email")}</code> on each field.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Show the form's state</b><span>A message for the whole form, and a button that knows when it is busy.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/pages/LoginPage.tsx" data-copy data-build="1:1-7;2:8-16;3:17-21,26;4:22-25" style="--code-size:15.5px">
+        const {
+          register, handleSubmit, setError,
+          formState: { errors, isSubmitting },
+        } = useForm<LoginValues>({
+          resolver: zodResolver(loginSchema),
+          defaultValues: { email: "", password: "" },
+        });
+
+        async function onSubmit(values: LoginValues) {
+          try {
+            await signIn(values.email, values.password);
+            navigate(from, { replace: true });
+          } catch {
+            setError("root", { message: "That email and password don't match." });
+          }
+        }
+
+        <form onSubmit={handleSubmit(onSubmit)} noValidate>
+          <TextField label="Email" error={errors.email?.message} {...register("email")} />
+          <TextField label="Password" type="password"
+            error={errors.password?.message} {...register("password")} />
+          {errors.root && <p role="alert">{errors.root.message}</p>}
+          <button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Signing in…" : "Sign in"}
+          </button>
+        </form>
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Open your <code>LoginPage</code> and delete the four <code>useState</code> lines first. TypeScript's red lines show what is left to change. The sign-in code itself (<code>signIn</code>) is unchanged: only how the values arrive.</p>
+    <p><b>Step 2:</b> <code>onSubmit</code> is called only with values the schema accepted. The type of <code>values</code> is <code>LoginValues</code>. <code>setError("root", …)</code> is for errors that belong to the whole form, like a wrong password; a field error would say which field.</p>
+    <p><b>Step 3:</b> <code>noValidate</code> switches off the browser's own message bubbles: the schema is the only judge, so the messages are ours and always the same.</p>
+    <p><b>Checkpoint:</b> <code>git commit -am "L33: the login with useForm and Zod"</code>.</p>
+  </aside>
+</section>
+
+<section class="slide" id="mode" data-phase="solution" data-title="When does the error show?">
+  <p class="eyebrow"><b>Solution 1</b> Pick a mode, type a wrong email, then leave the field</p>
+  <h2 class="h2 mt-s">When does the error show?</h2>
+  <div class="md">
+    <div class="md__left">
+      <div class="seg is-modes" id="md-mode"><button type="button" data-m="onSubmit">onSubmit</button><button type="button" class="is-on" data-m="onBlur">onBlur</button><button type="button" data-m="onChange">onChange</button><button type="button" data-m="onTouched">onTouched</button></div>
+      <div class="fm">
+        <label class="fm__field">Email<input class="fm__input" id="md-email" autocomplete="off" spellcheck="false" placeholder="maia@example.ge"></label>
+        <div class="fm__slot" id="md-slot"></div>
+        <button class="fm__btn" type="button" id="md-send">Send</button>
+      </div>
+      <div class="takeaway" id="md-rule" style="padding:18px 22px"><p class="k" id="md-rule-k">mode: "onBlur"</p><p id="md-rule-t" style="font-size:22px;line-height:1.4"></p></div>
+      <div class="row" style="--gap:10px"><button class="btn is-ghost" type="button" id="md-reset"><i data-icon="rotate-ccw"></i>Reset</button></div>
+    </div>
+    <div class="md__right">
+      <div class="state" id="md-state"></div>
+      <div class="devtools" id="md-log"><div class="devtools__head"><b>The form</b><span>what ran, in order</span></div><div class="devtools__body"></div></div>
+    </div>
+  </div>
+  <div class="why3">
+    <div class="takeaway" data-step="1"><p class="k">onSubmit · the default</p><p>A login. Two fields, and the guest knows what they typed.</p></div>
+    <div class="takeaway" data-step="2"><p class="k">onBlur · our sign-up</p><p>A long form with a server check. Ask when the guest has finished a field.</p></div>
+    <div class="takeaway" data-step="3"><p class="k">onTouched · live help</p><p>A short form: quiet until the first blur, then it follows every key.</p></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Start with <code>onBlur</code> (our sign-up uses it). Type <code>maia@exa</code> and click outside the field: the message appears. Click back in and finish the email: the message <b>stays</b> until the next blur. Now press Send: from then on, every change re-checks. Switch to <code>onChange</code> (it resets) and type again: the message shows at the very first letter. That is the noisy one.</p>
+    <p><b>Say:</b> <code>mode</code> is <i>when</i> the form first asks the schema. After the first Send, every field re-checks on every change, so a message disappears the moment it is fixed (<code>reValidateMode</code>).</p>
+    <p><b>Which one?</b> A login: the default (<code>onSubmit</code>). A long form with a server check: <code>onBlur</code>. A short form where you want live feedback without scolding: <code>onTouched</code>. <code>onChange</code> validates (and renders) at every key: use it rarely.</p>
+    <p><b>Verified</b> against the real library in Chrome: the demo follows its rules exactly.</p>
+  </aside>
+</section>
+
+<section class="slide" id="r-field" data-phase="solution" data-title="Recipe: TextField">
+  <p class="eyebrow"><b>Solution 1 · Recipe</b> One field, written once</p>
+  <h2 class="h3 mt-s">A TextField that shows its message</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>Props: a label, a message, and an input's props</b><span><code>ComponentProps&lt;"input"&gt;</code> keeps every attribute an input has.</span><span class="file-chip"><i data-icon="file-code"></i>src/components/TextField.tsx</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Wire the label to the input</b><span><code>useId</code> and <code>htmlFor</code>. <code>{...input}</code> carries <code>register</code>'s <code>onChange</code>, <code>onBlur</code>, <code>name</code> and <code>ref</code>.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>A message slot that is always there</b><span>It reserves the line, so a message never moves the page. The next slide shows why.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/components/TextField.tsx" data-copy data-build="1:1-5;2:6-11,16-18;3:12-15" style="--code-size:17px">
+        type TextFieldProps = ComponentProps<"input"> & {
+          label: string;
+          error?: string; // the message from the schema, if the field is invalid
+        };
+
+        export function TextField({ label, error, ...input }: TextFieldProps) {
+          const id = useId();
+          return (
+            <div className="field">
+              <label htmlFor={id}>{label}</label>
+              <input id={id} aria-invalid={error ? true : undefined} {...input} />
+              {/* the slot is always there, so a message never moves the page */}
+              <div className="field__slot">
+                {error && <p role="alert" className="form-error">{error}</p>}
+              </div>
+            </div>
+          );
+        }
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Create the component, then use it on the login page. The real file in <code>code/after-L33</code> also has a <code>hint</code> line and <code>aria-describedby</code>; the version on the slide is the heart of it.</p>
+    <p><b>Say:</b> In React 19, <code>ref</code> is an ordinary prop. That is why <code>{...register("email")}</code> works on our component with no <code>forwardRef</code>: the <code>ref</code> travels inside <code>...input</code> to the real input. (React 18 needed <code>forwardRef</code>; tutorials from before 2025 still show it.)</p>
+    <p><b>Accessibility:</b> <code>aria-invalid</code> tells a screen reader the field is wrong; <code>role="alert"</code> makes it read the message when it appears. L36 is about doing this properly everywhere.</p>
+  </aside>
+</section>
+
+<section class="slide" id="slot" data-phase="solution" data-title="The click that disappears">
+  <p class="eyebrow"><b>Solution 1</b> Click the email field, type, then press Send with the mouse</p>
+  <h2 class="h2 mt-s">The click that disappears</h2>
+  <div class="sl">
+    <div class="sl__left">
+      <div class="seg is-modes" id="sl-mode"><button type="button" class="is-on" data-m="shift">The message appears</button><button type="button" data-m="slot">The line is reserved</button></div>
+      <div class="fm" id="sl-form">
+        <label class="fm__field">Email<input class="fm__input" id="sl-email" autocomplete="off" spellcheck="false" placeholder="type something, then press Send"></label>
+        <div class="fm__slot" id="sl-msg"></div>
+        <button class="fm__btn" type="button" id="sl-send">Send</button>
+        <p class="fm__done" id="sl-done"></p>
+      </div>
+      <div class="counters"><div><b id="sl-lost">0</b><span>clicks lost</span></div><div><b id="sl-ok">0</b><span>clicks that worked</span></div></div>
+      <div class="row" style="--gap:10px"><button class="btn is-ghost" type="button" id="sl-reset"><i data-icon="rotate-ccw"></i>Reset</button></div>
+    </div>
+    <div class="sl__right">
+      <div class="devtools" id="sl-log"><div class="devtools__head"><b>The mouse</b><span>what the browser saw</span></div><div class="devtools__body"></div></div>
+      <div class="callout is-warn" data-step="1"><i data-icon="mouse-pointer-click"></i><div><p class="h4">A click needs the press and the release on the same button.</p><p class="small muted mt-s">On the press, the email field loses focus, the schema answers, and a message pushes the button down. The release lands on empty space.</p></div></div>
+    </div>
+  </div>
+  <div class="why3">
+    <div class="takeaway" data-step="2"><p class="k">1 · The press</p><p>The mouse goes down on Send, and the email field loses focus.</p></div>
+    <div class="takeaway" data-step="3"><p class="k">2 · The shift</p><p>The schema answers, a message appears, and the button is pushed down.</p></div>
+    <div class="takeaway" data-step="4" style="border-color:var(--good)"><p class="k" style="color:var(--good)">3 · The fix</p><p>A message slot of fixed height on every field: the page never moves.</p></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> With "The message appears" selected: click into the email field, type a few letters (an invalid email), then press the Send button <b>with the mouse</b>. The message appears at the moment you press, the button jumps down, and the click is lost (the log says so). Press again: now it works, because the message is already there. Switch to "The line is reserved" and repeat: it works the first time.</p>
+    <p><b>Say:</b> This happened to us while testing the real form: the guest clicks once, nothing happens, and clicks again. The fix is boring and permanent: every field has a message slot with a fixed height, even when it is empty.</p>
+    <p><b>Honest detail:</b> the demo's message is taller than a real one, so the click is lost wherever you press. In the real form a message is one line (20 px) and only presses on the top edge of the button are lost.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="When a form goes wrong">
+  <p class="eyebrow"><b>Solution 1</b> The four mistakes you will see today</p>
+  <h2 class="h2 mt-s">When a form goes wrong</h2>
+  <div class="mistakes">
+    <div class="mistake" data-step="1"><h4>A Zod 3 habit</h4><div class="bad">z.string({ required_error: "Name is required" })</div><div class="err">TS2769 · 'required_error' does not exist in type '$ZodStringParams'. In plain JavaScript there is no error: the option is silently ignored.</div><div class="good">z.string({ error: "Name is required" }), or .min(1, "Name is required")</div></div>
+    <div class="mistake" data-step="2"><h4>The schema as the form's type</h4><div class="bad">useForm&lt;typeof schema&gt;({ resolver: zodResolver(schema) })</div><div class="err">TS2322 · Type 'Resolver&lt;{ email: string; … }&gt;' is not assignable to type 'Resolver&lt;ZodObject&lt;…&gt;&gt;'</div><div class="good">useForm&lt;z.infer&lt;typeof schema&gt;&gt;(…): the type of the values, not of the schema</div></div>
+    <div class="mistake" data-step="3"><h4>Reading a message that may not exist</h4><div class="bad">{errors.email.message}</div><div class="err">TS18048 · 'errors.email' is possibly 'undefined'.</div><div class="good">{errors.email?.message}: there is no error until there is one</div></div>
+    <div class="mistake" data-step="4"><h4>register without the call</h4><div class="bad">&lt;input {...register} /&gt;</div><div class="err">No error at all. The field is never registered, so the form says it is invalid however much the guest types.</div><div class="good">&lt;input {...register("email")} /&gt;: it is a function, call it with the field's name</div></div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Three of these are loud and one is silent. The silent one is the dangerous one: nothing in the editor, nothing in the console, and the form refuses everything. If a field is always invalid, look at the <code>register</code> call first.</p>
+    <p><b>Mistake 1:</b> Zod 4 renamed the options: one <code>error</code> replaces <code>message</code>, <code>required_error</code> and <code>invalid_type_error</code>. AIs and old tutorials write Zod 3.</p>
+    <p><b>Mistake 2:</b> <code>useForm</code> wants the type of the <i>values</i> (<code>LoginValues</code>), which <code>z.infer</code> reads out of the schema. The real compiler message is longer than the one shown here: it ends in a wall of types.</p>
+    <p>All four messages were produced by compiling these exact lines with TypeScript 6, Zod 4.6 and React Hook Form 7.90.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="Where is the wrong email stopped?">
+  <div class="split-5-7 fill items-center">
+    <div class="stack" style="--gap:24px">
+      <p class="eyebrow"><b>Quick check</b> Vote, then click</p>
+      <h2 class="h1">The guest sends the form with a wrong email. Where is it stopped?</h2>
+    </div>
+    <div class="quiz" data-quiz>
+      <div class="quiz__opts">
+        <button class="quiz__opt">In <code>onSubmit</code>: it runs first and checks the email itself</button>
+        <button class="quiz__opt" data-correct>In <code>handleSubmit</code>: the schema runs first, <code>onSubmit</code> never does</button>
+        <button class="quiz__opt">In the browser: <code>type="email"</code> refuses to send</button>
+        <button class="quiz__opt">Nowhere: the server says no, later</button>
+      </div>
+      <p class="quiz__explain">B: <code>handleSubmit(onSubmit)</code> is the gate. It asks the schema, and only valid values reach your function. A: <code>onSubmit</code> would run with the wrong email. C: our form has <code>noValidate</code>, which turns the browser's own check off. D: the server still checks, but the guest should never wait for it to learn that an email has no @.</p>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Fingers up for 1 to 4, then press the number key of the most common answer. If many chose C: ask why our form has <code>noValidate</code>. (So that one judge, the schema, writes every message.)</p></aside>
+</section>
+
+<!-- ============================== CLASSWORK 1 ============================== -->
+
+<section class="slide" data-phase="classwork" data-title="Classwork 1: your login with a schema">
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Atelier · Classwork 1</b> 15 minutes, on your own project</p><h2 class="h1">Your login, with a schema</h2></div>
+    <div class="timer" data-timer="900"></div>
+  </div>
+  <div class="cw">
+    <div class="tiers">
+      <div class="tier base"><div class="tier__k"><span>Base</span><span>everyone</span></div><h3>useForm + a schema</h3>
+        <ul><li><code>npm install react-hook-form zod @hookform/resolvers@5</code></li><li><code>schemas/auth.ts</code>: <code>loginSchema</code> with messages, and <code>LoginValues</code>.</li><li><code>useForm</code>, <code>register</code> and <code>handleSubmit</code>. Delete the field <code>useState</code>s.</li><li>Show each message under its field.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Plus</span><span>most of you</span></div><h3>Server errors, a busy button</h3>
+        <ul><li>A wrong password: <code>setError("root", …)</code> shows the server's message.</li><li><code>disabled={isSubmitting}</code>. A <code>TextField</code> with a fixed message slot.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Pro</span><span>fast finishers</span></div><h3>A sign-up form</h3>
+        <ul><li>Name, username, email, password, repeat it. A <code>refine</code> with <code>path</code> for the match; send it to <code>POST /users/add</code>.</li></ul></div>
+    </div>
+    <div class="cw__side">
+      <div class="done-when"><p class="k">Done when</p><ul class="checks"><li>No <code>useState</code> for the fields is left</li><li>The rules and their messages are in one schema file</li><li>React DevTools: typing does not flash the form</li><li>A wrong password shows a message under the form</li></ul></div>
+      <div class="hint" data-peek="click for a hint"><div><p class="k">Stuck?</p><pre>export const loginSchema = z.object({
+  username: z.string().min(1, "Enter your username"),
+  password: z.string().min(1, "Enter your password"),
+});
+export type LoginValues = z.infer&lt;typeof loginSchema&gt;;
+
+const { register, handleSubmit, formState: { errors } } =
+  useForm&lt;LoginValues&gt;({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { username: "", password: "" },
+  });</pre></div></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Watch for:</b> <code>useForm&lt;typeof loginSchema&gt;</code>; a forgotten <code>defaultValues</code> (the schema says "expected string, received undefined"); <code>{...register}</code> without the call; and messages written in the JSX instead of in the schema.</p>
+    <p><b>DummyJSON login:</b> <code>POST https://dummyjson.com/auth/login</code> with <code>username</code> and <code>password</code>. A wrong password is answered with a 400 and a JSON <code>message</code>: show it with <code>setError("root", { message })</code>. Look at the exact text once in the Network tab.</p>
+    <p>Full brief and solutions: <code>classwork.md</code>.</p>
+  </aside>
+</section>
+
+<!-- ============================== BREAK ============================== -->
+
+<section class="slide" data-phase="break" data-tone="dark" data-title="Pause café">
+  <div class="pause">
+    <div class="stack" style="--gap:28px">
+      <p class="eyebrow"><b>Pause café</b> 10 minutes</p>
+      <h2 class="display">Pause café</h2>
+      <p class="lead">Stand up, refill, rest your eyes. After the break: a form that grows, steps, and a question for the server.</p>
+      <button class="pause__btn" type="button" data-start-break><i data-icon="coffee"></i>Start the break</button>
+    </div>
+    <div class="cup" aria-hidden="true"><span class="cup__steam"></span><span class="cup__steam"></span><span class="cup__steam"></span><div class="cup__plate"></div><div class="cup__body"></div><div class="cup__coffee"></div><div class="cup__handle"></div></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Click "Start the break" (or press B). A 10-minute countdown starts with radio music. +1 / −1 minute adjusts it. When it ends, a chime plays and a "Welcome back" screen appears.</p>
+    <p><b>No internet?</b> The radio needs it. Put mp3 files in <code>_shared/music/</code> and list them in <code>tracks.js</code>.</p>
+  </aside>
+</section>
+
+<!-- ============================== PROBLEM 2 ============================== -->
+
+<section class="slide" data-phase="problem2" data-tone="dark" data-title="One form, many guests, three steps">
+  <div class="problem-cover">
+    <div class="problem-cover__text">
+      <p class="eyebrow"><b>Second plat · Problem 2</b> The easy form is done</p>
+      <h2 class="display">One form.<br>Many guests.<br>Three steps.</h2>
+      <p class="lead">The table slip has a list that grows, three screens, and a phone number only the server can check. A login was easy. What could go wrong now?</p>
+    </div>
+    <div class="problem-cover__photo"><img src="../img/photo-pain-au-chocolat.jpg" alt=""></div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Welcome back. A login has two fields and one button. The slip we want for the kitchen is a different animal: how many seats, what time, who has an allergy (and we do not know how many), in three screens. Let's build the easy version by hand and see where it breaks.</p>
+  </aside>
+</section>
+
+<section class="slide" id="wizard" data-phase="problem2" data-title="Back loses everything">
+  <p class="eyebrow"><b>Problem 2</b> Fill in step 1 and step 2, then press Back</p>
+  <h2 class="h2 mt-s">Three steps, and Back loses everything</h2>
+  <div class="wz">
+    <div class="wz__left">
+      <div class="seg is-modes" id="wz-mode"><button type="button" class="is-on" data-m="own">Each step keeps its own state</button><button type="button" data-m="one">One form above the steps</button></div>
+      <div class="fm fm--wide" id="wz-card"></div>
+    </div>
+    <div class="wz__right">
+      <div class="state" id="wz-state"></div>
+      <div class="callout is-bad" id="wz-note"><i data-icon="circle-x"></i><div><p class="h4" id="wz-note-h">The review sees nothing.</p><p class="small muted mt-s" id="wz-note-p">Each step is a component, and a component's state dies when it leaves the screen.</p></div></div>
+    </div>
+  </div>
+  <div class="why3">
+    <div class="takeaway" data-step="1"><p class="k">1 · Fill in step 1 and 2</p><p>Four seats, 20:30, a guest with a diet. Press Next each time.</p></div>
+    <div class="takeaway" data-step="2"><p class="k">2 · Press Back</p><p>Step 1 is a new component: it starts again with the default values.</p></div>
+    <div class="takeaway" data-step="3"><p class="k">3 · Read the review</p><p>It only knows its own step, so it cannot read the others.</p></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> With "Each step keeps its own state": set 4 seats, pick 20:30, press Next, add a guest ("Anna", "no nuts"), press Next: the review says "Table of 2, arriving 19:00" and does not know about your guest. Press Back twice: step 1 has forgotten the 4 seats. Now switch to "One form above the steps" and repeat: everything survives, and the review reads it all.</p>
+    <p><b>Say:</b> A step is a component, and a component's state is born when it appears and dies when it leaves. Each step also only knows its own fields, so the last step cannot read the first. The fix is the one you learned in L28: put the state above the steps. A form library does exactly that, for the whole form at once.</p>
+    <p><b>Ask:</b> How would you do it with <code>useState</code>? <b>Expect:</b> "lift every field to the page and pass them down as props". That is a lot of props. We will pass none.</p>
+  </aside>
+</section>
+
+<section class="slide" id="phonebad" data-phase="problem2" data-title="A question for the server">
+  <p class="eyebrow"><b>Problem 2</b> Press the button: the guest types a phone number we already know</p>
+  <h2 class="h2 mt-s">Ask the server at every key</h2>
+  <div class="ph" id="ph1"></div>
+  <div class="why3">
+    <div class="takeaway" data-step="1"><p class="k">Nine digits, nine questions</p><p>Every key sends a request, even for "5" and "55".</p></div>
+    <div class="takeaway" data-step="2"><p class="k">The answers get mixed up</p><p>A slow answer to an old question arrives after a fast one to a new question.</p></div>
+    <div class="takeaway" data-step="3"><p class="k">The last one wins</p><p>The guest reads an answer for a number they are no longer typing.</p></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Press "Type 555123456". The number goes in digit by digit and every digit asks the server. The answers come back in a different order than they were asked, and the last one to arrive wins: it says the number is free, but it is the number of an existing account.</p>
+    <p><b>Say:</b> This is the race condition from L29, in a form. Nine requests for one phone number, nine "Checking…" flashes, and a wrong answer on screen. A real server does not answer in order either: it is slower for some requests than for others.</p>
+    <p><b>Note:</b> in Le Bistro the check is <code>GET /api/v1/enterprise/validation/check-phone?number=…</code>; it takes about 0.9 seconds and the number 555123456 is reserved as "taken". The delays in this demo are made up to show the order problem, so it does not wait for the real server.</p>
+  </aside>
+</section>
+
+<section class="slide v-center" data-phase="problem2" data-title="What would we need now?">
+  <p class="eyebrow"><b>Problem 2</b> Your turn</p>
+  <h2 class="display mt-m" style="font-size:112px;max-width:1500px;color:var(--wine)">What would we need now?</h2>
+  <div class="need">
+    <span class="chip" data-step="1" data-fx="pop">Rows that grow and shrink</span>
+    <span class="chip" data-step="2" data-fx="pop">One form above the steps</span>
+    <span class="chip" data-step="3" data-fx="pop">A rule about two fields at once</span>
+    <span class="chip" data-step="4" data-fx="pop">Ask the server once, at the right time</span>
+    <span class="chip is-answer" data-step="5" data-fx="pop"><i data-icon="puzzle"></i>The same two tools can do all of it</span>
+  </div>
+  <aside class="notes">
+    <p><b>Ask:</b> What does the form need that a login does not? Collect answers: "a list of guests", "go back without losing data", "the password must match", "wait for the server". Press next for each one that matches.</p>
+    <p><b>Step 5:</b> good news: we do not need a third tool. <code>useFieldArray</code>, <code>FormProvider</code>, <code>refine</code> and an async rule are all in React Hook Form and Zod.</p>
+  </aside>
+</section>
+
+<!-- ============================== SOLUTION 2 ============================== -->
+
+<section class="slide" data-phase="solution2" id="formctx" data-title="One form above the steps">
+  <div class="idea">
+    <div class="schema stor" data-wire-sides="t b" style="width:1040px;height:720px">
+      <div class="region" style="left:0;top:26px;width:1040px;height:690px"></div>
+      <span class="box-label" style="left:20px;top:0">TableNotesPage</span>
+      <div class="node is-wine lg" id="fc-form" style="left:290px;top:90px;width:460px;height:150px" data-step="1">useForm&lt;TableNotes&gt;()<small>shared with &lt;FormProvider&gt;</small></div>
+      <div class="node" id="fc-1" style="left:30px;top:440px;width:300px" data-step="2" data-on="3-3:is-quiet">TableStep<small>seats · arrival</small></div>
+      <div class="node" id="fc-2" style="left:370px;top:440px;width:300px" data-step="2" data-on="3-3:is-sub">SpecialStep<small>special[ ]</small></div>
+      <div class="node" id="fc-3" style="left:710px;top:440px;width:300px" data-step="2" data-on="3-3:is-quiet">ReviewStep<small>note · reads everything</small></div>
+      <b class="wire is-dash" data-from="fc-1" data-to="fc-form" data-step="2" data-label="useFormContext()" data-lx="-120" data-ly="0"></b>
+      <b class="wire is-dash" data-from="fc-2" data-to="fc-form" data-step="2"></b>
+      <b class="wire is-dash" data-from="fc-3" data-to="fc-form" data-step="2"></b>
+      <span class="box-label" style="left:30px;top:600px" data-step="3">steps 1 and 3 are not on screen: their values are safe in the form</span>
+    </div>
+    <div class="idea__side">
+      <p class="eyebrow"><b>Solution 2</b> Steps without props</p>
+      <h2 class="h2">One form above the steps</h2>
+      <div class="takeaway" data-step="1"><p class="k">The form lives in the page</p><p><code>useForm</code> is called once, in <code>TableNotesPage</code>, and <code>&lt;FormProvider&gt;</code> shares it with everything inside.</p></div>
+      <div class="takeaway" data-step="2"><p class="k">No props</p><p>Each step calls <code>useFormContext()</code> and gets the same form: the same values, the same errors.</p></div>
+      <div class="takeaway" data-step="3" style="border-color:var(--good)"><p class="k" style="color:var(--good)">Back is free</p><p>A step can leave the screen. Its values stay in the form, because the form is not inside the step.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Step 1: the form object. Step 2: three steps connect to it with dashed wires: they do not receive it as props, they ask for it. Step 3: only step 2 is on screen. Steps 1 and 3 are not mounted, and still the form holds their values.</p>
+    <p><b>Say:</b> This is the "lift state up" rule from L28 with the typing removed. Last time you lifted a value and passed it down. Here the whole form is lifted, and the context hands it to whoever asks. (L31 taught context; this is a good use.)</p>
+    <p><b>Remember:</b> the "Back loses everything" problem came from state living <i>inside</i> the steps.</p>
+  </aside>
+</section>
+
+<section class="slide" id="r-steps" data-phase="solution2" data-title="Recipe: a form in steps">
+  <p class="eyebrow"><b>Second plat · Recipe</b> Three screens, one form</p>
+  <h2 class="h3 mt-s">The table notes, in three steps</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>Say which fields belong to which step</b><span>A list of lists. Next will check only the current one.</span><span class="file-chip"><i data-icon="file-code"></i>src/pages/TableNotesPage.tsx</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>One form, one provider</b><span><code>useForm</code> once, <code>&lt;FormProvider {...form}&gt;</code> around the steps.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Next checks this step only</b><span><code>trigger([...fields])</code> validates just those fields and says if they are fine.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Different keys for Next and Save</b><span>Otherwise React reuses one button and Next sends the form.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/pages/TableNotesPage.tsx" data-copy data-build="1:1-2;2:3-8,14-18,24-25;3:9-13;4:19-23" style="--code-size:16px">
+        const STEPS = [["seats", "arrival"], ["special"], []] as const; // fields of each step
+
+        const form = useForm<TableNotes>({
+          resolver: zodResolver(tableNotesSchema),
+          mode: "onTouched",
+          defaultValues: { seats: 2, arrival: "19:00", special: [], note: "" },
+        });
+
+        async function goNext() {
+          const ok = await form.trigger([...STEPS[step]]); // this step's fields only
+          if (ok) setStep(step + 1);
+        }
+
+        <FormProvider {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
+            {step === 0 && <TableStep />}
+            {step === 1 && <SpecialStep />}
+            {step === 2 && <ReviewStep />}
+            {step < STEPS.length - 1 ? (
+              <button key="next" type="button" onClick={goNext}>Next</button>
+            ) : (
+              <button key="save" type="submit">Save the notes</button>
+            )}
+          </form>
+        </FormProvider>
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Build the page with only the first two steps wired, then add the third. The three step components are on the next slides.</p>
+    <p><b>Step 3:</b> <code>trigger</code> runs the schema but reports only the listed fields. If the seats are wrong, the guest stays on step 1 and the message shows under the field. The schema is still one schema for the whole slip: it also guards the final Save.</p>
+    <p><b>Step 4:</b> this is the bug we hit while testing: on the last step Next becomes Save at the same place in the JSX, React keeps one <code>&lt;button&gt;</code> and changes its <code>type</code> to <code>submit</code> in the middle of the click, and the browser sends the form. A <code>key</code> makes React build a new button instead.</p>
+    <p>The file in <code>code/after-L33</code> also has titles for the steps and a "Noted" page after saving; the slide shows the essentials.</p>
+  </aside>
+</section>
+
+<section class="slide" id="r-array" data-phase="solution2" data-title="Recipe: a list that grows">
+  <p class="eyebrow"><b>Second plat · Recipe</b> Guests with a diet: as many as the table has</p>
+  <h2 class="h3 mt-s">useFieldArray: rows that grow and shrink</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>Ask the form for a list</b><span>You get <code>fields</code> (the rows) and the actions <code>append</code> and <code>remove</code>.</span><span class="file-chip"><i data-icon="file-code"></i>src/components/notes/SpecialStep.tsx</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>One row per item, keyed by field.id</b><span>The form makes the id. It stays with the row when another row goes.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Register each input by its path</b><span><code>special.0.name</code>, <code>special.1.name</code>… and read each message by the same path.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Add and remove</b><span>A new row starts with empty values. <code>remove(index)</code> takes one away.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/components/notes/SpecialStep.tsx" data-copy data-build="1:1-3;2:4-5,17-18;3:6-15;4:16,19-21" style="--code-size:16px">
+        const { register, control, formState: { errors } } = useFormContext<TableNotes>();
+        const { fields, append, remove } = useFieldArray({ control, name: "special" });
+
+        {fields.map((field, index) => (
+          <div key={field.id} className="guest-row">
+            <TextField
+              label="Name"
+              error={errors.special?.[index]?.name?.message}
+              {...register(`special.${index}.name`)}
+            />
+            <TextField
+              label="Needs"
+              error={errors.special?.[index]?.need?.message}
+              {...register(`special.${index}.need`)}
+            />
+            <button type="button" onClick={() => remove(index)}>✕</button>
+          </div>
+        ))}
+        <button type="button" onClick={() => append({ name: "", need: "" })}>
+          Add a guest
+        </button>
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Build it in <code>SpecialStep</code>. Add three guests, type something in each, remove the first: the others keep their text.</p>
+    <p><b>The schema</b> says the same thing in one line: <code>special: z.array(z.object({ name: …, need: … })).max(6, "Up to six, please")</code>. The type of <code>append</code>'s argument comes from it.</p>
+    <p><b>Step 2:</b> <code>field.id</code> is not part of your data: the form invents it just for the key. <code>key={index}</code> looks fine at first (the form re-applies the typed text) and fails later: see the mistakes slide.</p>
+    <p><b>Ask:</b> where does the "Up to six" message appear? <b>Expect:</b> <code>errors.special?.message</code>, under the list: the array itself has an error too.</p>
+  </aside>
+</section>
+
+<section class="slide" id="r-ctrl" data-phase="solution2" data-title="Recipe: Controller">
+  <p class="eyebrow"><b>Second plat · Recipe</b> When the field is not an input</p>
+  <h2 class="h3 mt-s">Controller: connect your own component</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>Native elements: register</b><span><code>input</code>, <code>select</code>, <code>textarea</code>, a checkbox. They have a <code>name</code>, a <code>ref</code> and <code>onChange</code>.</span><span class="file-chip"><i data-icon="file-code"></i>src/components/notes/TableStep.tsx</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Our stepper is a component, not an input</b><span>It takes <code>qty</code> and two buttons' handlers. <code>register</code> has nothing to give it.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Controller hands you field</b><span><code>field.value</code> to show, <code>field.onChange(n)</code> to tell the form.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/components/notes/TableStep.tsx" data-copy data-build="1:1-3;2:4-7,15;3:8-14" style="--code-size:17px">
+        // native element: register
+        <select {...register("arrival")}>…</select>
+
+        // our own QuantityStepper: Controller
+        <Controller
+          control={control}
+          name="seats"
+          render={({ field }) => (
+            <QuantityStepper
+              qty={field.value}
+              onDecrease={() => field.onChange(Math.max(1, field.value - 1))}
+              onIncrease={() => field.onChange(Math.min(8, field.value + 1))}
+            />
+          )}
+        />
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> The rule of thumb: if the element is native, use <code>register</code>. If it is your own component, or a component from a UI library (a date picker, Radix's Select in L36), use <code>Controller</code>.</p>
+    <p><b>Do:</b> Reuse the <code>QuantityStepper</code> from the cart (L28/L31): it already takes <code>qty</code>, <code>onDecrease</code> and <code>onIncrease</code>. The number goes into the form as a real number, which is why the schema can say <code>z.number().int().min(1).max(8)</code>.</p>
+    <p><b>If asked "why not register with valueAsNumber?"</b> For a native <code>&lt;input type="number"&gt;</code> that is exactly right. Our stepper has no input.</p>
+  </aside>
+</section>
+
+<section class="slide" id="r-rules" data-phase="solution2" data-title="Recipe: rules between fields">
+  <p class="eyebrow"><b>Second plat · Recipe</b> The sign-up's hard rules</p>
+  <h2 class="h3 mt-s">Rules between fields, and a question for the server</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>Fields in one object</b><span>The schema of the whole sign-up. Each rule carries its message.</span><span class="file-chip"><i data-icon="file-code"></i>src/schemas/auth.ts</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>A rule about two fields: refine</b><span>Put it on the object. <code>path</code> chooses the field that shows the message.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Format first, then the server</b><span>The first <code>refine</code> has <code>abort: true</code>: a wrong format stops here. The second one is <code>async</code>.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>One question per number</b><span>A <code>Map</code> remembers each answer, so validating again does not ask again.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/schemas/auth.ts" data-copy data-build="1:1-4,14;2:15-18;3:5-13;4:19-25" style="--code-size:16px">
+        export const registerSchema = z
+          .object({
+            password: z.string().min(8, "At least 8 characters"),
+            confirmPassword: z.string(),
+            phone: z
+              .string()
+              .refine((v) => /^5\d{8}$/.test(digitsOf(v)), {
+                error: "A Georgian mobile number, like 599 12 34 56",
+                abort: true, // wrong format: stop here, never ask the server
+              })
+              .refine(async (v) => !(await isPhoneTaken(digitsOf(v))), {
+                error: "This number already has an account",
+              }),
+          })
+          .refine((v) => v.password === v.confirmPassword, {
+            error: "The passwords don't match",
+            path: ["confirmPassword"], // shown under this field
+          });
+
+        // one question per number, however often the form validates
+        const answers = new Map<string, Promise<boolean>>();
+        function isPhoneTaken(digits: string) {
+          if (!answers.has(digits)) answers.set(digits, askServer(digits));
+          return answers.get(digits)!;
+        }
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> The real file has all six fields (name, email, terms too): copy it from <code>code/after-L33</code> and read it in steps. The slide keeps the three rules that need explaining.</p>
+    <p><b>Step 2:</b> a rule on the object sees all the values. Without <code>path</code> the message would belong to the form, not to a field, and no field would show it. Note: in Zod 4 this object-level rule runs even when other fields have errors, so "The passwords don't match" can show while the email is wrong too.</p>
+    <p><b>Step 3:</b> <code>abort: true</code> means "if this rule fails, skip the rules after it". Without it, a typo in the number would still be sent to the server. The async rule needs <code>await</code>: <code>zodResolver</code> handles it for us.</p>
+    <p><b>The server call</b> is <code>GET /api/v1/enterprise/validation/check-phone?number=…</code>; the number 555123456 is "taken". <code>askServer</code> is a short function around <code>api()</code>; it is in the file.</p>
+  </aside>
+</section>
+
+<section class="slide" id="phone" data-phase="solution2" data-title="Ask the server once">
+  <p class="eyebrow"><b>Solution 2</b> Switch the three rules on, one by one, and press the button again</p>
+  <h2 class="h2 mt-s">Ask the server once, at the right time</h2>
+  <div class="ph" id="ph2" data-toggles="1"></div>
+  <div class="why3">
+    <div class="takeaway" data-step="1"><p class="k">Format first</p><p>A wrong format never leaves the browser: <code>abort: true</code>.</p></div>
+    <div class="takeaway" data-step="2"><p class="k">When the guest is done</p><p>Not at every key: <code>mode: "onBlur"</code> asks once, when the field is left.</p></div>
+    <div class="takeaway" data-step="3"><p class="k">Never twice</p><p>A <code>Map</code> remembers each answer, so the same number is asked once.</p></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> All three switches are off: it is the problem from before the break (9 requests, a wrong answer on top). Switch on <b>format first</b> (that is <code>abort: true</code>) and press "Type 555123456": one request, the right answer. Press "Send" twice: the number is asked again each time. Switch on <b>remember answers</b> (the <code>Map</code>) and repeat: the second Send asks nothing. Finally <b>when leaving the field</b> (<code>mode: "onBlur"</code>): nothing is asked while typing at all.</p>
+    <p><b>Say:</b> Three small decisions, each one line of the schema or the form: do not ask when the format is wrong, do not ask while the guest is still typing, do not ask twice. The form also tells us it is waiting: <code>formState.validatingFields.phone</code> is true while the request is out, and we show "Checking this number…".</p>
+    <p><b>Honest detail:</b> in the app the check runs when the guest leaves the field (<code>mode: "onBlur"</code>) and again, from the cache, on Send. The delays here are made up to make the answers arrive out of order.</p>
+  </aside>
+</section>
+
+<section class="slide" id="r-server" data-phase="solution2" data-title="Recipe: the server has the last word">
+  <p class="eyebrow"><b>Second plat · Recipe</b> A valid form can still be refused</p>
+  <h2 class="h3 mt-s">The server has the last word</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>Send what the form gives you</b><span><code>onSubmit</code> gets typed values that already passed the schema.</span><span class="file-chip"><i data-icon="file-code"></i>src/pages/RegisterPage.tsx</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>A refusal that names a field: show it there</b><span>409 means "this email already has an account": it goes under the email.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Anything else: a message for the whole form</b><span><code>setError("root", …)</code>, shown with <code>role="alert"</code> above the button.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/pages/RegisterPage.tsx" data-copy data-build="1:1-12,22;2:13-17,20-21;3:18-19" style="--code-size:17px">
+        async function onSubmit(values: RegisterValues) {
+          try {
+            await api("/api/v1/auth/register", {
+              method: "POST",
+              body: JSON.stringify({
+                email: values.email,
+                password: values.password,
+                displayName: values.displayName,
+              }),
+            });
+            await signIn(values.email, values.password);
+            navigate("/", { replace: true });
+          } catch (error) {
+            // the server has the last word: show it next to the right field
+            if (error instanceof ApiError && error.status === 409) {
+              setError("email", { message: error.message });
+            } else {
+              const message = error instanceof ApiError ? error.message : "No connection.";
+              setError("root", { message });
+            }
+          }
+        }
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Validation in the browser is a courtesy to the guest, not security. The server must check everything again, and it knows things the browser cannot: the email is taken, the phone is blocked. <code>setError</code> puts the server's words in the same place as the schema's.</p>
+    <p><b>Do:</b> <code>ApiError</code> is the error class from <code>lib/api.ts</code> (L29/L31): it carries the status and the server's message. Try registering twice with the same email.</p>
+    <p><b>Honest note:</b> the register and login flows were built from the API's Swagger description and run here against a local copy of it; run them once against the real server before you teach this and tell the room if the 409 text differs.</p>
+  </aside>
+</section>
+
+<section class="slide" id="end" data-phase="solution2" data-title="The page at the end of today">
+  <div class="map2">
+    <figure class="shot"><div class="shot__bar"><i></i><i></i><i></i><span class="shot__url"><i data-icon="globe"></i>localhost:5173/<b>register</b></span></div><div class="shot__body" style="height:560px"><img src="../img/l33-register.jpg" alt="Le Bistro's sign-up form with three messages" style="width:100%;height:100%;object-fit:cover;object-position:top"></div></figure>
+    <div class="stack" style="--gap:16px">
+      <p class="eyebrow"><b>Solution 2</b> Le Bistro, version 0.7</p>
+      <h2 class="h2">Where everything lives now</h2>
+      <table class="statemap">
+        <thead><tr><th>State</th><th>Home</th></tr></thead>
+        <tbody>
+          <tr data-step="1"><td>The login and sign-up fields</td><td>React Hook Form <small class="muted">(was <code>useState</code>)</small></td></tr>
+          <tr data-step="2"><td>Their rules and messages</td><td>a Zod schema</td></tr>
+          <tr data-step="3"><td>The table notes (3 steps)</td><td>one form, then the cart store</td></tr>
+          <tr data-step="4"><td>The cart, the session</td><td>stores, saved</td></tr>
+          <tr data-step="5"><td>Category, search text</td><td>the URL</td></tr>
+          <tr data-step="6"><td>Menu, profile, queue</td><td><code>useApi</code>, until L34</td></tr>
+        </tbody>
+      </table>
+      <p class="small muted" data-step="7">Full code: <code>bistro-track/code/after-L33</code>. Run it with <code>npm install</code> and <code>npm run dev</code>.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Show your live result if it works: sign-up with the messages, the phone check ("Checking this number…"), then <code>/notes</code> with its three steps. Open React DevTools with "Highlight updates": typing in a field does not flash the form.</p>
+    <p><b>Say:</b> The "Form" home of the map is filled. The table notes are saved in the cart store so that L35 can send them with the order: the kitchen reads "Table of 4, arriving 19:30. Anna: no nuts."</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Form mistakes, part two">
+  <p class="eyebrow"><b>Solution 2</b> The four mistakes of the second half</p>
+  <h2 class="h2 mt-s">When the slip gets messy</h2>
+  <div class="mistakes">
+    <div class="mistake" data-step="1"><h4>The index as a key</h4><div class="bad">{fields.map((field, index) =&gt; &lt;div key={index}&gt;…)}</div><div class="err">The typed text still looks right (the form puts it back). What the row remembers itself does not: an open panel, the focus, an animation jump to the wrong guest.</div><div class="good">key={field.id}: it follows the row, not the place</div></div>
+    <div class="mistake" data-step="2"><h4>register on your own component</h4><div class="bad">&lt;QuantityStepper {...register("seats")} /&gt;</div><div class="err">TS2739 · Type '{ onChange: ChangeHandler; onBlur: ChangeHandler; ref: RefCallBack; name: "seats"; … }' is missing the following properties: qty, onDecrease, onIncrease</div><div class="good">&lt;Controller … render={({ field }) =&gt; …} /&gt; and use field.value, field.onChange</div></div>
+    <div class="mistake" data-step="3"><h4>A number field gives text</h4><div class="bad">&lt;input type="number" {...register("seats")} /&gt;  with  z.number()</div><div class="err">Invalid input: expected number, received string. An empty field with valueAsNumber gives: expected number, received NaN.</div><div class="good">register("seats", { valueAsNumber: true }), or a Controller with real numbers</div></div>
+    <div class="mistake" data-step="4"><h4>Next and Save in one place</h4><div class="bad">{last ? &lt;button type="submit"&gt; : &lt;button type="button"&gt;}</div><div class="err">No error: Next sends the form. React keeps one button and turns it into a submit button during the click.</div><div class="good">&lt;button key="next" …&gt; and &lt;button key="save" …&gt;</div></div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Number 4 is the strangest one: the form saves after step 2 and the guest has not reached the review. We found it in our own tests. Number 1 is the one AIs write most.</p>
+    <p><b>Mistake 1:</b> we tested it: with <code>key={index}</code> and registered text inputs, the text stays correct after removing the first row, because the form writes the values back. A row that keeps its own state (an open "details" panel) shows it on the wrong guest: Beso's panel opened under Chiko.</p>
+    <p><b>Mistake 3:</b> an <code>&lt;input&gt;</code> always gives a string, even with <code>type="number"</code>.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Which field needs a Controller?">
+  <div class="split-5-7 fill items-center">
+    <div class="stack" style="--gap:24px">
+      <p class="eyebrow"><b>Quick check</b> Vote, then click</p>
+      <h2 class="h1">Which of these needs a <code>Controller</code>?</h2>
+    </div>
+    <div class="quiz" data-quiz>
+      <div class="quiz__opts">
+        <button class="quiz__opt">A <code>&lt;select&gt;</code> for the arrival time</button>
+        <button class="quiz__opt" data-correct>Our own <code>QuantityStepper</code> for the seats</button>
+        <button class="quiz__opt">A <code>&lt;textarea&gt;</code> for the note</button>
+        <button class="quiz__opt">A checkbox for the house rules</button>
+      </div>
+      <p class="quiz__explain">B: the stepper is a component, not an input: it has no <code>name</code>, <code>ref</code> or <code>onChange</code> that match, so <code>Controller</code> connects it. A, C and D are native elements: <code>register</code> works on them. The same goes for a date picker or Radix's <code>Select</code> from L36: components get a <code>Controller</code>.</p>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Fingers up for 1 to 4, then press the number key of the most common answer. If someone says A: <code>select</code> has a <code>name</code>, a <code>ref</code> and an <code>onChange</code>, like any input.</p></aside>
+</section>
+
+<!-- ============================== CLASSWORK 2 · WITH AI ============================== -->
+
+<section class="slide" data-phase="classwork2" data-title="Classwork 2 with AI: a form in steps">
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Atelier · Classwork 2 · with AI</b> 15 minutes, on your own project</p><h2 class="h1">Prompt it: a form in steps</h2></div>
+    <div class="timer" data-timer="900"></div>
+  </div>
+  <div class="cw">
+    <div class="stack" style="--gap:14px">
+      <div class="tier base"><div class="tier__k"><span>The task</span><span>the AI writes, you check</span></div>
+        <ul class="ai-levels"><li><b>Base</b>A checkout in three steps (contact, delivery, review) with a single <code>useForm</code> above the steps, a Zod schema and <code>trigger</code> on Next.</li><li><b>Plus</b>A list of gift notes (<code>useFieldArray</code>) and a stepper with <code>Controller</code>.</li><li><b>Pro</b>A sign-up with a <code>refine</code> for the matching passwords and an async username check that skips the server on a wrong format.</li></ul></div>
+      <div class="craft-mini"><p class="craft-mini__k">Your prompt, in five parts (CRAFT)</p>
+        <div class="craft-mini__row cr-c"><span class="craft__badge">C</span><p><b>Context</b>Your shop and stack, with the versions: react-hook-form 7, zod 4, resolvers 5. Paste <code>types.ts</code> and your cart store.</p></div>
+        <div class="craft-mini__row cr-r"><span class="craft__badge">R</span><p><b>Role</b>&quot;A React teacher who writes small forms for a beginner.&quot;</p></div>
+        <div class="craft-mini__row cr-a"><span class="craft__badge">A</span><p><b>Action</b>The Base task. Plus and Pro in follow-up prompts.</p></div>
+        <div class="craft-mini__row cr-f"><span class="craft__badge">F</span><p><b>Format</b>&quot;Only the files that change, complete, with paths.&quot;</p></div>
+        <div class="craft-mini__row cr-t"><span class="craft__badge">T</span><p><b>Target</b>&quot;No useState for field values. The schema holds every rule and message.&quot;</p></div>
+      </div>
+    </div>
+    <div class="cw__side">
+      <div class="done-when"><p class="k">Done when</p><ul class="checks"><li>One <code>useForm</code>, above the steps; no <code>useState</code> for values</li><li>Next validates only its own step</li><li>Zod 4 syntax: <code>z.email()</code>, <code>error:</code></li><li>AI.md: your prompt and one thing you changed</li></ul></div>
+      <div class="hint" data-peek="click for a sample prompt"><div><p class="k">A sample prompt · Tech store</p><pre class="is-prompt">CONTEXT
+Shop &quot;Volt&quot; (phones, laptops). Vite + React 19 + TypeScript
++ Tailwind 4, react-hook-form 7, zod 4 (z.email(), error:),
+@hookform/resolvers 5. Cart in a Zustand store (pasted).
+ROLE
+A React teacher who writes small forms for a beginner.
+ACTION
+A 3-step Checkout page: contact, delivery + a list of gift
+notes (name, message; add and remove), review. Save in
+the cart store.
+FORMAT
+Only changed files, complete, with paths.
+TARGET
+One useForm above the steps, no useState for fields.</pre></div></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Same kind of task as always, with an AI: you write the prompt, it writes the code, you check it. Today the check is long: forms are where AIs make the most small mistakes.</p>
+    <p><b>Do:</b> Start the timer. Walk around and ask two students to explain one line the AI wrote. If the answer does not build, the next prompt is the exact error message.</p>
+    <p><b>Watch for:</b> Zod 3 syntax (<code>required_error</code>, <code>z.string().email()</code>, <code>message:</code>); <code>useForm&lt;typeof schema&gt;</code>; one <code>useForm</code> per step; <code>key={index}</code>; <code>watch()</code> everywhere; a controlled <code>value=</code> together with <code>register</code>. The follow-up prompts are in <code>classwork.md</code>.</p>
+    <p><b>Then:</b> the Masterclass: the whole Le Bistro so far, in one prompt.</p>
+  </aside>
+</section>
+
+<!-- ============================== MASTERCLASS ============================== -->
+
+<section class="slide" data-phase="masterclass" data-title="Masterclass: Le Bistro in one prompt">
+  <p class="eyebrow"><b>Masterclass · LAB-33</b> Press next: the prompt opens part by part</p>
+  <h2 class="h2 mt-s">Le Bistro so far, in one prompt</h2>
+  <div class="craft mt-m" data-craft>
+    <div class="craft__bar"><span><i data-icon="message-square"></i>Prompt · LAB-33 · Le Bistro after L33</span><button type="button" class="copy-btn" data-craft-copy><i data-icon="copy"></i>Copy</button></div>
+    <div class="craft__part cr-c" data-step="1" data-fx="left" data-label="CONTEXT"><span class="craft__badge">C</span><p class="craft__name">Context<small>what exists and what we use</small></p><pre class="craft__text" style="--craft-size:15px">Le Bistro, a French restaurant site. Vite + React 19 + TypeScript + Tailwind CSS 4,
+react-router 8 (import from &quot;react-router&quot;), Zustand 5, react-hook-form 7, zod 4
+(z.email(), the option is error), @hookform/resolvers 5. API at /api through a Vite
+proxy: dishes, categories, search, /auth/login, /auth/register, /auth/me, and
+/enterprise/validation/check-phone?number= -> { isDuplicate } (1 second; 555123456 is taken).</pre></div>
+    <div class="craft__part cr-r" data-step="2" data-fx="left" data-label="ROLE"><span class="craft__badge">R</span><p class="craft__name">Role<small>who answers</small></p><pre class="craft__text" style="--craft-size:15px">You are a senior React developer who writes code for beginners to read.</pre></div>
+    <div class="craft__part cr-a" data-step="3" data-fx="left" data-label="ACTION"><span class="craft__badge">A</span><p class="craft__name">Action<small>what to build, step by step</small></p><pre class="craft__text" style="--craft-size:15px">Build the site as it is so far (menu, search, pages, Zustand stores, role guards) and its
+forms with React Hook Form and Zod, with no useState for field values:
+- schemas/auth.ts: loginSchema, and registerSchema (name, email, Georgian mobile phone,
+  password with a digit, confirm with refine + path, terms). The phone rule has abort:
+  true, then an async check-phone call whose answers are remembered.
+- TextField (label, input, message slot of fixed height), LoginPage and RegisterPage:
+  useForm + zodResolver, sign-up on mode onBlur, server errors with setError.
+- /notes: 3 steps in ONE form (FormProvider, trigger per step): seats (Controller + stepper),
+  arrival time, guests (useFieldArray, key = field.id), a note; saved in the cart store.</pre></div>
+    <div class="craft__part cr-f" data-step="4" data-fx="left" data-label="FORMAT"><span class="craft__badge">F</span><p class="craft__name">Format<small>what the answer looks like</small></p><pre class="craft__text" style="--craft-size:15px">First a table: each form, its fields and the rule that guards each. Then every file in
+full with its path. Each schema exports its z.infer type.</pre></div>
+    <div class="craft__part cr-t" data-step="5" data-fx="left" data-label="TARGET"><span class="craft__badge">T</span><p class="craft__name">Target<small>who reads it, when it's done</small></p><pre class="craft__text" style="--craft-size:15px">Beginners will read it: small components, messages live in the schemas, App.tsx only
+lists routes. It must pass npm run build.</pre></div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> One prompt rebuilds everything Le Bistro has so far, from L27 to today, forms included. Same five parts as your classwork prompt.</p>
+    <p><b>Do:</b> Press next five times. For each part, one sentence: what would go wrong without it? (No context: Zod 3 and react-hook-form 6 habits. No role: code for experts. No action: no <code>abort</code>, no <code>trigger</code>. No format: a wall of text. No target: nobody checks the build.)</p>
+    <p><b>Copy</b> copies the whole prompt with its five labels. Run it once before class. The script is in <code>masterclass.md</code>.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="masterclass" data-title="Run it, then check it">
+  <p class="eyebrow"><b>Masterclass · LAB-33</b> The AI writes fast. You decide if it's right.</p>
+  <h2 class="h2 mt-s">Run it, then check it</h2>
+  <div class="mc-run">
+    <ol class="mc-steps" data-step="1">
+      <li><b>Copy</b> the prompt into an AI tool<span>Claude, ChatGPT, Copilot Chat: any of them. Nothing to attach: the API is named in the prompt</span></li>
+      <li><b>Build</b> what it gives back<span>a new Vite project, every file at its path, plus <code>npm install zustand react-hook-form zod @hookform/resolvers@5</code></span></li>
+      <li><b>Run</b> <code>npm run dev</code> and <code>npm run build</code><span>an error message goes straight back into the chat</span></li>
+      <li><b>Compare</b> with <code>code/after-L33</code><span>the version we built by hand</span></li>
+    </ol>
+    <div class="mc-check">
+      <p class="k">Check it with what you learned today</p>
+      <ul class="checks"><li data-step="2">No <code>useState</code> holds a field's value: <code>register</code> or <code>Controller</code> does</li><li data-step="3">Every <code>useForm</code> is typed with <code>z.infer</code>, with <code>zodResolver(schema)</code> as its resolver</li><li data-step="4">Zod 4 syntax: <code>z.email()</code> and <code>error:</code>, no <code>required_error</code></li><li data-step="5">One <code>useForm</code> above the steps; guest rows use <code>key={field.id}</code>; Next and Save have different keys</li><li data-step="6">The phone rule has <code>abort: true</code> before the server call</li></ul>
+      <div class="callout is-warn mt-m" data-step="7"><i data-icon="sparkles"></i><div><p class="small">AIs write a <code>useState</code> for every field "to be safe" and one <code>useForm</code> per step. Today you can say why not.</p></div></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Show the answer you got before class, or run it live if there is time. Go through the checks one by one, in the AI's code. Then open <code>code/after-L33</code> next to it.</p>
+    <p><b>Say:</b> Every check is something from today. Without today's lecture you could not judge this code.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="masterclass" data-title="The short version">
+  <p class="eyebrow"><b>Masterclass · LAB-33</b> The same five parts, without the labels</p>
+  <h2 class="h2 mt-s">The short version</h2>
+  <div class="craft craft--short mt-m" data-craft data-on="1:show-parts">
+    <div class="craft__bar"><span><i data-icon="message-square"></i>Prompt · LAB-33 · the short version</span><button type="button" class="copy-btn" data-craft-copy><i data-icon="copy"></i>Copy</button></div>
+    <p class="craft__short"><span class="p-r">You're a senior React developer writing for beginners.</span> <span class="p-c">Le Bistro is a Vite + React 19 + TypeScript + Tailwind 4 app with react-router 8, Zustand 5, react-hook-form 7, zod 4 and @hookform/resolvers 5, and an API at /api through a Vite proxy (login, register, /auth/me, and a check-phone endpoint that takes a second and says 555123456 is taken).</span> <span class="p-a">Build the site as it is so far (menu, search, pages, a cart and a session in Zustand stores, role guards) and its forms: a schemas/auth.ts with loginSchema and a registerSchema (name, email, Georgian mobile phone with abort: true before an async, remembered server check, password with a digit, a refine with path for the matching passwords, terms), a TextField with a fixed-height message slot, a LoginPage and a RegisterPage on useForm + zodResolver (the sign-up on mode onBlur, server errors with setError), and a /notes page with three steps in one form (FormProvider, trigger per step): seats with Controller, arrival time, guests with useFieldArray keyed by field.id, a free note, saved in the cart store; no useState for field values.</span> <span class="p-f">Answer with a table of each form, its fields and the rules that guard them, then every file in full with its path.</span> <span class="p-t">Keep it simple for beginners, put every message in the schemas, and make sure npm run build passes.</span></p>
+    <div class="craft__legend" data-step="1"><span class="cr-c">Context</span><span class="cr-r">Role</span><span class="cr-a">Action</span><span class="cr-f">Format</span><span class="cr-t">Target</span></div>
+  </div>
+  <div class="takeaway mt-m" data-step="2"><p class="k">How CRAFT works</p><p>The five parts are a checklist for your thinking, not a form to fill in. Once all five are there, the labels can go.</p></div>
+  <aside class="notes">
+    <p><b>Do:</b> Read it aloud first. Press next: each part lights up in its colour. Ask: if we delete "abort: true before the server check", which part is poorer? (Action: the AI may ask the server for every typo.)</p>
+    <p><b>Say:</b> Long or short, it is the same prompt.</p>
+  </aside>
+</section>
+
+<!-- ============================== WRAP-UP ============================== -->
+
+<section class="slide" data-phase="wrap" data-title="Two problems, two answers">
+  <p class="eyebrow"><b>Dessert</b> What we solved today</p>
+  <h2 class="h2 mt-s">Two problems, two answers</h2>
+  <div class="recap">
+    <div class="recap__row" data-step="1">
+      <div class="recap__p"><p class="k">Problem 1</p><p>Seventeen letters, seventeen renders, and the same three lines six times.</p></div>
+      <div class="recap__arrow"><i data-icon="arrow-right"></i></div>
+      <div class="recap__s"><p class="k">A schema and a form</p><p><code>register</code> keeps the text in the input (0 renders). One Zod schema holds the rules, the messages and the type. <code>handleSubmit</code> is the gate.</p></div>
+    </div>
+    <div class="recap__row" data-step="2">
+      <div class="recap__p"><p class="k">Problem 2</p><p>A list that grows, steps that forget, a server question asked at every key.</p></div>
+      <div class="recap__arrow"><i data-icon="arrow-right"></i></div>
+      <div class="recap__s"><p class="k">One form, bigger tools</p><p><code>useFieldArray</code> and <code>Controller</code>; one <code>FormProvider</code> above the steps with <code>trigger</code>; <code>refine</code>, <code>abort</code> and a cache for the server.</p></div>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Ask:</b> Before each press, ask the room what the solution was. Then reveal.</p><p><b>Cost:</b> the three packages add about 41 kB (gzip) to the app: 89.7 kB at the end of L32, 131.1 kB now. Mostly Zod. Worth it for the first form, and every later form is free.</p></aside>
+</section>
+
+<section class="slide" data-phase="wrap" data-title="What does this do?">
+  <p class="eyebrow"><b>Dessert</b> Click a card to check yourself</p>
+  <h2 class="h2 mt-s">What does this do?</h2>
+  <div class="flips is-small">
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">01 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">useForm({ resolver: zodResolver(schema) })</script></div><div class="flip__face flip__back"><span class="flip__k">01</span><p>Makes the form object. The type comes from the schema, and Zod judges the values.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">02 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx"><input {...register("email")} /></script></div><div class="flip__face flip__back"><span class="flip__k">02</span><p>Gives the input a name and a ref. The browser keeps the text, so typing renders nothing.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">03 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">onSubmit={handleSubmit(onSubmit)}</script></div><div class="flip__face flip__back"><span class="flip__k">03</span><p>The gate: it asks the schema first. Only valid values reach <code>onSubmit</code>.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">04 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">setError("root", { message })</script></div><div class="flip__face flip__back"><span class="flip__k">04</span><p>Puts a message on the whole form, for what only the server can know.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">05 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">useFieldArray({ control, name: "special" })</script></div><div class="flip__face flip__back"><span class="flip__k">05</span><p>A list of fields that can grow and shrink. Key each row with <code>field.id</code>.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">06 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">form.trigger(["seats", "arrival"])</script></div><div class="flip__face flip__back"><span class="flip__k">06</span><p>Checks only these fields: Next validates its own step, not the whole form.</p></div></div></div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Point at a student for each card. They explain, then you click to flip.</p></aside>
+</section>
+
+<section class="slide" data-phase="wrap" data-title="Homework: v0.7">
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Homework</b> Before L34</p><h2 class="h1">Your shop, version 0.7</h2></div>
+    <span class="sticker">Live link required</span>
+  </div>
+  <div class="hw">
+    <div class="tiers">
+      <div class="tier base"><div class="tier__k"><span>Base</span><span>required</span></div><h3>Forms with a schema</h3>
+        <ul><li>A <code>schemas/</code> folder: the login and a sign-up (name, username, email, password, repeat it).</li><li><code>useForm</code> + <code>zodResolver</code>, messages in the schemas, types from <code>z.infer</code>.</li><li>No <code>useState</code> holds a field's value.</li><li>A <code>refine</code> with <code>path</code> for the matching passwords; the server's answer with <code>setError</code>.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Plus</span><span>recommended</span></div><h3>A form in steps</h3>
+        <ul><li>A checkout in three steps: one form above them, <code>trigger</code> per step, a <code>useFieldArray</code> list, a <code>Controller</code> field.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Pro</span><span>fast finishers</span></div><h3>Ask the server, once</h3>
+        <ul><li>"Is this username taken?" with <code>abort</code> and a cache, on <code>mode: "onTouched"</code>.</li></ul></div>
+    </div>
+    <div class="cw__side">
+      <div class="done-when"><p class="k">Before you submit</p><ul class="checks"><li>React DevTools: typing does not flash the form</li><li>Search for <code>useState</code> in the form files: none for values</li><li>The messages come from the schema</li><li><code>npm run build</code> passes, the Vercel link works</li></ul></div>
+      <p class="small muted">Full brief and grading: <code>homework.md</code>.</p>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Say:</b> Submit the GitHub link and the Vercel link. DummyJSON's <code>POST /users/add</code> takes the sign-up and answers as if it saved it (it does not): show the answer on the page.</p></aside>
+</section>
+
+<section class="slide" data-phase="wrap" data-tone="dark" data-title="Merci">
+  <div class="merci">
+    <div class="stack" style="--gap:22px">
+      <p class="eyebrow"><b>L33</b> Le bon de commande</p>
+      <h2 class="display">Merci!</h2>
+      <p class="lead">Questions now, or in the class chat. See you at L34.</p>
+    </div>
+    <div class="teaser" data-step="1">
+      <p class="k">Next time · L34</p>
+      <h3>The menu, loaded three times.</h3>
+      <p>Open Le Bistro, click a dish, go back, open the menu again. The same dishes crossed the network three times, and the main courses take three seconds each time. Watch the Network tab with a stopwatch. We'll give the server's data a cache.</p>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Step 1 shows the next problem. Open your site with the Network tab on, go home, menu, a dish, back, menu again: count the requests for the same menu. That is the hook for L34.</p></aside>
+</section>
+
+</div>
+</div>
+
+<script src="../_shared/vendor/icons.js"></script>
+<script src="../_shared/vendor/prism/prism.min.js" data-manual></script>
+<script src="../_shared/vendor/prism/prism-jsx.min.js"></script>
+<script src="../_shared/vendor/prism/prism-typescript.min.js"></script>
+<script src="../_shared/vendor/prism/prism-tsx.min.js"></script>
+<script src="../_shared/vendor/prism/prism-bash.min.js"></script>
+<script src="../_shared/vendor/prism/prism-json.min.js"></script>
+<script src="../_shared/music/tracks.js"></script>
+<script src="../_shared/bistro-data.js"></script>
+<script src="../_shared/deck.js"></script>
+<script src="../track.js"></script>
+<script>
+(function () {
+  'use strict';
+  Track.init();
+  Deck.init({
+    code: 'L33',
+    lecture: 33,
+    title: 'Le bon de commande',
+    footer: 'Le Bistro track · L33 · Forms with React Hook Form and Zod',
+    shared: '../_shared/',
+    breakMinutes: 10,
+    breakLine: 'Pause café. Stand up, refill, rest your eyes. Back in',
+    phases: [
+      { id: 'hello', label: 'Hello' }, { id: 'questions', label: 'Questions' },
+      { id: 'problem', label: 'Problem 1' }, { id: 'solution', label: 'Solution 1' }, { id: 'classwork', label: 'Classwork 1' },
+      { id: 'break', label: 'Break' },
+      { id: 'problem2', label: 'Problem 2' }, { id: 'solution2', label: 'Solution 2' }, { id: 'classwork2', label: 'Classwork 2 · AI' }, { id: 'masterclass', label: 'Masterclass' },
+      { id: 'wrap', label: 'Wrap-up' }
+    ]
+  });
+
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = Track.esc;
+  document.querySelectorAll('[data-start-break]').forEach(function (b) { b.addEventListener('click', function () { Deck.openBreak(); }); });
+
+  /* ---------- 1 · type an email, count the renders ---------- */
+  var EMAIL = 'maia.k@example.ge'; // 17 characters
+  var kd = { a: 0, timer: null };
+  function dots(n) { return new Array(n + 1).join('•'); }
+  function kdRender() {
+    $('kd-a-n').textContent = kd.a;
+    $('kd-b-n').textContent = 0;
+    $('kd-a-state').innerHTML = '<span class="k">// state in the component</span>\nemail:    <b>"' + esc($('kd-a-email').value) + '"</b>\npassword: <b>"' + dots($('kd-a-pass').value.length) + '"</b>\n<span class="k">→ setEmail(…): React draws the form again</span>';
+    $('kd-b-state').innerHTML = '<span class="k">// state in the component</span>\n<b>(none)</b>: the text lives in the &lt;input&gt;\n<span class="k">register("email") → name, onChange, ref\n→ typing renders nothing</span>';
+  }
+  function kdA() { kd.a++; Track.replay($('kd-a-card'), 'is-render'); kdRender(); }
+  $('kd-a-email').addEventListener('input', kdA);
+  $('kd-a-pass').addEventListener('input', kdA);
+  $('kd-b-email').addEventListener('input', kdRender);
+  $('kd-b-pass').addEventListener('input', kdRender);
+  function kdReset() {
+    clearInterval(kd.timer); kd.a = 0;
+    ['kd-a-email', 'kd-a-pass', 'kd-b-email', 'kd-b-pass'].forEach(function (id) { $(id).value = ''; });
+    kdRender();
+  }
+  $('kd-reset').addEventListener('click', kdReset);
+  $('kd-type').addEventListener('click', function () {
+    kdReset();
+    var i = 0, ea = $('kd-a-email'), eb = $('kd-b-email');
+    kd.timer = setInterval(function () {
+      if (i >= EMAIL.length) { clearInterval(kd.timer); return; }
+      ea.value += EMAIL.charAt(i); eb.value += EMAIL.charAt(i); i++;
+      kdA();
+    }, 110);
+  });
+  Deck.onSlide('keys', { leave: kdReset });
+  kdRender();
+
+  /* ---------- 2 · when does the error show? (the rules of RHF's mode, checked in Chrome) ---------- */
+  var MODE_TEXT = {
+    onSubmit: 'The first check is when the guest presses Send. After that, every change re-checks.',
+    onBlur: 'A field is checked when the guest leaves it. The message stays while they fix it, until the next blur. After Send, every change re-checks.',
+    onChange: 'Every letter is checked. The message shows while the guest is still typing: noisy, and a render per key.',
+    onTouched: 'The first check is on blur. After that, every change re-checks: live feedback, without scolding too early.'
+  };
+  var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  var md = { mode: 'onBlur', submitted: false, touched: false, error: '', checks: 0, line: null, typed: 0 };
+  function mdShould(evt) {
+    if (evt === 'submit') return true;
+    if (md.submitted) return evt === 'change';              // reValidateMode: onChange
+    if (md.mode === 'onBlur') return evt === 'blur';
+    if (md.mode === 'onChange') return evt === 'change';
+    if (md.mode === 'onTouched') return evt === 'blur' || (evt === 'change' && md.touched);
+    return false;                                           // onSubmit
+  }
+  function mdCheck() {
+    md.checks++;
+    md.error = EMAIL_RE.test($('md-email').value) ? '' : 'Enter a valid email address';
+    $('md-slot').textContent = md.error;
+    $('md-email').classList.toggle('is-bad', !!md.error);
+  }
+  function mdRender() {
+    $('md-state').innerHTML =
+      'mode:          <b>"' + md.mode + '"</b>\n' +
+      'isSubmitted:   <b>' + md.submitted + '</b>\n' +
+      'touchedFields: <b>' + (md.touched ? '{ email: true }' : '{}') + '</b>\n' +
+      'errors.email:  ' + (md.error ? '<span class="bad">"' + md.error + '"</span>' : '<b>undefined</b>') + '\n' +
+      'validations:   <b>' + md.checks + '</b>';
+    $('md-rule-k').textContent = 'mode: "' + md.mode + '"';
+    $('md-rule-t').textContent = MODE_TEXT[md.mode];
+  }
+  function mdLog(text, kind) { md.line = null; md.typed = 0; Track.log($('md-log'), text, kind); }
+  function mdVerdict() { return md.error ? '✗ "' + md.error + '"' : '✓ valid'; }
+  function mdEvent(evt) {
+    var go = mdShould(evt);
+    if (evt === 'change') {
+      if (go) { mdCheck(); mdLog('typing → asks the schema → ' + mdVerdict(), md.error ? 'warn' : 'ok'); }
+      else {
+        md.typed++;
+        var t = 'typing… no check yet (' + md.typed + ' key' + (md.typed > 1 ? 's' : '') + ')';
+        if (md.line) md.line.textContent = t; else md.line = Track.log($('md-log'), t, 'dim');
+      }
+    } else if (evt === 'blur') {
+      md.touched = true;
+      if (go) { mdCheck(); mdLog('leaves the field → asks the schema → ' + mdVerdict(), md.error ? 'warn' : 'ok'); }
+      else mdLog('leaves the field → no check (' + md.mode + ')', 'dim');
+    } else {
+      md.submitted = true;
+      mdCheck();
+      mdLog(md.error ? 'Send → handleSubmit → ' + mdVerdict() + ' · onSubmit is NOT called' : 'Send → handleSubmit → ✓ valid · onSubmit(values) runs', md.error ? 'err' : 'ok');
+    }
+    mdRender();
+  }
+  function mdReset() {
+    md.submitted = false; md.touched = false; md.error = ''; md.checks = 0; md.line = null; md.typed = 0;
+    $('md-email').value = ''; $('md-slot').textContent = ''; $('md-email').classList.remove('is-bad');
+    Track.clear($('md-log')); mdRender();
+  }
+  $('md-email').addEventListener('input', function () { mdEvent('change'); });
+  $('md-email').addEventListener('blur', function () { mdEvent('blur'); });
+  $('md-send').addEventListener('click', function () { mdEvent('submit'); });
+  $('md-reset').addEventListener('click', mdReset);
+  $('md-mode').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-m]'); if (!b) return;
+    md.mode = b.getAttribute('data-m');
+    Array.prototype.forEach.call($('md-mode').children, function (x) { x.classList.toggle('is-on', x === b); });
+    mdReset();
+  });
+  Deck.onSlide('mode', { leave: mdReset });
+  mdRender();
+
+  /* ---------- 3 · the click that disappears (real mouse events, nothing is simulated) ---------- */
+  var sl = { lost: 0, ok: 0, armed: false, timer: null };
+  function slLog(t, k) { Track.log($('sl-log'), t, k); }
+  function slCount() { $('sl-lost').textContent = sl.lost; $('sl-ok').textContent = sl.ok; }
+  $('sl-email').addEventListener('blur', function () {
+    var bad = !EMAIL_RE.test($('sl-email').value), msg = $('sl-msg');
+    if (!bad) { msg.textContent = ''; msg.classList.remove('is-open'); slLog('“Email” loses focus → the schema says ✓ valid', 'ok'); return; }
+    var reserved = $('sl-form').classList.contains('is-slot');
+    msg.textContent = 'Enter a valid email address';
+    msg.classList.add('is-open');
+    slLog('“Email” loses focus → ✗ message appears' + (reserved ? ' (the line was reserved: nothing moves)' : ' (+56 px: the button moves down!)'), reserved ? 'dim' : 'warn');
+  });
+  $('sl-send').addEventListener('mousedown', function () {
+    sl.armed = true;
+    slLog('press on “Send” (mousedown)', 'dim');
+    clearTimeout(sl.timer);
+    sl.timer = setTimeout(function () {
+      if (!sl.armed) return;
+      sl.armed = false; sl.lost++; slCount();
+      slLog('✗ no click: press and release were not on the same element', 'err');
+    }, 700);
+  });
+  document.addEventListener('mouseup', function (e) {
+    if (!sl.armed) return;
+    var on = e.target.closest ? e.target.closest('#sl-send') : null;
+    slLog(on ? 'release on “Send” (mouseup)' : 'release on empty space: the button is no longer under the mouse', on ? 'dim' : 'warn');
+  }, true);
+  $('sl-send').addEventListener('click', function () {
+    if (!sl.armed) return;
+    sl.armed = false; clearTimeout(sl.timer); sl.ok++; slCount();
+    slLog('click ✓ → the form is sent', 'ok');
+    $('sl-done').textContent = 'Sent ✓';
+    setTimeout(function () { $('sl-done').textContent = ''; }, 1400);
+  });
+  function slReset() {
+    sl.lost = 0; sl.ok = 0; sl.armed = false; clearTimeout(sl.timer); slCount();
+    $('sl-email').value = ''; $('sl-msg').textContent = ''; $('sl-msg').classList.remove('is-open'); $('sl-done').textContent = '';
+    Track.clear($('sl-log'));
+  }
+  $('sl-reset').addEventListener('click', slReset);
+  $('sl-mode').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-m]'); if (!b) return;
+    Array.prototype.forEach.call($('sl-mode').children, function (x) { x.classList.toggle('is-on', x === b); });
+    document.querySelector('.sl').classList.toggle('is-slot', b.getAttribute('data-m') === 'slot');
+    $('sl-form').classList.toggle('is-slot', b.getAttribute('data-m') === 'slot');
+    slReset();
+  });
+  Deck.onSlide('slot', { leave: slReset });
+  slCount();
+
+  /* ---------- 4 · three steps, and Back loses everything ---------- */
+  var SLOTS = ['18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00'];
+  var wz = { mode: 'own', step: 0, form: { seats: 2, arrival: '19:00', special: [] } };
+  function wzRow(g) {
+    return '<div class="fm__guest"><input class="fm__input" data-k="name" placeholder="Name" value="' + esc(g.name) + '"><input class="fm__input" data-k="need" placeholder="no nuts…" value="' + esc(g.need) + '"><button type="button" class="fm__x" data-rm aria-label="Remove this guest">✕</button></div>';
+  }
+  function wzSentence() {
+    var f = wz.form, s = 'Table of ' + f.seats + ', arriving ' + f.arrival + '.';
+    f.special.forEach(function (g) { if (g.name || g.need) s += ' ' + g.name + ': ' + g.need + '.'; });
+    return s;
+  }
+  function wzState() {
+    $('wz-state').innerHTML = wz.mode === 'one'
+      ? '<span class="k">// the form, above the steps</span>\nseats:    <b>' + wz.form.seats + '</b>\narrival:  <b>"' + wz.form.arrival + '"</b>\nspecial:  <b>' + (wz.form.special.length ? '[' + wz.form.special.map(function (g) { return '{ ' + esc(g.name) + ': ' + esc(g.need) + ' }'; }).join(', ') + ']' : '[]') + '</b>'
+      : '<span class="k">// what the page knows</span>\n<span class="bad">nothing</span>\n<span class="k">// each step keeps its own state,\n// and loses it when it leaves</span>';
+    var one = wz.mode === 'one';
+    $('wz-note').className = 'callout ' + (one ? 'is-good' : 'is-bad');
+    $('wz-note-h').textContent = one ? 'Back is free.' : 'The review sees nothing.';
+    $('wz-note-p').textContent = one ? 'The form sits above the steps. A step can come and go: the values stay.' : 'Each step is a component, and a component\'s state dies when it leaves the screen.';
+  }
+  function wzRender() {
+    var f = wz.mode === 'one' ? wz.form : { seats: 2, arrival: '19:00', special: [] };
+    var title = ['Your table', 'Special needs', 'Check it'][wz.step];
+    var h = '<p class="fm__step">Step ' + (wz.step + 1) + ' of 3 · ' + title + '</p>';
+    if (wz.step === 0) {
+      h += '<div class="fm__field">How many seats?<div class="fm__stepper"><button type="button" data-d="-1" aria-label="One less">−</button><output id="wz-seats">' + f.seats + '</output><button type="button" data-d="1" aria-label="One more">+</button></div></div>';
+      h += '<label class="fm__field">Arriving at<select class="fm__input" id="wz-arr">' + SLOTS.map(function (s) { return '<option' + (s === f.arrival ? ' selected' : '') + '>' + s + '</option>'; }).join('') + '</select></label>';
+    } else if (wz.step === 1) {
+      h += '<div class="fm__guests" id="wz-guests">' + f.special.map(wzRow).join('') + '</div><div><button type="button" class="fm__ghost" data-add>Add a guest</button></div>';
+    } else {
+      h += '<div class="fm__review"><p class="fm__k">What the kitchen will read</p><p>' + esc(wz.mode === 'one' ? wzSentence() : 'Table of ?, arriving ?.') + '</p></div>';
+    }
+    h += '<div class="fm__actions">' + (wz.step > 0 ? '<button type="button" class="fm__ghost" data-back>Back</button>' : '') +
+      (wz.step < 2 ? '<button type="button" class="fm__btn" data-next>Next</button>' : '<button type="button" class="fm__btn" data-save>Save the notes</button>') + '</div>';
+    $('wz-card').innerHTML = h;
+    wzState();
+  }
+  function wzSync() {
+    if (wz.mode !== 'one') return;
+    var g = $('wz-guests');
+    if (g) wz.form.special = Array.prototype.map.call(g.children, function (r) { return { name: r.querySelector('[data-k="name"]').value, need: r.querySelector('[data-k="need"]').value }; });
+    var s = $('wz-seats'); if (s) wz.form.seats = Number(s.textContent);
+    var a = $('wz-arr'); if (a) wz.form.arrival = a.value;
+    wzState();
+  }
+  $('wz-card').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    if (b.hasAttribute('data-d')) {
+      var out = $('wz-seats'); out.textContent = Math.max(1, Math.min(8, Number(out.textContent) + Number(b.getAttribute('data-d')))); wzSync();
+    } else if (b.hasAttribute('data-next')) { wzSync(); wz.step++; wzRender(); }
+    else if (b.hasAttribute('data-back')) { wzSync(); wz.step--; wzRender(); }
+    else if (b.hasAttribute('data-add')) { $('wz-guests').insertAdjacentHTML('beforeend', wzRow({ name: '', need: '' })); wzSync(); }
+    else if (b.hasAttribute('data-rm')) { b.closest('.fm__guest').remove(); wzSync(); }
+    else if (b.hasAttribute('data-save')) { Deck.toast('Saved. (In the real page this goes to the cart store.)'); }
+  });
+  $('wz-card').addEventListener('input', wzSync);
+  $('wz-card').addEventListener('change', wzSync);
+  function wzReset() { wz.step = 0; wz.form = { seats: 2, arrival: '19:00', special: [] }; wzRender(); }
+  $('wz-mode').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-m]'); if (!b) return;
+    wz.mode = b.getAttribute('data-m');
+    Array.prototype.forEach.call($('wz-mode').children, function (x) { x.classList.toggle('is-on', x === b); });
+    wzReset();
+  });
+  Deck.onSlide('wizard', { leave: wzReset });
+  wzRender();
+
+  /* ---------- 5 · the phone number: ask the server at every key, or once ---------- */
+  // made-up delays, one per digit typed, so that the answers come back in another order than the questions
+  var LAT = { 1: 900, 2: 1500, 3: 700, 4: 1400, 5: 600, 6: 1300, 7: 500, 8: 1100, 9: 900 };
+  var TAKEN = '555123456', FORMAT_MSG = 'A Georgian mobile number, like 599 12 34 56';
+  function makePhone(rootId, withToggles) {
+    var root = $(rootId), opt = { abort: false, blur: false, cache: false };
+    var S = { keys: 0, req: 0, ans: 0, pending: 0, shown: '', timers: [], cache: {}, typing: null };
+    var opts = withToggles
+      ? '<div class="ph__opts">' +
+        '<label class="ph__opt"><input type="checkbox" data-opt="abort"><span><b>Format first</b> <code>abort: true</code></span></label>' +
+        '<label class="ph__opt"><input type="checkbox" data-opt="blur"><span><b>Only when leaving the field</b> <code>mode: "onBlur"</code></span></label>' +
+        '<label class="ph__opt"><input type="checkbox" data-opt="cache"><span><b>Remember the answers</b> <code>a Map</code></span></label></div>' : '';
+    root.innerHTML =
+      '<div class="ph__left">' + opts +
+      '<div class="fm"><label class="fm__field">Mobile phone<input class="fm__input" data-r="input" inputmode="numeric" autocomplete="off" placeholder="599 12 34 56"></label><div class="fm__slot" data-r="msg"></div><button type="button" class="fm__btn" data-r="send">Send</button></div>' +
+      '<div class="row" style="--gap:10px"><button type="button" class="btn is-wine" data-r="type">' + Deck.icon('keyboard') + 'Type 555123456</button><button type="button" class="btn is-ghost" data-r="reset">' + Deck.icon('rotate-ccw') + 'Reset</button></div></div>' +
+      '<div class="ph__right"><div class="counters"><div><b data-r="n-keys">0</b><span>digits typed</span></div><div><b data-r="n-req">0</b><span>requests sent</span></div><div><b data-r="n-ans">0</b><span>answers shown</span></div></div>' +
+      '<div class="devtools" data-r="log"><div class="devtools__head"><b>Network</b><span>GET check-phone, in order</span></div><div class="devtools__body"></div></div>' +
+      '<p class="ph__verdict" data-r="verdict"></p></div>';
+    var r = function (k) { return root.querySelector('[data-r="' + k + '"]'); };
+    function digits(v) { return v.replace(/\D/g, '').replace(/^995/, ''); }
+    function render() {
+      r('n-keys').textContent = S.keys; r('n-req').textContent = S.req; r('n-ans').textContent = S.ans;
+      var m = r('msg');
+      m.className = 'fm__slot' + (S.pending ? ' is-hint' : (S.shown.charAt(0) === '✓' ? ' is-ok' : ''));
+      m.textContent = S.pending ? 'Checking this number…' : S.shown;
+      var d = digits(r('input').value), truth = d === TAKEN ? 'This number already has an account' : '✓ looks free';
+      var v = r('verdict');
+      if (S.pending || !S.ans || (S.shown === FORMAT_MSG)) { v.className = 'ph__verdict'; v.textContent = S.pending ? 'Waiting for the server…' : ''; return; }
+      var right = S.shown === truth;
+      v.className = 'ph__verdict ' + (right ? 'is-good' : 'is-bad');
+      v.textContent = right ? '✓ The guest sees the right answer.' : '✗ The guest sees “' + S.shown + '”, but ' + (d === TAKEN ? '555123456 already has an account.' : 'the number is free.');
+    }
+    function ask(d) {
+      if (opt.cache && S.cache[d]) { Track.log(r('log'), '(remembered ' + d + ': no request)', 'dim'); S.cache[d].then(function () {}); return; }
+      var n = d.length, ms = LAT[n] || 900, t0 = Date.now(), seq = ++S.req;
+      S.pending++;
+      Track.log(r('log'), '→ #' + seq + ' check-phone?number=' + d, 'dim');
+      var p = new Promise(function (resolve) {
+        S.timers.push(setTimeout(function () {
+          var taken = d === TAKEN;
+          S.pending--; S.ans++; S.shown = taken ? 'This number already has an account' : '✓ looks free';
+          Track.log(r('log'), '← #' + seq + ' ' + d + ': ' + (taken ? 'TAKEN' : 'free') + ' (' + ((Date.now() - t0) / 1000).toFixed(1) + ' s)', taken ? 'warn' : 'ok');
+          render(); resolve();
+        }, ms));
+      });
+      if (opt.cache) S.cache[d] = p;
+      render();
+    }
+    function validate(evt) {
+      var d = digits(r('input').value);
+      if (opt.blur && evt === 'change') return;   // mode onBlur: nothing while typing
+      if (!opt.blur && evt === 'blur') return;    // any other mode: leaving the field asks nothing new
+      if (!d) return;
+      if (opt.abort && !/^5\d{8}$/.test(d)) { S.shown = FORMAT_MSG; Track.log(r('log'), 'format is wrong → stop here, no request', 'dim'); render(); return; }
+      ask(d);
+    }
+    function reset() {
+      S.timers.forEach(clearTimeout); clearInterval(S.typing); S.timers = [];
+      S.keys = 0; S.req = 0; S.ans = 0; S.pending = 0; S.shown = ''; S.cache = {};
+      r('input').value = ''; Track.clear(r('log')); render();
+    }
+    r('input').addEventListener('input', function () { S.keys++; validate('change'); render(); });
+    r('input').addEventListener('blur', function () { if (r('input').value) validate('blur'); });
+    r('send').addEventListener('click', function () { if (r('input').value) { Track.log(r('log'), 'Send → validate again', 'dim'); validate('submit'); } });
+    r('reset').addEventListener('click', reset);
+    r('type').addEventListener('click', function () {
+      reset();
+      var i = 0, el = r('input');
+      el.focus();
+      S.typing = setInterval(function () {
+        if (i >= TAKEN.length) { clearInterval(S.typing); setTimeout(function () { el.blur(); }, 150); return; }
+        el.value += TAKEN.charAt(i); i++; S.keys++; validate('change'); render();
+      }, 120);
+    });
+    root.addEventListener('change', function (e) {
+      var o = e.target.getAttribute && e.target.getAttribute('data-opt'); if (!o) return;
+      opt[o] = e.target.checked; reset();
+    });
+    render();
+    return { reset: reset };
+  }
+  var ph1 = makePhone('ph1', false), ph2 = makePhone('ph2', true);
+  Deck.onSlide('phonebad', { leave: ph1.reset });
+  Deck.onSlide('phone', { leave: ph2.reset });
+})();
+</script>
+</body>
+</html>

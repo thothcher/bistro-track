@@ -69,6 +69,27 @@ Test users: **emilys / emilyspass** (admin), **averyp / averyppass** (user). Mor
 
 The exact tasks and grading of each version are in the lecture's `homework.md`.
 
+### 3b. The second five: v0.6 to v1.0
+
+The row "L32–L38" above is spelled out here, one version after every lecture of the second five (L32 to L36 in the track):
+
+| After | Version | What your shop can do | Le Bistro on screen |
+|---|---|---|---|
+| L32 | **v0.6** | The cart and the session live in Zustand stores (with `persist`), every component reads them with a selector, and the context providers are gone | One store, no provider |
+| L33 | **v0.7** | A login and a sign-up with React Hook Form and Zod schemas, error messages from the schema, and a form in steps or a dynamic list (Plus) | A sign-up, a login, table notes |
+| L34 | **v0.8** | All server data on TanStack Query: one `queryClient`, `queryOptions`, keys that list what their functions use, a smooth category change, prefetch on hover, a retry rule | The menu fetched once |
+| L35 | **v0.9** | A "Place order" mutation (`POST /carts/add`) with a guard, `invalidateQueries` and one global error toast; an optimistic heart (Plus); an infinite list (Pro) | Orders, "My orders", the kitchen's buttons |
+| L36 | **v1.0** | shadcn/ui, the cart as a `Sheet` you can use with a keyboard, a skip link, titles on every dialog, Sonner; Plus: a quick look, an account menu, a confirmation; Pro: role tokens and measured contrast | An accessible UI |
+
+v1.0 is the version the next lectures test and speed up, so keep it tidy. (The numbers in the main table and in sections 1 to 6 use the older syllabus numbering: in the current syllabus the Admin Dashboard is L42–L45 and Demo Day is L45.)
+
+### 3c. The third five: v1.1 and on
+
+| After | Version | What your shop can do | Le Bistro on screen |
+|---|---|---|---|
+| L37 | **v1.1** | A net under the shop: Vitest, jsdom, Testing Library and user-event set up; at least six tests (three for the cart logic, two for components found by role, label or text, one for a form or a hook), a table in the README of three things you broke on purpose and which test went red; Plus: a fake kitchen with MSW (loading, error with retry, empty); Pro: a GitHub Actions workflow with a red check and a green check | 115 tests and a robot |
+| L38 | **v1.2** | Faster and harder to break, with numbers: a before/after table in the README (at least two rows: the action, renders or kilobytes before and after, what you changed, how you measured); every page except the first ones with `lazy()`, one `Suspense` skeleton, and `npm run build` printing a file per page; an error boundary around the page (`resetKeys`, `onError`); Plus: lazy photos and a high-priority hero, a boundary around each product card with a test, a size budget in CI; Pro: a virtual list or paging for the 194 products with the element count before and after, a `vite:preloadError` handler with a test, the compiler with its report | a search box that keeps its text, a kitchen with 800 orders, a size check |
+
 ## 4. Rules
 
 **Tools:** Node.js 24 LTS (React Router 8 needs 22.22 or newer), VS Code, Git, a GitHub and a Vercel account. Start with `npm create vite@latest my-shop -- --template react-ts`.

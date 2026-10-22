@@ -1,0 +1,1746 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La chambre froide · L34</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Karla:ital,wght@0,400..800;1,400..800&family=JetBrains+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="../_shared/deck.css">
+<link rel="stylesheet" href="../track.css">
+<style>
+/* ---------- L33 only ---------- */
+.sofar { display: flex; align-items: center; gap: 12px; margin-top: 18px; font: 700 14px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+.sofar b { color: var(--good); }
+.sofar span { padding: 8px 12px; background: color-mix(in srgb, var(--good) 12%, transparent); color: var(--good); border-radius: 999px; }
+
+.state { background: #1d1816; color: #e9dcc8; border-radius: 12px; padding: 16px 20px; font: 500 18px/1.55 var(--f-mono); white-space: pre; box-shadow: var(--shadow-1); overflow: hidden; }
+.state b { color: #f3cd83; font-weight: 600; }
+.state .k { color: #9c8f84; }
+.state .bad { color: #ffb4a8; }
+.state .ok { color: #b9d89a; }
+.why3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 24px; }
+.why3 .takeaway { padding: 16px 22px; }
+.why3 .takeaway p { font-size: 21px; line-height: 1.4; }
+.idea__side.is-tight .takeaway { padding: 16px 22px; }
+.idea__side.is-tight .takeaway p { font-size: 21px; line-height: 1.4; }
+.ph__verdict:empty { display: none; }
+.is-render { animation: rflash .9s ease; }
+@keyframes rflash { 0% { box-shadow: 0 0 0 5px #f3cd83; background: #fbe9c2; } 100% { box-shadow: 0 0 0 0 transparent; } }
+.counters { display: flex; gap: 12px; }
+.counters div { flex: 1; padding: 12px 14px; background: var(--surface-2); border-radius: 10px; }
+.counters b { display: block; font: 700 34px/1 var(--f-mono); color: var(--wine); }
+.counters span { font: 700 12px/1.3 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+.seg.is-modes button { font-size: 17px; padding: 12px 16px; }
+
+/* diagrams */
+.stor .node { min-width: 0; }
+.stor .node.is-sub { box-shadow: var(--shadow-1), 0 0 0 3px var(--good); background: color-mix(in srgb, var(--good) 12%, var(--surface)); }
+.stor .node.is-quiet { opacity: .45; }
+
+/* the little Le Bistro form used in the demos: the same look as the real one */
+.fm { position: relative; display: flex; flex-direction: column; gap: 12px; padding: 22px 26px 24px; background: #fdfaf2; border: 1px solid #ddd2bf; border-radius: 6px; box-shadow: var(--shadow-1); color: #2e2a26; font-family: var(--f-body); }
+.fm--wide { min-height: 440px; }
+.fm__field { display: flex; flex-direction: column; gap: 6px; font: 600 16px/1.2 var(--f-body); color: #2e2a26; }
+.fm__input { width: 100%; box-sizing: border-box; padding: 11px 13px; border: 1px solid #ddd2bf; border-radius: 0; background: #f6f1e7; font: 400 20px/1.2 var(--f-body); color: #2e2a26; outline: none; }
+.fm__input:focus { border-color: #2e2a26; box-shadow: 0 0 0 3px rgba(46, 42, 38, .12); }
+.fm__input.is-bad { border-color: #a93b2c; }
+.fm__slot { min-height: 22px; font: 400 16px/1.35 var(--f-body); color: #a93b2c; }
+.fm__slot.is-hint { color: #6e645a; }
+.fm__slot.is-ok { color: #3f6b4a; }
+.fm__btn { appearance: none; border: 0; cursor: pointer; padding: 15px 18px; border-radius: 0; background: #5c1a23; color: #fdfaf2; font: 700 17px/1 var(--f-body); }
+.fm__ghost { appearance: none; cursor: pointer; padding: 13px 18px; background: transparent; border: 1px solid #5c1a23; color: #5c1a23; font: 700 16px/1 var(--f-body); border-radius: 0; }
+.fm__step { margin: 0; font: 700 14px/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: #a98545; }
+.fm__done { margin: 0; min-height: 20px; font: 600 16px/1.3 var(--f-body); color: #3f6b4a; }
+.fm__actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: auto; padding-top: 10px; }
+.fm__stepper { display: inline-flex; align-items: center; align-self: flex-start; border: 1px solid #ddd2bf; background: #f6f1e7; }
+.fm__stepper button { appearance: none; border: 0; background: transparent; cursor: pointer; padding: 8px 16px; font: 700 22px/1 var(--f-body); color: #2e2a26; }
+.fm__stepper output { min-width: 40px; text-align: center; font: 700 22px/1 var(--f-body); }
+.fm__guests { display: flex; flex-direction: column; gap: 10px; }
+.fm__guest { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+.fm__guest .fm__input { font-size: 18px; padding: 9px 11px; }
+.fm__x { appearance: none; border: 0; background: transparent; cursor: pointer; padding: 6px 10px; font: 400 20px/1 var(--f-body); color: #6e645a; }
+.fm__review { padding: 14px 16px; background: #f6f1e7; border: 1px solid #ddd2bf; }
+.fm__review p { margin: 0; font: 500 20px/1.4 var(--f-body); }
+.fm__review .fm__k { font: 700 13px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: #a98545; margin-bottom: 8px; }
+.fm.is-render { animation: rflash .9s ease; }
+
+/* problem 1: type, count the renders */
+.kd { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 430px; gap: 34px; margin-top: 20px; align-items: start; }
+.kd__col { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.kd__h { margin: 0; display: flex; flex-direction: column; gap: 4px; }
+.kd__h b { font: 700 24px/1.1 var(--f-body); color: var(--wine); }
+.kd__h span { font: 500 17px/1.2 var(--f-mono); color: var(--ink-3); }
+.kd__num { display: flex; align-items: baseline; gap: 16px; padding: 12px 22px; background: var(--surface); border-radius: var(--card-r); box-shadow: var(--shadow-1); border-left: 5px solid var(--wine); }
+.kd__num b { font: 700 84px/1 var(--f-mono); color: var(--wine); }
+.kd__num.is-good { border-left-color: var(--good); }
+.kd__num.is-good b { color: var(--good); }
+.kd__num span { font: 700 14px/1.3 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+.kd__side { display: flex; flex-direction: column; gap: 16px; }
+.kd .state { font-size: 17px; min-height: 126px; }
+
+/* solution 1: when does the error show / the click that disappears */
+.md, .sl, .wz, .ph { display: grid; grid-template-columns: 600px minmax(0, 1fr); gap: 40px; margin-top: 20px; align-items: start; }
+.wz { grid-template-columns: 640px minmax(0, 1fr); }
+.md__left, .sl__left, .wz__left, .ph__left { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.md__right, .sl__right, .wz__right, .ph__right { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.md .state { font-size: 19px; }
+.md .devtools__body, .sl .devtools__body, .ph .devtools__body { min-height: 290px; max-height: 290px; }
+#sl-msg { min-height: 0; }
+#sl-msg.is-open, .sl.is-slot #sl-msg { min-height: 56px; }
+.sl .fm { gap: 10px; }
+
+/* problem 2: the wizard and the phone number */
+.wz .state { font-size: 19px; min-height: 150px; }
+.ph__opts { display: flex; flex-direction: column; gap: 8px; }
+.ph__opt { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: var(--surface); border-radius: 10px; box-shadow: var(--shadow-1); font: 600 19px/1.25 var(--f-body); cursor: pointer; }
+.ph__opt input { width: 22px; height: 22px; accent-color: var(--wine); flex: none; }
+.ph__opt code { font-size: 16px; }
+.ph__verdict { margin: 0; padding: 12px 16px; border-radius: 10px; font: 600 19px/1.35 var(--f-body); background: var(--surface); box-shadow: var(--shadow-1); min-height: 30px; color: var(--ink-2); }
+.ph__verdict.is-bad { color: var(--bad); }
+.ph__verdict.is-good { color: var(--good); }
+
+/* the page at the end */
+.map2 { display: grid; grid-template-columns: 560px minmax(0, 1fr); gap: 44px; margin-top: 24px; align-items: start; }
+.statemap { width: 100%; border-collapse: collapse; font-size: 20px; }
+.statemap th { text-align: left; font: 700 13px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--brass); padding: 0 12px 10px 0; }
+.statemap td { padding: 10px 12px 10px 0; border-top: 1px solid var(--line); vertical-align: top; line-height: 1.35; }
+.statemap td:first-child { font-weight: 600; }
+.statemap code { font-size: 16px; }
+.flips.is-small .flip__face .code { --code-size: 17px; }
+
+/* ---------- L34 only ---------- */
+.skel { background: linear-gradient(90deg, #ece4d3 0%, #f6f1e7 50%, #ece4d3 100%); background-size: 200% 100%; animation: shimmer 1.2s linear infinite; border-radius: 6px; min-height: 22px; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+.skel-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.skel-grid .skel { height: 110px; }
+.chips-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.cbtn { appearance: none; cursor: pointer; padding: 11px 18px; border-radius: 999px; border: 1px solid #ddd2bf; background: #fdfaf2; color: #2e2a26; font: 600 18px/1 var(--f-body); }
+.cbtn.is-on { background: #5c1a23; border-color: #5c1a23; color: #fdfaf2; }
+.cbtn small { font: 500 13px/1 var(--f-mono); opacity: .65; margin-left: 8px; }
+
+/* problem 1: home, menu, a dish */
+.ws { display: grid; grid-template-columns: 700px minmax(0, 1fr); gap: 40px; margin-top: 20px; align-items: start; }
+.ws__left, .ws__right { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.ws__nav { display: flex; gap: 8px; padding: 12px 16px; background: #efe7d8; border-bottom: 1px solid #ddd2bf; }
+.ws__nav button { appearance: none; border: 1px solid #5c1a23; background: transparent; color: #5c1a23; padding: 9px 16px; font: 700 16px/1 var(--f-body); cursor: pointer; }
+.ws__nav button.is-ghost { border-color: #ddd2bf; color: #6e645a; }
+.ws__nav button.is-on { background: #5c1a23; color: #fdfaf2; }
+.ws__page { min-height: 300px; }
+.ws__page h3 { margin: 0 0 12px; font: 600 28px/1 var(--f-display); color: #5c1a23; }
+.ws__page .mgrid .mcard img { aspect-ratio: 16 / 8; }
+.ws__page .mcard__body { padding: 8px 10px 10px; gap: 3px; }
+.ws__page .mcard__title { font-size: 17px; }
+.ws__dish { max-width: 340px; display: flex; flex-direction: column; gap: 8px; }
+
+/* solution 1: the lifecycle */
+.lc, .kl, .sw, .qu, .rt, .lk { display: grid; gap: 40px; margin-top: 20px; align-items: start; }
+.lc { grid-template-columns: 700px minmax(0, 1fr); }
+.lc__left, .lc__right, .kl__left, .kl__right, .sw__left, .sw__right, .qu__left, .qu__right, .rt__left, .rt__right, .lk__left, .lk__right { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.lcbars { display: flex; flex-direction: column; gap: 18px; padding: 18px 22px; background: var(--surface); border-radius: var(--card-r); box-shadow: var(--shadow-1); }
+.lcbar { display: grid; grid-template-columns: minmax(0, 1fr) 150px; column-gap: 14px; row-gap: 8px; align-items: center; }
+.lcbar__k { grid-column: 1 / -1; margin: 0; font: 700 15px/1.2 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+.lcbar__k small { font: 500 14px/1 var(--f-mono); color: var(--ink-3); letter-spacing: 0; text-transform: none; margin-left: 10px; }
+.lcbar__track { position: relative; height: 32px; background: #ece4d3; border-radius: 6px; overflow: hidden; }
+.lcbar__ok { position: absolute; left: 0; top: 0; bottom: 0; width: 25%; background: color-mix(in srgb, var(--good) 24%, transparent); }
+.lcbar__fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--good); transition: width .2s linear, background-color .3s; }
+.lcbar__fill.is-stale { background: var(--warn); }
+.lcbar__fill.is-gc { background: var(--brass); }
+.lcbar__mark { position: absolute; top: 50%; transform: translateY(-50%); padding: 0 8px; font: 700 13px/1 var(--f-mono); color: var(--ink-2); z-index: 1; }
+.lcbar__mark[style*="left:100%"] { transform: translate(-100%, -50%); }
+.lcbar b { font: 700 18px/1.1 var(--f-mono); color: var(--wine); text-align: right; }
+.lc__screen { min-height: 200px; padding: 16px 20px; background: #fdfaf2; border: 1px solid #ddd2bf; border-radius: 6px; color: #2e2a26; }
+.lc__screen h4, .kl__screen h4, .lk__screen h4 { margin: 0 0 12px; font: 700 14px/1.2 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: #a98545; }
+.lc__dishes { display: flex; flex-direction: column; gap: 8px; }
+.lc__dish { padding: 10px 14px; background: #f6f1e7; border: 1px solid #ddd2bf; font: 600 20px/1.2 var(--f-body); }
+.lc .state { font-size: 18px; }
+.lc .devtools__body, .kl .devtools__body, .rt .devtools__body, .sw .devtools__body, .qu .devtools__body, .ws .devtools__body { min-height: 190px; max-height: 190px; }
+
+/* solution 1: the key lab */
+.kl { grid-template-columns: 640px minmax(0, 1fr); }
+.kl__screen { min-height: 250px; padding: 16px 20px; background: #fdfaf2; border: 1px solid #ddd2bf; border-radius: 6px; color: #2e2a26; }
+.kl__list { margin: 0; padding-left: 22px; font: 600 21px/1.5 var(--f-body); }
+.kl__bad { margin: 12px 0 0; padding: 10px 14px; background: color-mix(in srgb, var(--bad) 12%, transparent); color: var(--bad); font: 700 18px/1.3 var(--f-body); border-radius: 6px; }
+.kl__cache { background: #1d1816; color: #e8dccb; border-radius: 12px; box-shadow: var(--shadow-2); overflow: hidden; font: 500 17px/1.45 var(--f-mono); }
+.kl__cache table { width: 100%; border-collapse: collapse; }
+.kl__cache th { text-align: left; padding: 10px 16px; background: #2a2320; color: #9c8f84; font: 700 13px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; }
+.kl__cache td { padding: 10px 16px; border-top: 1px solid rgba(255, 255, 255, .06); }
+.kl__cache td.k { color: #9c8f84; }
+.kl__cache tr.is-hit td { background: rgba(185, 216, 154, .16); }
+
+/* solution 1: the devtools screenshot */
+.dt { display: grid; grid-template-columns: 1040px minmax(0, 1fr); gap: 40px; margin-top: 16px; align-items: start; }
+.dt__side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+/* problem 2 and solution 2: switching a category */
+.sw { grid-template-columns: 740px minmax(0, 1fr); }
+.sw__screen { position: relative; min-height: 300px; padding: 14px 16px; background: #fdfaf2; border: 1px solid #ddd2bf; border-radius: 6px; color: #2e2a26; }
+.sw__h { margin: 0 0 10px; font: 600 26px/1 var(--f-display); color: #5c1a23; }
+.sw__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; transition: opacity .25s; }
+.sw__screen.is-dim .sw__grid { opacity: .4; }
+.sw__grid .mcard img { aspect-ratio: 16 / 7; }
+.sw__grid .mcard__body { padding: 8px 10px 10px; gap: 3px; }
+.sw__grid .mcard__title { font-size: 16px; }
+.sw__badge { position: absolute; top: 12px; right: 14px; z-index: 3; padding: 8px 14px; background: #1d1816; color: #f3cd83; font: 700 15px/1 var(--f-mono); border-radius: 999px; }
+.sw .counters b { font-size: 30px; }
+.sw .cbtn { font-size: 16px; padding: 10px 14px; }
+.sw .cbtn small { margin-left: 6px; font-size: 12px; }
+
+/* problem 2 and solution 2: the kitchen's queue */
+.qu { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.qu__page { padding: 16px 20px 18px; background: #fdfaf2; border: 1px solid #ddd2bf; border-radius: 6px; color: #2e2a26; display: flex; flex-direction: column; gap: 12px; }
+.qu__head { display: flex; justify-content: space-between; align-items: center; }
+.qu__head b { font: 600 28px/1 var(--f-display); color: #5c1a23; }
+.qu__chip { padding: 7px 12px; background: #ece4d3; font: 700 14px/1 var(--f-mono); border-radius: 999px; color: #6e645a; }
+.qu__chip.is-busy { background: #1d1816; color: #f3cd83; }
+.qu__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; min-height: 250px; }
+.qu__order { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #f6f1e7; border: 1px solid #ddd2bf; font: 500 19px/1.2 var(--f-body); }
+.qu__order em { margin-left: 12px; font: 700 12px/1 var(--f-mono); font-style: normal; letter-spacing: .08em; color: #a98545; }
+.qu__order i { font: 700 15px/1 var(--f-mono); font-style: normal; color: #6e645a; }
+.qu__order.is-new { animation: rflash 1.2s ease; }
+
+/* solution 2: the retry rule */
+.rt { grid-template-columns: 700px minmax(0, 1fr); }
+.rt__btns { display: flex; flex-wrap: wrap; gap: 10px; }
+.rt__btns .btn { height: 48px; font-size: 14px; padding: 0 16px; }
+.rt__line { position: relative; height: 110px; background: var(--surface); border-radius: var(--card-r); box-shadow: var(--shadow-1); margin: 0 0 0 0; overflow: hidden; }
+.rt__axis { position: absolute; left: 4%; right: 4%; top: 46px; height: 3px; background: #ddd2bf; }
+.rt__tick { position: absolute; top: 76px; transform: translateX(-50%); font: 700 13px/1 var(--f-mono); color: var(--ink-3); }
+.rt__dot, .rt__end { position: absolute; top: 31px; transform: translateX(-50%); width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font: 700 16px/1 var(--f-mono); }
+.rt__dot { background: var(--wine); color: #fff; }
+.rt__end { background: var(--bad); color: #fff; box-shadow: 0 0 0 5px color-mix(in srgb, var(--bad) 25%, transparent); }
+.rt__end.is-ok { background: var(--good); box-shadow: 0 0 0 5px color-mix(in srgb, var(--good) 25%, transparent); }
+
+/* solution 2: two guests, one cache */
+.lk { grid-template-columns: 640px minmax(0, 1fr); }
+.lk__screen { min-height: 230px; padding: 16px 20px; background: #fdfaf2; border: 1px solid #ddd2bf; border-radius: 6px; color: #2e2a26; }
+.lk__dl { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 8px 14px; margin: 0; font: 500 20px/1.3 var(--f-body); }
+.lk__dl dt { font: 700 13px/1.6 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: #a98545; }
+.lk__dl dd { margin: 0; font-weight: 600; }
+
+/* the numbers at the end */
+.bn { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; margin-top: 24px; }
+.bn__c { padding: 18px 22px; background: var(--surface); border-radius: var(--card-r); box-shadow: var(--shadow-1); border-top: 5px solid var(--wine); display: flex; flex-direction: column; gap: 6px; }
+.bn__c b { font: 700 64px/1 var(--f-mono); color: var(--wine); }
+.bn__c span { font: 600 21px/1.3 var(--f-body); }
+.bn__c small { font: 500 17px/1.35 var(--f-body); color: var(--ink-3); }
+.bn__c small code { font-size: 15px; }
+</style>
+</head>
+<body>
+<div class="deck">
+<div class="stage">
+
+<!-- ============================== HELLO ============================== -->
+
+<section class="slide" data-phase="hello" id="cover" data-title="La chambre froide">
+  <div class="cover">
+    <div class="stack" style="--gap:24px">
+      <p class="cover__hello">Bonjour!</p>
+      <p class="eyebrow"><b>L34</b> React · lecture 9 · track 8 of 10 · syllabus L36</p>
+      <h1 class="display" style="font-size:150px">La chambre<br>froide</h1>
+      <p class="lead" style="max-width:930px">The cold room is where the kitchen keeps what it fetched from the market. Every box has a label and a date. Before a cook walks to the market again, they read the label: fresh enough? Use it. Too old? Fetch again, and keep serving from the shelf until the delivery arrives.</p>
+      <dl class="cover__meta">
+        <div><dt>Theme</dt><dd>TanStack Query: reading data</dd></div>
+        <div><dt>Le Bistro today</dt><dd>One cache for the menu, the profile, the queue</dd></div>
+        <div><dt>Your project</dt><dd>v0.8 · a cache for the API</dd></div>
+        <div><dt>Length</dt><dd>2 hours · one break</dd></div>
+      </dl>
+    </div>
+    <div class="plate">
+      <div class="plate__rim"></div>
+      <div class="plate__food"><img src="../_shared/img/dishes/champagne-brut.jpg" alt=""></div>
+      <div class="plate__tag"><small>la chambre froide</small>“a label and a date on everything”</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Bonjour! Last time the guests could type into Le Bistro. Today we look at the other direction: what comes back from the server, and what we do with it so that we do not fetch the same thing over and over.</p>
+    <p><b>The title:</b> "la chambre froide" is the cold room. A kitchen does not go to the market for every plate. It keeps what it bought, with a label and a date, and it decides by the date. That is a cache, and today it is called TanStack Query.</p>
+    <p><b>Numbers:</b> this deck is lecture L34 of the track and L36 in the syllabus. Your project is at v0.7 and moves to v0.8 today.</p>
+  </aside>
+</section>
+
+<section class="slide v-center" data-phase="hello" data-title="Today's menu">
+  <div class="menu-card">
+    <div class="menu-card__head"><p class="eyebrow">Le Bistro · L34 · 120 minutes</p><h2>Today's menu</h2></div>
+    <ol class="menu-card__list">
+      <li class="course"><span class="course__k">Accueil</span><span class="course__name">Hello <small>where Le Bistro is today</small></span><span class="course__t">3′</span></li>
+      <li class="course"><span class="course__k">Apéritif</span><span class="course__name">Questions <small>and two homework demos</small></span><span class="course__t">8′</span></li>
+      <li class="course"><span class="course__k">Entrée</span><span class="course__name">Problem 1 <small>the menu, loaded three times</small></span><span class="course__t">5′</span></li>
+      <li class="course"><span class="course__k">Plat</span><span class="course__name">A cache for the server's data <small>useQuery, keys, fresh and stale</small></span><span class="course__t">24′</span></li>
+      <li class="course"><span class="course__k">Atelier</span><span class="course__name">Classwork 1 <small>your product list in a cache</small></span><span class="course__t">15′</span></li>
+      <li class="course is-pause"><span class="course__k">Pause café</span><span class="course__name">Break <small>music on, screens off</small></span><span class="course__t">10′</span></li>
+      <li class="course"><span class="course__k">Second plat</span><span class="course__name">Problem 2 and a cache that behaves <small>blank screens, old queues, retries</small></span><span class="course__t">27′</span></li>
+      <li class="course"><span class="course__k">Atelier</span><span class="course__name">Classwork 2 with AI <small>prompt it, then check it</small></span><span class="course__t">15′</span></li>
+      <li class="course"><span class="course__k">Masterclass</span><span class="course__name">One prompt, the whole Le Bistro <small>CRAFT, then the short version</small></span><span class="course__t">8′</span></li>
+      <li class="course"><span class="course__k">Dessert</span><span class="course__name">Wrap-up <small>recap, homework, what comes next</small></span><span class="course__t">5′</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-phase="hello" data-title="Le Bistro, lecture by lecture">
+  <p class="eyebrow"><b>Route</b> The second five lectures</p>
+  <h2 class="h2 mt-s">Le Bistro, lecture by lecture</h2>
+  <p class="sofar"><b>Done</b><span>L27 components</span><span>L28 state</span><span>L29 effects</span><span>L30 routing</span><span>L31 context</span><span>L32 stores</span><span>L33 forms</span></p>
+  <div class="road" style="margin-top:30px">
+    <div class="stop is-done"><div class="stop__shot"><img src="../img/l32-cart.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L32 · done</p><p class="stop__t">Stores</p><p class="stop__d">Zustand. One cart and one session, outside React.</p></div>
+    <div class="stop is-done"><div class="stop__shot"><img src="../img/l33-register.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L33 · done</p><p class="stop__t">Forms</p><p class="stop__d">React Hook Form and Zod. A sign-up and a table slip.</p></div>
+    <div class="stop is-now"><div class="stop__shot"><img src="../img/l34-devtools.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L34 · today</p><p class="stop__t">Cache</p><p class="stop__d">TanStack Query. The menu is fetched once.</p></div>
+    <div class="stop"><div class="stop__shot"><img src="../img/l35-kitchen.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L35</p><p class="stop__t">Changes</p><p class="stop__d">Mutations, optimistic updates, endless lists.</p></div>
+    <div class="stop"><div class="stop__shot"><img src="../img/l36-sheet.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L36</p><p class="stop__t">UI</p><p class="stop__d">Accessible dialogs and shadcn/ui.</p></div>
+  </div>
+  <div class="lane" style="margin-top:28px">
+    <span class="lane__k">Your project</span>
+    <span class="lane__v"><b>v0.6 ✓</b>a store, not a provider</span>
+    <span class="lane__v"><b>v0.7 ✓</b>forms with a schema</span>
+    <span class="lane__v"><b>v0.8 · today</b>a cache for the API</span>
+    <span class="lane__v"><b>v0.9</b>orders and optimistic UI</span>
+    <span class="lane__v"><b>v1.0</b>accessible components</span>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Two lectures ago the cart got a pantry. Last time the guests got forms. Today the other half of the map: the server's data, the menu, the profile and the kitchen's queue, gets its own tool.</p>
+    <p><b>Do:</b> Point at today's picture: the TanStack DevTools, a list of keys with "fresh" and "inactive". By the end of the lecture your site has this panel.</p>
+  </aside>
+</section>
+
+<section class="slide" id="goal" data-phase="hello" data-title="Before and after today">
+  <div class="split-4-8 fill items-center" style="gap:56px">
+    <div class="stack" style="--gap:22px">
+      <p class="eyebrow"><b>Today's goal</b> Press next to unveil it</p>
+      <h2 class="h2">The same menu, and forty lines fewer</h2>
+      <p class="lead">Under the blind: how <code>MenuPage</code> fetches its dishes now. Red goes, green comes.</p>
+      <ul class="checks is-done" data-step="1"><li>The <code>useApi</code> hook is deleted</li><li>Home, Menu and a dish share <b>one</b> request</li><li>Back to the menu: the dishes are already there</li><li>Hover a category: its request starts before the click</li></ul>
+    </div>
+    <div data-step="1" data-fx="curtain" data-curtain="MenuPage.tsx · after today">
+      <script type="text/plain" data-lang="tsx" data-file="src/pages/MenuPage.tsx (red = gone, green = new)" data-del="1-4" data-add="6-7" style="--code-size:21px">
+        import { useApi } from "../hooks/useApi";
+        const path = category === "all" ? "/dishes" : `/dishes?category=${category}`;
+        const menu = useApi<Dish[]>(searching ? null : path);
+        // hooks/useApi.ts: 37 lines, one answer per component, forgotten on unmount
+
+        import { useQuery } from "@tanstack/react-query";
+        const menu = useQuery({ ...dishQueries.list(category), enabled: !searching });
+      </script>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Press next: the blind rolls up. This is the real <code>MenuPage</code> from the end of last lecture, with the path shortened. Red: the path built by hand, the hook call, and the hook itself (37 lines in <code>hooks/useApi.ts</code>).</p><p><b>Say:</b> The new line is not magic: <code>dishQueries.list(category)</code> is a small object with an address (the key) and a function (how to fetch). The rest is what the library does for us. Everything on the left of this slide comes back, better, in the next two hours.</p></aside>
+</section>
+
+<!-- ============================== QUESTIONS ============================== -->
+
+<section class="slide" data-phase="questions" data-title="Questions from last time">
+  <div class="qa">
+    <div class="stack" style="--gap:26px">
+      <p class="eyebrow"><b>Apéritif</b> Before we start</p>
+      <h2 class="display">Questions from last time?</h2>
+      <p class="lead">React Hook Form, Zod, steps and lists.</p>
+    </div>
+    <div class="qa-list">
+      <div class="qa-card" data-step="1"><span class="n">01</span><h3>Why does <code>register</code> cause no renders while typing?</h3>
+        <div class="reveal-box" data-reveal><button class="reveal-box__cover">[ show answer ]</button><p>The browser keeps the text in the input. The form reads it when the guest presses Send. With <code>useState</code> every letter is a state change and a render.</p></div></div>
+      <div class="qa-card" data-step="2"><span class="n">02</span><h3>What does <code>handleSubmit(onSubmit)</code> do?</h3>
+        <div class="reveal-box" data-reveal><button class="reveal-box__cover">[ show answer ]</button><p>It is the gate: it asks the schema first. <code>onSubmit</code> gets typed values only when they are valid; otherwise the messages appear next to the fields.</p></div></div>
+      <div class="qa-card" data-step="3"><span class="n">03</span><h3>Why does "Back" lose data in a three-step form?</h3>
+        <div class="reveal-box" data-reveal><button class="reveal-box__cover">[ show answer ]</button><p>Each step kept its own state, and a component's state dies when it leaves the screen. One form above the steps keeps the values, whoever is on screen.</p></div></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Wait for real questions first. If nobody asks, press next for the backup questions, and ask the room before you reveal each answer.</p>
+    <p><b>Why these three:</b> question 3 is today's problem in disguise: state that lives in the component, so it dies with it. Today it is the menu that lives in three different components.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="questions" data-title="Homework: show your v0.7">
+  <div class="split-7-5 fill items-center" style="gap:64px">
+    <div class="stack" style="--gap:22px">
+      <p class="eyebrow"><b>Homework check</b> Two volunteers, two minutes each</p>
+      <h2 class="h1">Show us your v0.7</h2>
+      <p class="lead">Open the sign-up and type in a field with <b>Highlight updates</b> on: nothing flashes. Then open the <b>Network</b> tab, go Home → Menu → a product, and count the requests for the same list.</p>
+    </div>
+    <div class="done-when">
+      <p class="k">Look for</p>
+      <ul class="checks">
+        <li>No <code>useState</code> holds a field's value</li>
+        <li>Every message comes from a schema</li>
+        <li><code>useForm</code> is typed with <code>z.infer</code></li>
+        <li>The repeated-password message sits under its field</li>
+        <li>The live Vercel link works</li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> For each volunteer, open their shop with the Network tab (filter: Fetch/XHR) and click Home, the list, a product, and Back. Count the requests for the same list aloud. That number is today's first problem.</p><p><b>Expect:</b> one request per page, and one more when you come back. Nobody did anything wrong: that is how every <code>useEffect</code> fetch behaves.</p></aside>
+</section>
+
+<!-- ============================== PROBLEM 1 ============================== -->
+
+<section class="slide" data-phase="problem" data-tone="dark" data-title="Three pages. One menu. Three requests.">
+  <div class="problem-cover">
+    <div class="problem-cover__text">
+      <p class="eyebrow"><b>Entrée · Problem 1</b> Before the new tool</p>
+      <h2 class="display">Three pages.<br>One menu.<br>Three requests.</h2>
+      <p class="lead">Open the home page, then the menu, then a dish. How many times did the browser ask the server for the same dishes?</p>
+    </div>
+    <div class="problem-cover__photo"><img src="../img/photo-bouillabaisse.jpg" alt=""></div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Think about the three pages we have: the home page shows three favourites, the menu shows everything, a dish page needs one dish. They all come from the same list of dishes. Guess how many times we ask the server.</p>
+    <p><b>Ask:</b> Collect two or three numbers. "Once" is what a sensible person expects. The real answer, measured on our own app, is on the next slide.</p>
+  </aside>
+</section>
+
+<section class="slide" id="waste" data-phase="problem" data-title="Home, Menu, a dish: count the requests">
+  <p class="eyebrow"><b>Problem 1</b> Click through the site, or press the button</p>
+  <h2 class="h2 mt-s">Home, Menu, a dish: count the requests</h2>
+  <div class="ws">
+    <div class="ws__left">
+      <div class="seg is-modes" id="ws-mode"><button type="button" class="is-on" data-m="api">Each page asks (useApi)</button><button type="button" data-m="query">One cache (TanStack Query)</button></div>
+      <div class="mock ws__mock">
+        <div class="mock__bar"><i></i><i></i><i></i><span id="ws-url">localhost:5173/</span></div>
+        <div class="ws__nav"><button type="button" data-p="home">Home</button><button type="button" data-p="menu">Menu</button><button type="button" data-p="dish">A dish</button><button type="button" data-p="back" class="is-ghost">← Back</button></div>
+        <div class="mock__page ws__page" id="ws-page"></div>
+      </div>
+      <div class="row" style="--gap:10px"><button class="btn is-wine" type="button" id="ws-tour"><i data-icon="route"></i>Walk it for me</button><button class="btn is-ghost" type="button" id="ws-reset"><i data-icon="rotate-ccw"></i>Reset</button></div>
+    </div>
+    <div class="ws__right">
+      <div class="counters"><div><b id="ws-req">0</b><span>requests for the dishes</span></div><div><b id="ws-wait">0.0</b><span>seconds of skeleton</span></div></div>
+      <div class="devtools" id="ws-log"><div class="devtools__head"><b>Network</b><span>GET /enterprise/dishes, in order</span></div><div class="devtools__body"></div></div>
+      <div class="callout is-warn" data-step="1"><i data-icon="triangle-alert"></i><div><p class="h4">On the real app: 4.</p><p class="small muted mt-s">Home, Menu, a dish and Back to the menu: four requests for the same list (measured on the production build). With a cache: one.</p></div></div>
+    </div>
+  </div>
+  <div class="why3">
+    <div class="takeaway" data-step="2"><p class="k">Every page asks</p><p>A page does not know that another page already has the answer.</p></div>
+    <div class="takeaway" data-step="3"><p class="k">Every page waits</p><p>The skeleton shows again on each page, even for data we had a second ago.</p></div>
+    <div class="takeaway" data-step="4"><p class="k">Nothing is remembered</p><p>The answer lives in the component's state, and dies with the component.</p></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Press "Walk it for me" with "Each page asks" selected: Home, Menu, a dish, Back to the menu, with a skeleton every time. Four requests, about three seconds of skeleton. Then switch to "One cache" (it resets) and walk again: one request, one skeleton.</p>
+    <p><b>Say:</b> Each page has its own <code>useApi</code>, and each <code>useApi</code> keeps its answer in its own <code>useState</code>. When the page goes away, the answer goes with it. The next page has no idea.</p>
+    <p><b>Honest detail:</b> the demo simulates both versions with a made-up delay of 0.8 s. The numbers on the callout are measured on the real L33 and L34 apps, production builds, against our local copy of the API: <code>GET /dishes</code> was sent 1, 2, 3 and 4 times, against once with the cache.</p>
+  </aside>
+</section>
+
+<section class="slide" id="byhand" data-phase="problem" data-title="The cache we have: useApi">
+  <p class="eyebrow"><b>Problem 1</b> The hook from L29, read as a reviewer</p>
+  <h2 class="h3 mt-s">What useApi does, and what it cannot</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>One answer, kept in this component</b><span>The key and the state belong to <b>this</b> call of the hook.</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>A request on every mount</b><span>Home, Menu and the dish page each start their own.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Old requests are cancelled</b><span>Good: this is the race fix from L29.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>…and everything is forgotten</b><span>When the page goes, the state goes. Nobody else could ever read it.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/hooks/useApi.ts · 37 lines, shortened" data-walk="1:2-3;2:5-11;3:7,13;4:3,16-17" style="--code-size:16px">
+        export function useApi<T>(path: string | null, token?: string) {
+          const key = path === null ? null : `${path}|${token ?? ""}`;
+          const [result, setResult] = useState<Result<T> | null>(null);
+
+          useEffect(() => {
+            if (path === null || key === null) return;
+            const controller = new AbortController();
+
+            api<T>(path, { signal: controller.signal }, token)
+              .then((data) => setResult({ key, data, error: null }))
+              .catch((error) => { /* … */ });
+
+            return () => controller.abort(); // cancel what nobody needs
+          }, [key, path, token]);
+
+          const current = result !== null && result.key === key ? result : null;
+          return { data: current?.data ?? null, error: …, loading: … };
+        }
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> This hook is good. It cancels old requests, it never shows an answer under the wrong question, and it derives <code>loading</code> instead of storing it. We wrote it with care in L29. The problem is not its quality; it is its memory.</p>
+    <p><b>Step 4:</b> the answer is in a <code>useState</code> inside the hook. A <code>useState</code> belongs to the component that called the hook. Three components, three states, three requests. To share it we would have to lift it, and to refresh it, retry it, share a request between two components that mount at the same moment, and forget it after a while, we would write a cache.</p>
+    <p><b>Ask:</b> what is missing? <b>Expect:</b> "a place outside the components". That is the next slide.</p>
+  </aside>
+</section>
+
+<section class="slide v-center" data-phase="problem" data-title="What would we need?">
+  <p class="eyebrow"><b>Problem 1</b> Your turn</p>
+  <h2 class="display mt-m" style="font-size:112px;max-width:1500px;color:var(--wine)">What would we need?</h2>
+  <div class="need">
+    <span class="chip" data-step="1" data-fx="pop">A memory outside the components</span>
+    <span class="chip" data-step="2" data-fx="pop">Know which question an answer belongs to</span>
+    <span class="chip" data-step="3" data-fx="pop">Share one request between pages</span>
+    <span class="chip" data-step="4" data-fx="pop">Know when an answer is too old</span>
+    <span class="chip is-answer" data-step="5" data-fx="pop"><i data-icon="database"></i>That is a server-state cache</span>
+  </div>
+  <aside class="notes">
+    <p><b>Ask:</b> If you could design the tool, what would it keep, and what would it look at before it asks the server again? Collect two or three answers before pressing next. "The date of the answer" is the key one: it is the label on the box.</p>
+    <p><b>Step 5:</b> the name of the idea: a cache for server state, the second kind of state from the map in L32. TanStack Query (the library used to be called React Query) is the standard tool for it.</p>
+  </aside>
+</section>
+
+<!-- ============================== SOLUTION 1 ============================== -->
+
+<section class="slide" data-phase="solution" id="qcidea" data-title="A cache between the pages and the server">
+  <div class="idea">
+    <div class="schema stor" data-wire-sides="r l" style="width:1040px;height:720px">
+      <div class="region" style="left:0;top:26px;width:330px;height:690px"></div>
+      <span class="box-label" style="left:20px;top:0">The component tree</span>
+      <div class="node" id="qi-h" style="left:30px;top:96px;width:270px">Home<small>Favourites</small></div>
+      <div class="node" id="qi-m" style="left:30px;top:276px;width:270px">Menu<small>the whole list</small></div>
+      <div class="node" id="qi-d" style="left:30px;top:456px;width:270px">A dish<small>finds one in the list</small></div>
+      <div class="node is-wine lg" id="qi-c" style="left:470px;top:236px;width:250px;height:230px" data-step="1" data-on="5-5:is-sub">QueryClient<small>the cache</small></div>
+      <span class="box-label" style="left:470px;top:478px" data-step="1">Outside the components</span>
+      <div class="node is-ghost" id="qi-s" style="left:870px;top:270px;width:170px;height:160px" data-step="3">The API<small>srmsapi</small></div>
+      <b class="wire is-wine" data-id="qw-h" data-from="qi-h" data-to="qi-c" data-step="2" data-label="useQuery(key)" data-lx="76" data-ly="-62"></b>
+      <b class="wire is-wine" data-id="qw-m" data-from="qi-m" data-to="qi-c" data-step="2"></b>
+      <b class="wire is-wine" data-id="qw-d" data-from="qi-d" data-to="qi-c" data-step="2"></b>
+      <b class="wire is-wine" data-id="qw-s" data-from="qi-c" data-to="qi-s" data-step="3" data-label="queryFn" data-lx="0" data-ly="-14"></b>
+      <b class="packet is-wine" data-wire="qw-s" data-on="3-3:go" style="--dur:1.5s">GET /dishes</b>
+      <b class="wire is-good" data-id="qn-h" data-from="qi-c" data-to="qi-h" data-sides="l r" data-step="4" data-nohead></b>
+      <b class="wire is-good" data-id="qn-m" data-from="qi-c" data-to="qi-m" data-sides="l r" data-step="4" data-nohead></b>
+      <b class="wire is-good" data-id="qn-d" data-from="qi-c" data-to="qi-d" data-sides="l r" data-step="4" data-nohead></b>
+      <b class="packet is-good" data-wire="qn-h" data-on="4-4:go" style="--dur:1.5s">the dishes</b>
+      <b class="packet is-good" data-wire="qn-m" data-on="4-4:go" style="--dur:1.5s">the dishes</b>
+      <b class="packet is-good" data-wire="qn-d" data-on="4-4:go" style="--dur:1.5s">the dishes</b>
+    </div>
+    <div class="idea__side is-tight">
+      <p class="eyebrow"><b>Solution 1</b> The cold room</p>
+      <h2 class="h2">Ask the cache, not the server</h2>
+      <div class="takeaway" data-step="1"><p class="k">A cache outside the tree</p><p>The <code>QueryClient</code> is a map from a <b>key</b> to an answer. It lives in a module, not in a component.</p></div>
+      <div class="takeaway" data-step="2"><p class="k">A page asks by key</p><p>"Give me the answer for <code>["dishes","list","all"]</code>, and here is how to fetch it if you do not have it."</p></div>
+      <div class="takeaway" data-step="3"><p class="k">The cache decides</p><p>Missing or too old: it calls <code>queryFn</code>. Otherwise it answers at once, with no request.</p></div>
+      <div class="takeaway" data-step="4" style="border-color:var(--good)"><p class="k" style="color:var(--good)">Everybody shares it</p><p>Home, Menu and the dish page read <b>one</b> entry. Two pages that ask at the same moment share one request.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> One press per idea. Step 1: the cache appears <i>outside</i> the component tree. Step 2: three pages ask it by key, with the same key. Step 3: the cache has nothing yet, so it calls the <code>queryFn</code> and a request goes to the API. Step 4: the answer is stored under the key and given to all three.</p>
+    <p><b>Say:</b> Compare with L32: a store holds data we own. This cache holds copies of data the server owns, and it knows how old each copy is. Same place in the map, a different tool.</p>
+    <p><b>Next time a page asks:</b> the cache looks at the date on the label. Fresh: it answers at once, and no packet goes to the API. That is the whole idea; the rest of the lecture is its settings.</p>
+  </aside>
+</section>
+
+<section class="slide" id="usequery" data-phase="solution" data-title="useQuery in one picture">
+  <p class="eyebrow"><b>Solution 1</b> What you give, what you get</p>
+  <h2 class="h2 mt-s">Two things in, a few flags out</h2>
+  <div class="anatomy" style="margin-top:34px">
+    <div class="anatomy__code" style="display:block;font-size:29px;line-height:1.6">const {
+  <span class="part" data-on="3:is-on">data,</span>
+  <span class="part" data-on="3:is-on">isPending,</span>
+  <span class="part" data-on="3:is-on">isError,</span>
+  <span class="part" data-on="4:is-on">isFetching,</span>
+} = useQuery({
+  <span class="part" data-on="1:is-on">queryKey: ["dishes", "list", category],</span>
+  <span class="part" data-on="2:is-on">queryFn: () =&gt; api&lt;Dish[]&gt;(path),</span>
+});</div>
+    <div class="anatomy__notes">
+      <div class="card" data-step="1"><span class="num">01</span><p><code>queryKey</code><br>The address of the data in the cache. Same key, same entry. It works like a dependency array: change a value in it and you ask a new question.</p></div>
+      <div class="card" data-step="2"><span class="num">02</span><p><code>queryFn</code><br>How to fetch it, as a function that returns a promise. Called only when the cache has no fresh answer. If it throws, the query is in error.</p></div>
+      <div class="card" data-step="3"><span class="num">03</span><p><code>data</code> · <code>isPending</code> · <code>isError</code><br>The three states of a screen: nothing yet, something wrong, or the answer. <code>data</code> is <code>undefined</code> until it arrives.</p></div>
+      <div class="card" data-step="4"><span class="num">04</span><p><code>isFetching</code><br>A request is running <b>right now</b>, for the first time or in the background. The old <code>data</code> stays on screen meanwhile.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> That is the whole API for reading data. Two inputs and a handful of flags. The rest of the options (<code>staleTime</code>, <code>enabled</code>, <code>placeholderData</code>…) are tuning.</p>
+    <p><b>Remember:</b> in TanStack Query v5 the options go in <b>one object</b>. Tutorials from before 2024 pass the key and the function as two arguments, and use <code>cacheTime</code>, <code>keepPreviousData</code> and <code>onSuccess</code>. All of those are gone; the mistakes slide shows the TypeScript messages.</p>
+    <p><b>Flags:</b> <code>isPending</code> means "no data yet". <code>isFetching</code> means "a request is running". They are different: after the first answer, a refresh has <code>isFetching</code> true and <code>isPending</code> false. <code>isLoading</code> is both at once: the very first request.</p>
+  </aside>
+</section>
+
+<section class="slide" id="r-setup" data-phase="solution" data-title="Recipe: the cache and its provider">
+  <p class="eyebrow"><b>Solution 1 · Recipe</b> Type it with me, step by step</p>
+  <h2 class="h3 mt-s">One cache, one provider</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>Install it</b><span>The library, and its inspector for development.</span><span class="file-chip"><i data-icon="terminal"></i>npm install</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Make the cache once</b><span>In its own module, never inside a component: a component would make a new, empty cache on every render.</span><span class="file-chip"><i data-icon="file-code"></i>src/lib/queryClient.ts</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Give it to the tree</b><span>One provider around the app. The cart and the session stay in their stores.</span><span class="file-chip"><i data-icon="file-code"></i>src/main.tsx</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Add the inspector</b><span>The DevTools: a panel on the page. It is left out of the production build.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="bash" data-file="terminal" data-copy data-build="1:1" style="--code-size:19px">
+        npm install @tanstack/react-query @tanstack/react-query-devtools
+      </script>
+      <script type="text/plain" data-lang="tsx" data-file="src/lib/queryClient.ts" data-copy data-build="2:1-6" style="--code-size:18px">
+        import { QueryClient } from "@tanstack/react-query";
+
+        // One cache for the whole app. Never create it inside a component.
+        export const queryClient = new QueryClient({
+          defaultOptions: { queries: { staleTime: 60_000 } }, // fresh for a minute
+        });
+      </script>
+      <script type="text/plain" data-lang="tsx" data-file="src/main.tsx" data-copy data-build="3:1-4,6;4:5" style="--code-size:18px">
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Type along, or press Copy. Install first. Each press adds the lines of one step in green.</p>
+    <p><b>Step 2:</b> <code>staleTime: 60_000</code> says "what we fetched counts as fresh for a minute". The default is 0: data is stale the moment it arrives, so every new component that mounts asks again. A minute suits a menu. We come back to this on the lifecycle slide.</p>
+    <p><b>If someone forgets the provider:</b> <code>No QueryClient set, use QueryClientProvider to set one</code>. It is the whole message, and it is clear.</p>
+    <p><b>Checkpoint:</b> <code>npm run dev</code> should show a small flower at the bottom of the page: the DevTools.</p>
+  </aside>
+</section>
+
+<section class="slide" id="r-dishes" data-phase="solution" data-title="Recipe: the dishes, asked by key">
+  <p class="eyebrow"><b>Solution 1 · Recipe</b> Replace every useApi</p>
+  <h2 class="h3 mt-s">One file for the questions</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>A key and a function, together</b><span><code>queryOptions</code> keeps them in one object, so every page asks the same question the same way.</span><span class="file-chip"><i data-icon="file-code"></i>src/queries/dishes.ts</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Ask from any page</b><span>Home, Menu and the dish page all use the <b>same</b> entry: <code>"all"</code>.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Delete the hook</b><span>The best part. Follow TypeScript's red lines until nothing imports it.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/queries/dishes.ts" data-copy data-build="1:1-16" style="--code-size:16px">
+        import { queryOptions } from "@tanstack/react-query";
+
+        // The key is the address of the data in the cache.
+        // Every key about dishes starts with "dishes".
+        export const dishQueries = {
+          list: (category: string) =>
+            queryOptions({
+              queryKey: ["dishes", "list", category],
+              queryFn: () =>
+                api<Dish[]>(
+                  category === "all"
+                    ? "/api/v1/enterprise/dishes"
+                    : `/api/v1/enterprise/dishes?category=${category}`,
+                ),
+            }),
+        };
+      </script>
+      <script type="text/plain" data-lang="tsx" data-file="Favourites.tsx · MenuPage.tsx · DishPage.tsx" data-copy data-build="2:1-2" style="--code-size:16px">
+        // the same entry on three pages: one request
+        const { data, isPending, isError } = useQuery(dishQueries.list("all"));
+      </script>
+      <script type="text/plain" data-lang="bash" data-file="src/hooks" data-del="1" data-build="3:1" style="--code-size:19px">
+        useApi.ts            gone
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Create <code>queries/dishes.ts</code>. Then open <code>Favourites.tsx</code>: replace <code>useApi</code> with <code>useQuery</code>, <code>loading</code> with <code>isPending</code>, <code>error</code> with <code>isError</code>. Do the same in <code>MenuPage</code> and <code>DishPage</code>. Delete <code>useApi.ts</code> and follow TypeScript's red lines.</p>
+    <p><b>Say:</b> The key starts with <code>"dishes"</code> on purpose. Soon we will want "refresh everything about dishes" in one call, and a prefix makes that possible (L35).</p>
+    <p><b>Checkpoint:</b> <code>git commit -am "L34: dishes in the cache"</code>. Open the Network tab: Home → Menu → a dish → Back to the menu: one request for the dishes.</p>
+  </aside>
+</section>
+
+<section class="slide" id="lifecycle" data-phase="solution" data-title="Fresh, stale, inactive, gone">
+  <p class="eyebrow"><b>Solution 1</b> Mount a component, unmount it, fast-forward the clock</p>
+  <h2 class="h2 mt-s">A label and a date on every entry</h2>
+  <div class="lc">
+    <div class="lc__left">
+      <div class="lcbars">
+        <div class="lcbar"><p class="lcbar__k">Age of the answer <small>staleTime = 10 s</small></p><div class="lcbar__track"><i class="lcbar__ok"></i><i class="lcbar__fill" id="lc-age"></i><span class="lcbar__mark" style="left:25%">stale →</span></div><b id="lc-age-t">no data</b></div>
+        <div class="lcbar"><p class="lcbar__k">Time with nobody using it <small>gcTime = 30 s</small></p><div class="lcbar__track"><i class="lcbar__fill is-gc" id="lc-gc"></i><span class="lcbar__mark" style="left:100%">gone</span></div><b id="lc-gc-t">—</b></div>
+      </div>
+      <div class="row" style="--gap:10px;flex-wrap:wrap"><button class="btn is-wine" type="button" id="lc-mount"><i data-icon="plus"></i>Mount a component</button><button class="btn is-ghost" type="button" id="lc-unmount"><i data-icon="minus"></i>Unmount it</button><button class="btn is-ghost" type="button" id="lc-ff"><i data-icon="clock"></i>+10 s</button><button class="btn is-ghost" type="button" id="lc-reset"><i data-icon="rotate-ccw"></i></button></div>
+      <div class="lc__screen" id="lc-screen"></div>
+    </div>
+    <div class="lc__right">
+      <div class="state" id="lc-state"></div>
+      <div class="devtools" id="lc-log"><div class="devtools__head"><b>The cache</b><span>what it did, in order</span></div><div class="devtools__body"></div></div>
+    </div>
+  </div>
+  <div class="why3">
+    <div class="takeaway" data-step="1"><p class="k">Fresh · the first 10 s</p><p>A component that mounts gets the answer at once. No request.</p></div>
+    <div class="takeaway" data-step="2"><p class="k">Stale · after 10 s</p><p>It gets the answer at once, and a refresh runs in the background.</p></div>
+    <div class="takeaway" data-step="3"><p class="k">Gone · 30 s with no user</p><p>The entry is removed. The next component starts from a skeleton.</p></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Press "Mount a component": no entry, so a request goes out (1 s) and the screen shows a skeleton, then the dishes. Press "Unmount it": the entry stays in the cache, now <b>inactive</b>. Press "Mount" again within the ten seconds: no request, the dishes appear at once (<b>fresh</b>). Press "+10 s" and mount again: the dishes appear at once <b>and</b> a refresh runs in the background (<b>stale</b>: show it, then check). Unmount and press "+10 s" three times: after 30 seconds without a user the entry is <b>gone</b>, and the next mount starts from a skeleton again.</p>
+    <p><b>Say:</b> Two clocks. <code>staleTime</code>: how long an answer counts as fresh (we use 60 s; here 10 s so we can watch it). <code>gcTime</code>: how long an unused answer stays in the cache (the default is 5 minutes; here 30 s). Stale is not bad: it means "show it, and check again when someone looks".</p>
+    <p><b>Honest detail:</b> the demo scales the clocks down. The rules are the library's own: fresh data is not fetched on mount; stale data is shown at once and refetched in the background; an entry nobody observes is removed after <code>gcTime</code>.</p>
+  </aside>
+</section>
+
+<section class="slide" id="keylab" data-phase="solution" data-title="The key is the address">
+  <p class="eyebrow"><b>Solution 1</b> Click a category, then try the key that forgets it</p>
+  <h2 class="h2 mt-s">The key is the address</h2>
+  <div class="kl">
+    <div class="kl__left">
+      <div class="seg is-modes" id="kl-key"><button type="button" class="is-on" data-m="good">["dishes", "list", category]</button><button type="button" data-m="bad">["dishes"]</button></div>
+      <div class="chips-row" id="kl-chips"></div>
+      <div class="kl__screen" id="kl-screen"></div>
+    </div>
+    <div class="kl__right">
+      <div class="kl__cache" id="kl-cache"></div>
+      <div class="devtools" id="kl-log"><div class="devtools__head"><b>The cache</b><span>hit or miss, in order</span></div><div class="devtools__body"></div></div>
+    </div>
+  </div>
+  <div class="why3">
+    <div class="takeaway" data-step="1"><p class="k">Same key, same entry</p><p>Two components with the same key share one answer and one request.</p></div>
+    <div class="takeaway" data-step="2"><p class="k">A new value, a new key</p><p>Change the category and you ask a new question, with its own entry.</p></div>
+    <div class="takeaway" data-step="3"><p class="k">A dependency array</p><p>Put in the key everything the function uses, as you do for <code>useEffect</code>.</p></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> With the good key, click Starters, Drinks, Starters: the first click of each category is a <b>miss</b> (a request); the second Starters is a <b>hit</b> (no request). Each category has its own entry. Now switch to <code>["dishes"]</code> (it resets) and click Starters, then Drinks: it is a hit, and the screen still shows the starters under a "Drinks" chip.</p>
+    <p><b>Say:</b> The key is the address. Same address, same entry. If the question depends on a value (the category, the search text, the guest, the page number), that value goes in the key. It is the dependency array of <code>useEffect</code>, with the same rule: everything the function uses.</p>
+    <p><b>Remember:</b> no error and no warning: the bug is silent, which is why this is mistake number one on the next slides.</p>
+  </aside>
+</section>
+
+<section class="slide" id="devtools" data-phase="solution" data-title="The DevTools">
+  <div class="dt">
+    <figure class="hotspots shot" data-hotspots data-size="1440x900" style="width:1040px">
+      <img src="../img/l34-devtools.jpg" alt="Le Bistro's menu with the TanStack DevTools open, listing six query keys">
+      <span class="hs tip-left" data-step="1" data-box="982,411,448,28"><span class="hs__tip"><b>Fresh 3 · Inactive 3</b><span>how many answers are in each state</span></span></span>
+      <span class="hs is-alt tip-below" data-step="2" data-box="26,491,720,144"><span class="hs__tip"><b>one row per key</b><span>the address of each answer</span></span></span>
+      <span class="hs is-warm" data-step="3" data-box="0,491,26,144"></span>
+      <span class="hs is-warm tip-left" data-step="4" data-box="1380,539,60,24"><span class="hs__tip"><b>disabled</b><span>enabled: false</span></span></span>
+      <span class="hs is-warm" data-step="4" data-box="1380,611,60,24"></span>
+    </figure>
+    <div class="dt__side">
+      <p class="eyebrow"><b>Solution 1</b> Open it, always</p>
+      <h2 class="h2">A window into the cold room</h2>
+      <div class="takeaway" data-step="1" style="padding:16px 22px"><p class="k">The counters</p><p style="font-size:21px;line-height:1.4">Fresh, fetching, paused, stale, inactive: every entry is in exactly one of them.</p></div>
+      <div class="takeaway" data-step="2" style="padding:16px 22px"><p class="k">The keys</p><p style="font-size:21px;line-height:1.4">Click a row to see the data, the age, and buttons to refetch or invalidate it.</p></div>
+      <div class="takeaway" data-step="3" style="padding:16px 22px"><p class="k">The number on the left</p><p style="font-size:21px;line-height:1.4"><b>1</b>: a component uses this entry. <b>0</b>: inactive, waiting for <code>gcTime</code>.</p></div>
+      <div class="takeaway" data-step="4" style="padding:16px 22px"><p class="k">disabled</p><p style="font-size:21px;line-height:1.4">The entry exists but is not asked for: <code>enabled: false</code>. Here: no search text.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> This is a screenshot of Le Bistro after today's work, with a search for "coq". Three entries are fresh and in use, three are inactive: they were fetched (the "main courses" and "desserts" lists) and nobody looks at them now. Two are disabled.</p>
+    <p><b>Do:</b> In your own app, open the flower at the bottom of the page. Click through the site and watch entries change colour. Click a row and press "Refetch" or "Invalidate".</p>
+    <p><b>Why it matters:</b> half of the questions students will ask about TanStack Query are answered by looking at this panel.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="When a cache goes wrong">
+  <p class="eyebrow"><b>Solution 1</b> The four mistakes you will see today</p>
+  <h2 class="h2 mt-s">When a cache goes wrong</h2>
+  <div class="mistakes">
+    <div class="mistake" data-step="1"><h4>A variable missing from the key</h4><div class="bad">useQuery({ queryKey: ["dishes"], queryFn: () =&gt; fetchDishes(category) })</div><div class="err">No error. Click Drinks and the starters stay: same key, same entry.</div><div class="good">queryKey: ["dishes", "list", category]: everything the function uses</div></div>
+    <div class="mistake" data-step="2"><h4>The cache made inside a component</h4><div class="bad">function App() { const client = new QueryClient(); … }</div><div class="err">No error. Every render makes an empty cache, so everything is fetched again.</div><div class="good">One <code>queryClient</code> in its own module, imported by <code>main.tsx</code></div></div>
+    <div class="mistake" data-step="3"><h4>The old way of calling it (Query v4)</h4><div class="bad">useQuery(["dishes"], fetchDishes)  ·  cacheTime  ·  onSuccess</div><div class="err">TS2769 · Property 'queryKey' is missing in type 'string[]'. · 'cacheTime' does not exist in type 'UseQueryOptions&lt;…&gt;'</div><div class="good">useQuery({ queryKey, queryFn }) · <code>gcTime</code> · no callbacks: use the data</div></div>
+    <div class="mistake" data-step="4"><h4>No provider around the app</h4><div class="bad">createRoot(…).render(&lt;App /&gt;)  // no QueryClientProvider</div><div class="err">Error: No QueryClient set, use QueryClientProvider to set one</div><div class="good">&lt;QueryClientProvider client={queryClient}&gt; in main.tsx</div></div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Two silent ones and two loud ones. The silent ones are the dangerous ones: number 1 gives a page that looks fine and shows the wrong dishes. Number 2 gives a page that works and fetches on every render: only the Network tab tells.</p>
+    <p><b>Mistake 3:</b> the TypeScript message is longer: it lists three overloads. The first line is the useful one. AIs and old tutorials write v4: if an AI answer uses two arguments, <code>cacheTime</code>, <code>keepPreviousData: true</code> or <code>onSuccess</code>, it is v4.</p>
+    <p>All the messages were produced by compiling these lines with TypeScript 6 and TanStack Query 5.104.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="Which key is wrong?">
+  <div class="split-5-7 fill items-center">
+    <div class="stack" style="--gap:24px">
+      <p class="eyebrow"><b>Quick check</b> Vote, then click</p>
+      <h2 class="h1">Which <code>queryKey</code> will show the wrong data?</h2>
+    </div>
+    <div class="quiz" data-quiz>
+      <div class="quiz__opts">
+        <button class="quiz__opt"><code>["dishes", "list", category]</code> for <code>fetchDishes(category)</code></button>
+        <button class="quiz__opt"><code>["profile", email]</code> for <code>fetchProfile(email)</code></button>
+        <button class="quiz__opt" data-correct><code>["dishes"]</code> for <code>fetchDishes(category)</code></button>
+        <button class="quiz__opt"><code>["dishes", "search", text]</code> for <code>search(text)</code></button>
+      </div>
+      <p class="quiz__explain">C: the function uses <code>category</code>, but the key does not mention it, so every category shares one entry. The key must contain everything the function uses, like the dependency array of an effect. A, B and D do.</p>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Fingers up for 1 to 4, then press the number key of the most common answer. If someone picks B: it is the right way for data that belongs to one guest. We will see why in the second half.</p></aside>
+</section>
+
+<!-- ============================== CLASSWORK 1 ============================== -->
+
+<section class="slide" data-phase="classwork" data-title="Classwork 1: your product list in a cache">
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Atelier · Classwork 1</b> 15 minutes, on your own project</p><h2 class="h1">Your products, in a cache</h2></div>
+    <div class="timer" data-timer="900"></div>
+  </div>
+  <div class="cw">
+    <div class="tiers">
+      <div class="tier base"><div class="tier__k"><span>Base</span><span>everyone</span></div><h3>useQuery for the list</h3>
+        <ul><li><code>npm install @tanstack/react-query @tanstack/react-query-devtools</code>; a <code>queryClient</code> in its own module and the provider in <code>main.tsx</code>.</li><li><code>queries/products.ts</code> with <code>queryOptions</code> (key and function together).</li><li>The list page and the product page use <code>useQuery</code>. Delete your fetch hook.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Plus</span><span>most of you</span></div><h3>Categories and search</h3>
+        <ul><li>Categories in the key (<code>["products","list",category]</code>) and <code>placeholderData: keepPreviousData</code>.</li><li>A search that waits for its text: <code>enabled</code>.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Pro</span><span>fast finishers</span></div><h3>One product, from the list</h3>
+        <ul><li>The product page reads <code>GET /products/{id}</code> and starts from the list's data (<code>initialData</code> from the cache).</li></ul></div>
+    </div>
+    <div class="cw__side">
+      <div class="done-when"><p class="k">Done when</p><ul class="checks"><li>Network tab: list → product → back is <b>one</b> request for the list</li><li>No fetch hook and no <code>useEffect</code> that fetches is left</li><li>Every variable the function uses is in its key</li><li>The DevTools show your keys</li></ul></div>
+      <div class="hint" data-peek="click for a hint"><div><p class="k">Stuck?</p><pre>export const productQueries = {
+  list: (category: string) =&gt;
+    queryOptions({
+      queryKey: ["products", "list", category],
+      queryFn: () =&gt; fetchJson&lt;ProductList&gt;(
+        category === "all"
+          ? `${BASE}/products?limit=30`
+          : `${BASE}/products/category/${category}`,
+      ),
+    }),
+};</pre></div></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Watch for:</b> a key without the category (the silent bug: they will see it when they click a category), <code>new QueryClient()</code> inside <code>App</code>, a forgotten provider (the clear error), and v4 syntax copied from old tutorials.</p>
+    <p><b>DummyJSON:</b> <code>GET https://dummyjson.com/products?limit=30</code> answers <code>{ products, total, skip, limit }</code>; <code>/products/category/{slug}</code> has the same shape; <code>/products/search?q=</code> and <code>/products/{id}</code> too. The <code>queryFn</code> can return <code>data.products</code> so the page stays as it was.</p>
+    <p>Full brief and solutions: <code>classwork.md</code>.</p>
+  </aside>
+</section>
+
+<!-- ============================== BREAK ============================== -->
+
+<section class="slide" data-phase="break" data-tone="dark" data-title="Pause café">
+  <div class="pause">
+    <div class="stack" style="--gap:28px">
+      <p class="eyebrow"><b>Pause café</b> 10 minutes</p>
+      <h2 class="display">Pause café</h2>
+      <p class="lead">Stand up, refill, rest your eyes. After the break: three seconds of nothing, a queue that gets old, and a guest who leaves.</p>
+      <button class="pause__btn" type="button" data-start-break><i data-icon="coffee"></i>Start the break</button>
+    </div>
+    <div class="cup" aria-hidden="true"><span class="cup__steam"></span><span class="cup__steam"></span><span class="cup__steam"></span><div class="cup__plate"></div><div class="cup__body"></div><div class="cup__coffee"></div><div class="cup__handle"></div></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Click "Start the break" (or press B). A 10-minute countdown starts with radio music. +1 / −1 minute adjusts it. When it ends, a chime plays and a "Welcome back" screen appears.</p>
+    <p><b>No internet?</b> The radio needs it. Put mp3 files in <code>_shared/music/</code> and list them in <code>tracks.js</code>.</p>
+  </aside>
+</section>
+
+<!-- ============================== PROBLEM 2 ============================== -->
+
+<section class="slide" data-phase="problem2" data-tone="dark" data-title="Three seconds of nothing">
+  <div class="problem-cover">
+    <div class="problem-cover__text">
+      <p class="eyebrow"><b>Second plat · Problem 2</b> We have a cache now</p>
+      <h2 class="display">Three seconds<br>of nothing.</h2>
+      <p class="lead">Click "Main Courses". The kitchen needs three seconds. What does the guest see while they wait, and what does the kitchen's screen show all evening?</p>
+    </div>
+    <div class="problem-cover__photo"><img src="../img/photo-crepes-suzette.jpg" alt=""></div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Welcome back. The cache saved us requests. But "fetched once" is not the whole story: the first fetch can be slow, and some data does not stay still. Two small stories.</p>
+  </aside>
+</section>
+
+<section class="slide" id="switch" data-phase="problem2" data-title="Click a category, wait">
+  <p class="eyebrow"><b>Problem 2</b> Click "Main Courses", then "Drinks", then back</p>
+  <h2 class="h2 mt-s">Click a category, wait</h2>
+  <div class="sw" id="sw1"></div>
+  <div class="why3">
+    <div class="takeaway" data-step="1"><p class="k">The first visit is blank</p><p>Nothing is in the cache yet, so the guest sees a skeleton for the whole wait.</p></div>
+    <div class="takeaway" data-step="2"><p class="k">The second visit is instant</p><p>The cache remembers: a category we have seen costs nothing.</p></div>
+    <div class="takeaway" data-step="3"><p class="k">Three seconds is long</p><p>The main courses take three seconds on the real API. A guest may leave.</p></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Click "Main Courses": a skeleton for <b>three seconds</b>, then six dishes. Click "Drinks": a skeleton again, shorter. Now click "Main Courses" a second time: it is instant, the cache remembers. Watch the counters: requests, and the seconds the guest saw nothing.</p>
+    <p><b>Say:</b> This is the app after the first half: the cache works (a minute of freshness), so a category we have seen is instant. The pain is the <b>first</b> visit: nothing on screen until the server answers. The main courses request takes three seconds on the real API (it is a teaching trap), the drinks about half a second.</p>
+    <p><b>Ask:</b> what would you want to see while waiting? <b>Expect:</b> "the old dishes", "nothing to wait for". Both are on the way.</p>
+  </aside>
+</section>
+
+<section class="slide" id="queue" data-phase="problem2" data-title="The queue is as old as the page">
+  <p class="eyebrow"><b>Problem 2</b> The kitchen opens its screen. The evening goes on.</p>
+  <h2 class="h2 mt-s">The queue is as old as the page</h2>
+  <div class="qu" id="qu1"></div>
+  <div class="why3">
+    <div class="takeaway" data-step="1"><p class="k">The copy is as old as the page</p><p>Nothing asks the server again. The age only grows.</p></div>
+    <div class="takeaway" data-step="2"><p class="k">The server moves on</p><p>A new order arrives every few seconds. The page does not know.</p></div>
+    <div class="takeaway" data-step="3"><p class="k">Only F5 helps</p><p>And the kitchen's screen should not need a guest to press F5.</p></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> The kitchen page has loaded its queue (3 orders). The server adds an order every few seconds: look at the right-hand counter go up while the page stays the same, and its "updated" age grows. Only "Reload the page" (F5) shows the new orders.</p>
+    <p><b>Say:</b> The data changes on its own, at the server. A copy that nobody refreshes is a copy that lies. In L32 this was the "stale Bouillabaisse": server state kept as if it were ours. The cache must know that some data goes old fast.</p>
+  </aside>
+</section>
+
+<section class="slide v-center" data-phase="problem2" data-title="What would we need now?">
+  <p class="eyebrow"><b>Problem 2</b> Your turn</p>
+  <h2 class="display mt-m" style="font-size:112px;max-width:1500px;color:var(--wine)">What would we need now?</h2>
+  <div class="need">
+    <span class="chip" data-step="1" data-fx="pop">Show the old dishes while the new ones load</span>
+    <span class="chip" data-step="2" data-fx="pop">Start loading before the click</span>
+    <span class="chip" data-step="3" data-fx="pop">Refresh what changes on its own</span>
+    <span class="chip" data-step="4" data-fx="pop">Retry what failed, but not what never will work</span>
+    <span class="chip" data-step="5" data-fx="pop">Forget what belongs to a guest who left</span>
+    <span class="chip is-answer" data-step="6" data-fx="pop"><i data-icon="sliders-horizontal"></i>The cache has a setting for each</span>
+  </div>
+  <aside class="notes">
+    <p><b>Ask:</b> What would a good cold room do? Collect answers: "show what we have", "prepare in advance", "check again every few seconds", "do not keep asking a closed shop", "throw away Maia's data when Beso comes in".</p>
+    <p><b>Step 6:</b> good news: each one is an option or one line. The second half of today goes through them, one by one.</p>
+  </aside>
+</section>
+
+<!-- ============================== SOLUTION 2 ============================== -->
+
+<section class="slide" id="r-keep" data-phase="solution2" data-title="Recipe: keep the old dishes">
+  <p class="eyebrow"><b>Second plat · Recipe</b> Never show a blank page when you have something</p>
+  <h2 class="h3 mt-s">placeholderData and enabled</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>Keep the old dishes while the new ones load</b><span><code>placeholderData: keepPreviousData</code>: the last answer stands in until the new key has data.</span><span class="file-chip"><i data-icon="file-code"></i>src/pages/MenuPage.tsx</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Tell the guest they are old</b><span><code>isPlaceholderData</code> is true while the stand-in shows: dim the grid, and mark it <code>aria-busy</code>.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>A query that waits for its turn</b><span><code>enabled: false</code> asks nothing: no menu request while a search is showing, and no search without text.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/pages/MenuPage.tsx" data-copy data-build="1:1-3,5;2:7-13;3:4,6" style="--code-size:17px">
+        const menu = useQuery({
+          ...dishQueries.list(category),
+          placeholderData: keepPreviousData, // the old dishes stay while another category loads
+          enabled: !searching,               // no menu request while a search is showing
+        });
+        const results = useQuery({ ...dishQueries.search(search), enabled: searching });
+
+        <div
+          aria-busy={menu.isPlaceholderData}
+          className={menu.isPlaceholderData ? "opacity-50" : ""}
+        >
+          <DishGrid dishes={dishes} />
+        </div>
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> In <code>MenuPage</code>: add the two options, then dim the grid with <code>isPlaceholderData</code>. Click a category in the browser: the old dishes stay, dimmed, and the new ones replace them.</p>
+    <p><b>Say:</b> <code>keepPreviousData</code> in v5 is a function you pass to <code>placeholderData</code>. The old option <code>keepPreviousData: true</code> is gone. The stand-in is not stored in the cache: it is only on screen.</p>
+    <p><b>enabled:</b> a disabled query has no data and no request. Careful with the skeleton: <code>isPending</code> is true for a disabled query that never ran (second mistakes slide).</p>
+  </aside>
+</section>
+
+<section class="slide" id="r-prefetch" data-phase="solution2" data-title="Recipe: prefetch on hover">
+  <p class="eyebrow"><b>Second plat · Recipe</b> Start the kitchen before the guest orders</p>
+  <h2 class="h3 mt-s">Start loading before the click</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>Get the cache in a component</b><span><code>useQueryClient()</code> returns the client from the provider.</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Prefetch when the pointer arrives</b><span><code>prefetchQuery</code> fills the cache for a key without a component. If the entry is fresh, it does nothing.</span><span class="file-chip"><i data-icon="file-code"></i>MenuPage.tsx</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>The chips report it</b><span>Mouse and keyboard: <code>onMouseEnter</code> and <code>onFocus</code>. By the click the dishes are often there.</span><span class="file-chip"><i data-icon="file-code"></i>CategoryChips.tsx</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="MenuPage.tsx · CategoryChips.tsx" data-copy data-build="1:1-2;2:3-9;3:10-15" style="--code-size:16px">
+        const queryClient = useQueryClient();
+
+        <CategoryChips
+          categories={categories.data ?? []}
+          onSelect={selectCategory}
+          // start the request when the pointer arrives: by the click the dishes are often here
+          onHover={(slug) => void queryClient.prefetchQuery(dishQueries.list(slug))}
+        />
+
+        // in CategoryChips:
+        <button
+          onClick={() => onSelect(chip.slug)}
+          onMouseEnter={() => onHover?.(chip.slug)}
+          onFocus={() => onHover?.(chip.slug)}
+        >
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Add the three lines. Open the DevTools, hover "Main Courses" and wait three seconds: the entry turns <b>fresh</b> without a click. Then click: the six dishes appear at once.</p>
+    <p><b>Measured:</b> on our app the click renders the six main courses in about 70 ms after a hover of three seconds, instead of waiting three seconds.</p>
+    <p><b>Say:</b> A prefetch is a cheap bet: it costs a request the guest may never need, and it saves a wait when they do. Hover and focus are good signals. Do not prefetch the whole site.</p>
+    <p><b>Accessibility:</b> <code>onFocus</code> matters: keyboard users get the same head start as mouse users.</p>
+  </aside>
+</section>
+
+<section class="slide" id="switch2" data-phase="solution2" data-title="Two settings, no blank screen">
+  <p class="eyebrow"><b>Solution 2</b> Switch the two settings on, one by one, and click the categories again</p>
+  <h2 class="h2 mt-s">Two settings, no blank screen</h2>
+  <div class="sw" id="sw2" data-toggles="1"></div>
+  <aside class="notes">
+    <p><b>Do:</b> Both off: it is the problem from before the break (a category we have not seen shows a skeleton). Switch on <b>keep the old dishes</b>: no more blank grid, the old dishes stay dimmed while the new ones load (<code>keepPreviousData</code>). Switch on <b>prefetch on hover</b>: hover "Main Courses" for three seconds, then click: the dishes are there before the click, and the last-click time drops to a few milliseconds.</p>
+    <p><b>Say:</b> Two settings, each one line: <code>placeholderData</code> and a <code>prefetchQuery</code> in <code>onMouseEnter</code>. Look at the counters: the seconds of blank screen go to zero. The cache itself (one minute of freshness) is on in every case: that was the first half of the lecture.</p>
+    <p><b>Honest detail:</b> the demo simulates the cache; the delays are the real ones (3 s for the main courses, about half a second for the others), and the numbers match the ones we measured in the real app.</p>
+  </aside>
+</section>
+
+<section class="slide" id="r-poll" data-phase="solution2" data-title="Recipe: data that changes">
+  <p class="eyebrow"><b>Second plat · Recipe</b> The kitchen's queue</p>
+  <h2 class="h3 mt-s">Refresh what changes on its own</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>A key for the queue</b><span>Every key about orders starts with <code>"orders"</code>. The function adds the staff token.</span><span class="file-chip"><i data-icon="file-code"></i>src/queries/kitchen.ts</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Never trust an old queue</b><span><code>staleTime: 0</code> overrides the minute we gave everything else.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Ask again every five seconds</b><span><code>refetchInterval</code> while the page is open. It also refetches when the guest comes back to the tab.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Show the refresh, keep the list</b><span><code>isPending</code>: nothing yet. <code>isFetching</code>: a refresh is running, the old queue stays visible.</span><span class="file-chip"><i data-icon="file-code"></i>KitchenPage.tsx</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/queries/kitchen.ts" data-copy data-build="1:1-5,8-9;2:6;3:7" style="--code-size:16px">
+        export const kitchenQueries = {
+          queue: () =>
+            queryOptions({
+              queryKey: ["orders", "queue"],
+              queryFn: () => api<OrderQueue>(path, {}, token), // path and token as before
+              staleTime: 0, // orders arrive all the time: never trust an old queue
+              refetchInterval: 5_000, // ask again every 5 seconds while the page is open
+            }),
+        };
+      </script>
+      <script type="text/plain" data-lang="tsx" data-file="src/pages/KitchenPage.tsx" data-copy data-build="4:1-4" style="--code-size:16px">
+        const queue = useQuery(kitchenQueries.queue());
+
+        {queue.isPending && <p>Loading the queue…</p>}
+        {queue.isFetching && !queue.isPending && <p>Updating…</p>}
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Write <code>kitchenQueries.queue()</code> in a new file, use it in <code>KitchenPage</code> (delete the <code>useApi</code> call), and watch the Network tab: a request every five seconds. Switch to another tab and back: an immediate refresh (<code>refetchOnWindowFocus</code> is on by default).</p>
+    <p><b>Say:</b> The two flags again. On the first load <code>isPending</code> is true: show "Loading". On every refresh after that only <code>isFetching</code> is true: show a small "Updating…" and keep the list. Never hide the data for a refresh.</p>
+    <p><b>Polling is the simple tool.</b> A real kitchen would use WebSockets or server-sent events; the API we use has none. Polling every five seconds is fine for a queue, and the library stops while the tab is hidden.</p>
+  </aside>
+</section>
+
+<section class="slide" id="queue2" data-phase="solution2" data-title="The queue refreshes itself">
+  <p class="eyebrow"><b>Solution 2</b> Switch the settings on and watch the counter on the right</p>
+  <h2 class="h2 mt-s">The queue refreshes itself</h2>
+  <div class="qu" id="qu2" data-toggles="1"></div>
+  <div class="why3">
+    <div class="takeaway" data-step="1"><p class="k">refetchInterval</p><p>Ask again every five seconds while the page is open.</p></div>
+    <div class="takeaway" data-step="2"><p class="k">refetchOnWindowFocus</p><p>Ask again when the guest comes back to the tab (on by default for stale data).</p></div>
+    <div class="takeaway" data-step="3"><p class="k">isFetching, not isPending</p><p>Show "Updating…" and keep the list. Never hide the data for a refresh.</p></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Both off: the page shows its first copy and the server's counter keeps going up. Switch on <b>refetch every 5 s</b>: the page catches up in steps of five seconds, with a short "Updating…" that does not hide the list. Switch on <b>refetch on focus</b> and press "Switch to another tab and back": it catches up at once.</p>
+    <p><b>Say:</b> <code>refetchInterval</code> and <code>refetchOnWindowFocus</code>: two options. The second one is on by default for every query whose data is stale, which is also why <code>staleTime</code> matters: fresh data is not refetched on focus.</p>
+  </aside>
+</section>
+
+<section class="slide" id="retry" data-phase="solution2" data-title="Retry what can recover">
+  <p class="eyebrow"><b>Solution 2</b> Press a failure and watch the attempts</p>
+  <h2 class="h2 mt-s">Retry what can recover, not what cannot</h2>
+  <div class="rt">
+    <div class="rt__left">
+      <div class="seg is-modes" id="rt-policy"><button type="button" class="is-on" data-m="ours">Our policy</button><button type="button" data-m="default">The default: 3 retries</button></div>
+      <div class="rt__btns">
+        <button class="btn is-wine" type="button" data-f="500">Server error · 500</button>
+        <button class="btn is-wine" type="button" data-f="net">No network</button>
+        <button class="btn" type="button" data-f="404">Not found · 404</button>
+        <button class="btn" type="button" data-f="429">Too many requests · 429</button>
+        <button class="btn is-ghost" type="button" data-f="200">It works · 200</button>
+      </div>
+      <div class="counters"><div><b id="rt-n">0</b><span>requests sent</span></div><div><b id="rt-t">0</b><span>seconds to the error</span></div></div>
+      <div class="rt__line" id="rt-line"></div>
+    </div>
+    <div class="rt__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/lib/queryClient.ts" data-copy style="--code-size:17px">
+        retry: (failureCount, error) =>
+          !(error instanceof ApiError && error.status >= 400 && error.status < 500) &&
+          failureCount < 2,
+        // the default: 3 retries, after 1 s, 2 s and 4 s
+      </script>
+      <div class="devtools" id="rt-log"><div class="devtools__head"><b>Requests</b><span>one line per attempt</span></div><div class="devtools__body"></div></div>
+    </div>
+  </div>
+  <div class="why3">
+    <div class="takeaway" data-step="1"><p class="k">A 5xx may recover</p><p>A server hiccup or a lost connection: try again, after 1 s, then 2 s.</p></div>
+    <div class="takeaway" data-step="2"><p class="k">A 4xx never will</p><p>404 does not exist, 429 means too many requests: asking again makes it worse.</p></div>
+    <div class="takeaway" data-step="3"><p class="k">Two retries are enough</p><p>The default is three, after 1, 2 and 4 seconds: seven seconds before the guest sees the error.</p></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> With "Our policy": press "Server error": three attempts (now, after 1 s, after 3 s), then the error. Press "Too many requests": <b>one</b> attempt, the error at once. "Not found": one. "No network": three. Switch to "The default" and press "Server error": four attempts, the error after seven seconds.</p>
+    <p><b>Say:</b> A 5xx or a lost connection may be fixed by trying again: retrying is kind. A 4xx never will: 404 means it does not exist, 429 means "too many requests", and asking again only makes it worse. Our search endpoint allows ten requests a minute, and a classroom shares one address: in class we meet the 429 for real.</p>
+    <p><b>Honest detail:</b> the demo runs twice as fast as the real delays (1 s, 2 s, 4 s); the timeline shows the real seconds. The rule is the library's own: a function that gets the failure count and the error and answers true or false.</p>
+  </aside>
+</section>
+
+<section class="slide" id="leak" data-phase="solution2" data-title="Two guests, one cache">
+  <p class="eyebrow"><b>Solution 2</b> Maia signs in, signs out, Beso signs in: whose profile is on screen?</p>
+  <h2 class="h2 mt-s">Data that belongs to a guest</h2>
+  <div class="lk">
+    <div class="lk__left">
+      <div class="ph__opts">
+        <label class="ph__opt"><input type="checkbox" data-opt="key"><span><b>The guest is in the key</b> <code>["profile", email]</code></span></label>
+        <label class="ph__opt"><input type="checkbox" data-opt="clear"><span><b>Clear the cache on sign-out</b> <code>queryClient.clear()</code></span></label>
+      </div>
+      <div class="row" style="--gap:10px;flex-wrap:wrap"><button class="btn is-wine" type="button" data-u="Maia">Maia signs in</button><button class="btn is-wine" type="button" data-u="Beso">Beso signs in</button><button class="btn is-ghost" type="button" id="lk-out">Sign out</button><button class="btn is-ghost" type="button" id="lk-reset"><i data-icon="rotate-ccw"></i></button></div>
+      <div class="lk__screen" id="lk-screen"></div>
+    </div>
+    <div class="lk__right">
+      <script type="text/plain" data-lang="tsx" data-file="accountQueries · queryClient.ts" data-copy style="--code-size:16px">
+        queryKey: ["profile", email],   // not just ["profile"]
+
+        useAuthStore.subscribe((state, previous) => {
+          if (previous.session && !state.session) queryClient.clear();
+        });
+      </script>
+      <div class="kl__cache" id="lk-cache"></div>
+    </div>
+  </div>
+  <div class="why3">
+    <div class="takeaway" data-step="1"><p class="k">A cache does not know who is looking</p><p>Whatever is fresh is served, to whoever asks.</p></div>
+    <div class="takeaway" data-step="2"><p class="k">Put the guest in the key</p><p>Maia and Beso get two entries: nobody sees the other's data.</p></div>
+    <div class="takeaway" data-step="3"><p class="k">Clear it when the guest leaves</p><p>On sign-out the cache is emptied: nothing of Maia's stays in the browser.</p></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Both switches off. Press "Maia signs in": Maia's profile loads. "Sign out". "Beso signs in": <b>Maia's profile</b> is on screen, at once, with a red banner: the entry <code>["profile"]</code> is still in the cache and still fresh, so the cache answers without asking. Switch on "the guest is in the key": Beso now gets a request of their own. Switch on "clear the cache on sign-out" instead: the cache is empty when Beso arrives.</p>
+    <p><b>Say:</b> A cache does not know who is looking. Whatever belongs to a person must carry that person in its key, and the cache must be emptied when the person leaves. We do both: <code>["profile", email]</code> and a <code>subscribe</code> on the session store (L32) that calls <code>queryClient.clear()</code>. It is a privacy rule, not a performance one.</p>
+    <p><b>Remember:</b> <code>subscribe</code> works outside React: another good use of a store that is a plain object.</p>
+  </aside>
+</section>
+
+<section class="slide" id="end" data-phase="solution2" data-title="The page at the end of today">
+  <p class="eyebrow"><b>Solution 2</b> Le Bistro, version 0.8</p>
+  <h2 class="h2 mt-s">What the cache bought us</h2>
+  <div class="bn">
+    <div class="bn__c" data-step="1"><b>1</b><span>request for Home → Menu → a dish → Back</span><small>it was 4 with <code>useApi</code></small></div>
+    <div class="bn__c" data-step="2"><b>70 ms</b><span>from click to six main courses</span><small>after a hover; it was 3 seconds</small></div>
+    <div class="bn__c" data-step="3"><b>5 s</b><span>between two looks at the kitchen's queue</span><small>no F5, no button</small></div>
+    <div class="bn__c" data-step="4"><b>+10 kB</b><span>of JavaScript, gzipped</span><small>131.1 → 141.3 kB; the devtools are not in it</small></div>
+  </div>
+  <div class="map2 mt-m" style="grid-template-columns:minmax(0,1fr)">
+    <table class="statemap">
+      <thead><tr><th>State</th><th>Home</th></tr></thead>
+      <tbody>
+        <tr data-step="5"><td>Menu, categories, search results</td><td>TanStack Query <small class="muted">(was <code>useApi</code>)</small></td></tr>
+        <tr data-step="6"><td>The profile, the kitchen's queue</td><td>TanStack Query: the guest in the key, polling</td></tr>
+        <tr data-step="7"><td>The cart, the session</td><td>stores, saved</td></tr>
+        <tr data-step="8"><td>The forms</td><td>React Hook Form and Zod</td></tr>
+        <tr data-step="9"><td>Category, search text</td><td>the URL</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Show your live result if it works: DevTools open, Home → Menu → a dish → Back with the Network tab on (one request), hover "Main Courses" and click. Then the kitchen page with the Network tab: a request every five seconds.</p>
+    <p><b>The numbers</b> are measured on the real code against our local copy of the API: 1 request instead of 4 on the production build; 70 ms from the click to the six dishes after a hover; the bundle at 141.3 kB gzip against 131.1 kB (TanStack Query is the +10 kB).</p>
+    <p><b>Say:</b> "Server" is the last home of the state map in L32. It is filled in now. The code is in <code>code/after-L34</code>.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Cache mistakes, part two">
+  <p class="eyebrow"><b>Solution 2</b> The four mistakes of the second half</p>
+  <h2 class="h2 mt-s">When the cold room is run badly</h2>
+  <div class="mistakes">
+    <div class="mistake" data-step="1"><h4>A copy of the data in state</h4><div class="bad">useEffect(() =&gt; { if (data) setDishes(data); }, [data]);</div><div class="err">It works, until the cache refreshes: you hold an old copy, and render once more for nothing.</div><div class="good">Use <code>data</code> directly, and derive what you need from it</div></div>
+    <div class="mistake" data-step="2"><h4>A skeleton on isPending for a disabled query</h4><div class="bad">{results.isPending &amp;&amp; &lt;Skeleton /&gt;}  with  enabled: searching</div><div class="err">No error. A query that never ran is pending forever: the skeleton never goes away. (isLoading is false.)</div><div class="good"><code>isLoading</code>, or <code>isFetching &amp;&amp; !data</code>, or render it only while enabled</div></div>
+    <div class="mistake" data-step="3"><h4>Thinking "stale" means broken</h4><div class="bad">the default staleTime: 0, and "why does it fetch again?"</div><div class="err">No error. Stale data is shown at once and refetched when someone looks: on mount, on focus.</div><div class="good">Give each kind of data the <code>staleTime</code> it deserves: a minute for the menu, 0 for a queue</div></div>
+    <div class="mistake" data-step="4"><h4>A guest's data with no guest in the key</h4><div class="bad">queryKey: ["profile"]</div><div class="err">No error. Beso signs in and sees Maia's profile: the entry is still fresh.</div><div class="good">queryKey: ["profile", email], and <code>queryClient.clear()</code> on sign-out</div></div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> All four are silent. Number 4 is the serious one: it is a privacy bug. Number 2 is the one that wastes an afternoon: a spinner that never stops, with nothing in the console.</p>
+    <p><b>Flags in v5:</b> <code>isPending</code> = no data yet (it covers "disabled" and "loading"); <code>isLoading</code> = <code>isPending && isFetching</code>, the first request in flight. We checked: a disabled query has <code>isPending: true</code>, <code>isFetching: false</code>, <code>isLoading: false</code>.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="What does staleTime: 60000 mean?">
+  <div class="split-5-7 fill items-center">
+    <div class="stack" style="--gap:24px">
+      <p class="eyebrow"><b>Quick check</b> Vote, then click</p>
+      <h2 class="h1">What does <code>staleTime: 60_000</code> mean?</h2>
+    </div>
+    <div class="quiz" data-quiz>
+      <div class="quiz__opts">
+        <button class="quiz__opt">The answer is deleted after one minute</button>
+        <button class="quiz__opt" data-correct>The answer counts as fresh for a minute: no refetch on mount or on focus</button>
+        <button class="quiz__opt">The query refetches itself every minute</button>
+        <button class="quiz__opt">The first request waits one minute before it starts</button>
+      </div>
+      <p class="quiz__explain">B: for sixty seconds after it arrives, the answer is <b>fresh</b>: a new component, or a return to the tab, gets it from the cache without a request. After that it is <b>stale</b>: shown at once, and refetched when someone looks. A is <code>gcTime</code> (and it counts unused time). C is <code>refetchInterval</code>.</p>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Fingers up for 1 to 4, then press the number key of the most common answer. If many chose A: draw the two clocks on the board: <code>staleTime</code> from the moment the answer arrives, <code>gcTime</code> from the moment nobody uses it.</p></aside>
+</section>
+
+<!-- ============================== CLASSWORK 2 · WITH AI ============================== -->
+
+<section class="slide" data-phase="classwork2" data-title="Classwork 2 with AI: a cache with settings">
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Atelier · Classwork 2 · with AI</b> 15 minutes, on your own project</p><h2 class="h1">Prompt it: a cache with settings</h2></div>
+    <div class="timer" data-timer="900"></div>
+  </div>
+  <div class="cw">
+    <div class="stack" style="--gap:14px">
+      <div class="tier base"><div class="tier__k"><span>The task</span><span>the AI writes, you check</span></div>
+        <ul class="ai-levels"><li><b>Base</b>Your product list and product page on <code>useQuery</code> with <code>queryOptions</code>, a <code>queryClient</code> module and the provider. No fetch hook left.</li><li><b>Plus</b><code>keepPreviousData</code> on a category change, <code>enabled</code> for the search, and a prefetch on hover and focus.</li><li><b>Pro</b>A guest's data (<code>/auth/me</code>) with the guest in the key and a cache cleared on sign-out.</li></ul></div>
+      <div class="craft-mini"><p class="craft-mini__k">Your prompt, in five parts (CRAFT)</p>
+        <div class="craft-mini__row cr-c"><span class="craft__badge">C</span><p><b>Context</b>Your shop and stack, with versions: <code>@tanstack/react-query</code> 5. Paste your fetch hook and your list page.</p></div>
+        <div class="craft-mini__row cr-r"><span class="craft__badge">R</span><p><b>Role</b>&quot;A React teacher who writes small TanStack Query code for a beginner.&quot;</p></div>
+        <div class="craft-mini__row cr-a"><span class="craft__badge">A</span><p><b>Action</b>The Base task. Plus and Pro in follow-up prompts.</p></div>
+        <div class="craft-mini__row cr-f"><span class="craft__badge">F</span><p><b>Format</b>&quot;Only the files that change, complete, with paths. Query v5: one options object.&quot;</p></div>
+        <div class="craft-mini__row cr-t"><span class="craft__badge">T</span><p><b>Target</b>&quot;Every variable the function uses is in its key. No useEffect fetching, no state copy.&quot;</p></div>
+      </div>
+    </div>
+    <div class="cw__side">
+      <div class="done-when"><p class="k">Done when</p><ul class="checks"><li>Every key lists what its function uses</li><li>No <code>useEffect</code> fetches and no <code>useState</code> copies the data</li><li>Query v5 syntax: one options object, <code>gcTime</code>, <code>placeholderData</code></li><li>AI.md: your prompt and one thing you changed</li></ul></div>
+      <div class="hint" data-peek="click for a sample prompt"><div><p class="k">A sample prompt · Tech store</p><pre class="is-prompt">CONTEXT
+Shop &quot;Volt&quot; (phones, laptops). Vite + React 19 + TypeScript
++ Tailwind 4, @tanstack/react-query 5. DummyJSON API. Products
+are fetched in useProducts, a useEffect hook (pasted).
+ROLE
+A React teacher who writes small TanStack Query code.
+ACTION
+Replace useProducts with queries/products.ts (queryOptions:
+list by category, one product). queryClient.ts with a
+1 minute staleTime. Keep the old products while a category
+loads; prefetch a category on hover.
+FORMAT
+Only changed files, complete, with paths. Query v5.
+TARGET
+Every variable used by a queryFn is in its key.</pre></div></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Same kind of task as always, with an AI: you write the prompt, it writes the code, you check it. Today's check: is it Query v5?</p>
+    <p><b>Do:</b> Start the timer. Walk around and ask two students to explain one line the AI wrote. If the answer does not build, the next prompt is the exact error message.</p>
+    <p><b>Watch for:</b> <code>useQuery(["products"], fn)</code> and <code>cacheTime</code>, <code>keepPreviousData: true</code>, <code>onSuccess</code> (all v4: TypeScript says so); <code>new QueryClient()</code> inside <code>App</code>; a key that forgets the category; <code>useEffect</code> + <code>setState</code> around the data. The follow-up prompts are in <code>classwork.md</code>.</p>
+    <p><b>Then:</b> the Masterclass: the whole Le Bistro so far, in one prompt.</p>
+  </aside>
+</section>
+
+<!-- ============================== MASTERCLASS ============================== -->
+
+<section class="slide" data-phase="masterclass" data-title="Masterclass: Le Bistro in one prompt">
+  <p class="eyebrow"><b>Masterclass · LAB-34</b> Press next: the prompt opens part by part</p>
+  <h2 class="h2 mt-s">Le Bistro so far, in one prompt</h2>
+  <div class="craft mt-m" data-craft>
+    <div class="craft__bar"><span><i data-icon="message-square"></i>Prompt · LAB-34 · Le Bistro after L34</span><button type="button" class="copy-btn" data-craft-copy><i data-icon="copy"></i>Copy</button></div>
+    <div class="craft__part cr-c" data-step="1" data-fx="left" data-label="CONTEXT"><span class="craft__badge">C</span><p class="craft__name">Context<small>what exists and what we use</small></p><pre class="craft__text" style="--craft-size:15px">Le Bistro, a French restaurant site. Vite + React 19 + TypeScript + Tailwind CSS 4,
+react-router 8 (import from &quot;react-router&quot;), Zustand 5, react-hook-form 7, zod 4,
+@tanstack/react-query 5. API at /api through a Vite proxy: dishes?category= (main-courses
+takes 3 s), categories, search?q= (10 a minute, then 429), login (2-minute token),
+profile and the staff-only orders/queue.</pre></div>
+    <div class="craft__part cr-r" data-step="2" data-fx="left" data-label="ROLE"><span class="craft__badge">R</span><p class="craft__name">Role<small>who answers</small></p><pre class="craft__text" style="--craft-size:15px">You are a senior React developer who writes code for beginners to read.</pre></div>
+    <div class="craft__part cr-a" data-step="3" data-fx="left" data-label="ACTION"><span class="craft__badge">A</span><p class="craft__name">Action<small>what to build, step by step</small></p><pre class="craft__text" style="--craft-size:15px">Build the site as it is so far (pages, role guards, cart and session in Zustand stores, the
+login, sign-up and table-notes forms), with ALL server data in TanStack Query v5:
+- lib/queryClient.ts: staleTime 1 minute; no retry on a 4xx, two retries otherwise; the cache
+  is cleared when the session ends (store subscribe).
+- queries/dishes.ts, account.ts, kitchen.ts with queryOptions: every dish key starts with
+  &quot;dishes&quot;, the profile key holds the guest's email, the queue refetches every 5 seconds.
+- Menu: keepPreviousData, enabled for the search, prefetch on hover and focus of a category,
+  &quot;Try again&quot;, a message for a 429. Home, Menu and the dish page share one entry. No useApi.</pre></div>
+    <div class="craft__part cr-f" data-step="4" data-fx="left" data-label="FORMAT"><span class="craft__badge">F</span><p class="craft__name">Format<small>what the answer looks like</small></p><pre class="craft__text" style="--craft-size:15px">First a table: each piece of server data, its query key and its staleTime. Then every
+file in full with its path.</pre></div>
+    <div class="craft__part cr-t" data-step="5" data-fx="left" data-label="TARGET"><span class="craft__badge">T</span><p class="craft__name">Target<small>who reads it, when it's done</small></p><pre class="craft__text" style="--craft-size:15px">Beginners will read it: one queryClient module, keys in one place, no useState copies of
+query data, v5 syntax only (one options object, gcTime, placeholderData). It must pass npm run build.</pre></div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> One prompt rebuilds everything Le Bistro has so far, from L27 to today. Same five parts as your classwork prompt.</p>
+    <p><b>Do:</b> Press next five times. For each part, one sentence: what would go wrong without it? (No context: Query v4 and <code>cacheTime</code>. No role: code for experts. No action: no prefetch, no polling, a guest-less key. No format: a wall of text. No target: copies of the data in <code>useState</code>.)</p>
+    <p><b>Copy</b> copies the whole prompt with its five labels. Run it once before class. The script is in <code>masterclass.md</code>.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="masterclass" data-title="Run it, then check it">
+  <p class="eyebrow"><b>Masterclass · LAB-34</b> The AI writes fast. You decide if it's right.</p>
+  <h2 class="h2 mt-s">Run it, then check it</h2>
+  <div class="mc-run">
+    <ol class="mc-steps" data-step="1">
+      <li><b>Copy</b> the prompt into an AI tool<span>Claude, ChatGPT, Copilot Chat: any of them. Nothing to attach: the API is named in the prompt</span></li>
+      <li><b>Build</b> what it gives back<span>a new Vite project, every file at its path, plus <code>npm install zustand react-hook-form zod @hookform/resolvers@5 @tanstack/react-query</code></span></li>
+      <li><b>Run</b> <code>npm run dev</code> and <code>npm run build</code><span>an error message goes straight back into the chat</span></li>
+      <li><b>Compare</b> with <code>code/after-L34</code><span>the version we built by hand</span></li>
+    </ol>
+    <div class="mc-check">
+      <p class="k">Check it with what you learned today</p>
+      <ul class="checks"><li data-step="2">Query v5 only: one options object, <code>gcTime</code>, <code>placeholderData</code>; no <code>cacheTime</code>, no <code>onSuccess</code></li><li data-step="3">One <code>queryClient</code> in its own module; the provider is in <code>main.tsx</code>; the cache is never made inside a component</li><li data-step="4">Every key lists what its function uses; the profile key holds the guest</li><li data-step="5">No <code>useEffect</code> fetches and no <code>useState</code> copies query data</li><li data-step="6">A 4xx is not retried; the menu has <code>keepPreviousData</code> and a prefetch</li></ul>
+      <div class="callout is-warn mt-m" data-step="7"><i data-icon="sparkles"></i><div><p class="small">AIs love <code>useEffect</code> + <code>useState</code> around a fetch, even when you ask for TanStack Query. Today you can say why not.</p></div></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Show the answer you got before class, or run it live if there is time. Go through the checks one by one, in the AI's code. Then open <code>code/after-L34</code> next to it.</p>
+    <p><b>Say:</b> Every check is something from today. Without today's lecture you could not judge this code.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="masterclass" data-title="The short version">
+  <p class="eyebrow"><b>Masterclass · LAB-34</b> The same five parts, without the labels</p>
+  <h2 class="h2 mt-s">The short version</h2>
+  <div class="craft craft--short mt-m" data-craft data-on="1:show-parts">
+    <div class="craft__bar"><span><i data-icon="message-square"></i>Prompt · LAB-34 · the short version</span><button type="button" class="copy-btn" data-craft-copy><i data-icon="copy"></i>Copy</button></div>
+    <p class="craft__short"><span class="p-r">You're a senior React developer writing for beginners.</span> <span class="p-c">Le Bistro is a Vite + React 19 + TypeScript + Tailwind 4 app with react-router 8, Zustand 5, react-hook-form 7, zod 4 and @tanstack/react-query 5, and an API at /api through a Vite proxy (dishes by category, where the main courses take 3 seconds; categories; a search that allows 10 requests a minute and then answers 429; a login with a 2-minute token; the profile; and the staff-only order queue).</span> <span class="p-a">Build the site as it is so far (pages, role guards, a cart and a session in Zustand stores, the login, sign-up and table-notes forms) with all server data in TanStack Query v5: a lib/queryClient.ts (staleTime one minute, no retry on a 4xx and two retries otherwise, the cache cleared when the session ends), queries/dishes.ts, account.ts and kitchen.ts with queryOptions (every dish key starts with "dishes", the profile key holds the guest's email, the queue refetches every 5 seconds), and a menu with keepPreviousData, enabled for the search, a prefetch on hover and focus of a category, a "Try again" button and a message for a 429; Home, Menu and the dish page share one entry, and there is no useApi.</span> <span class="p-f">Answer with a table of each piece of server data, its query key and its staleTime, then every file in full with its path.</span> <span class="p-t">Keep it simple for beginners, with keys in one place, no useState copies of query data and v5 syntax only, and make sure npm run build passes.</span></p>
+    <div class="craft__legend" data-step="1"><span class="cr-c">Context</span><span class="cr-r">Role</span><span class="cr-a">Action</span><span class="cr-f">Format</span><span class="cr-t">Target</span></div>
+  </div>
+  <div class="takeaway mt-m" data-step="2"><p class="k">How CRAFT works</p><p>The five parts are a checklist for your thinking, not a form to fill in. Once all five are there, the labels can go.</p></div>
+  <aside class="notes">
+    <p><b>Do:</b> Read it aloud first. Press next: each part lights up in its colour. Ask: if we delete "the guest's email in the profile key", which part is poorer? (Action: the AI may write <code>["profile"]</code>, and Beso sees Maia's data.)</p>
+    <p><b>Say:</b> Long or short, it is the same prompt.</p>
+  </aside>
+</section>
+
+<!-- ============================== WRAP-UP ============================== -->
+
+<section class="slide" data-phase="wrap" data-title="Two problems, two answers">
+  <p class="eyebrow"><b>Dessert</b> What we solved today</p>
+  <h2 class="h2 mt-s">Two problems, two answers</h2>
+  <div class="recap">
+    <div class="recap__row" data-step="1">
+      <div class="recap__p"><p class="k">Problem 1</p><p>The same menu fetched on every page, and forgotten with the page.</p></div>
+      <div class="recap__arrow"><i data-icon="arrow-right"></i></div>
+      <div class="recap__s"><p class="k">A cache by key</p><p><code>useQuery</code> with a key that lists what the function uses. Fresh answers come from the cache, stale ones are refetched when someone looks.</p></div>
+    </div>
+    <div class="recap__row" data-step="2">
+      <div class="recap__p"><p class="k">Problem 2</p><p>Three seconds of nothing, a queue that gets old, a guest who leaves.</p></div>
+      <div class="recap__arrow"><i data-icon="arrow-right"></i></div>
+      <div class="recap__s"><p class="k">Settings, not code</p><p><code>keepPreviousData</code>, <code>prefetchQuery</code>, <code>refetchInterval</code>, a retry rule, the guest in the key and a cache that is cleared.</p></div>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Ask:</b> Before each press, ask the room what the solution was. Then reveal.</p></aside>
+</section>
+
+<section class="slide" data-phase="wrap" data-title="What does this do?">
+  <p class="eyebrow"><b>Dessert</b> Click a card to check yourself</p>
+  <h2 class="h2 mt-s">What does this do?</h2>
+  <div class="flips is-small">
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">01 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">queryKey: ["dishes", "list", category]</script></div><div class="flip__face flip__back"><span class="flip__k">01</span><p>The address of the answer. Same key, same entry; a new category is a new question.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">02 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">staleTime: 60_000</script></div><div class="flip__face flip__back"><span class="flip__k">02</span><p>The answer counts as fresh for a minute: no refetch on mount or on focus.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">03 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">placeholderData: keepPreviousData</script></div><div class="flip__face flip__back"><span class="flip__k">03</span><p>The old answer stays on screen, marked <code>isPlaceholderData</code>, while the new key loads.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">04 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">enabled: !searching</script></div><div class="flip__face flip__back"><span class="flip__k">04</span><p>The query waits: no request until the condition is true.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">05 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">queryClient.prefetchQuery(options)</script></div><div class="flip__face flip__back"><span class="flip__k">05</span><p>Fills the cache for a key without a component, if the entry is not fresh.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">06 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">refetchInterval: 5_000</script></div><div class="flip__face flip__back"><span class="flip__k">06</span><p>Asks again every five seconds while the page is open: for data that changes on its own.</p></div></div></div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Point at a student for each card. They explain, then you click to flip.</p></aside>
+</section>
+
+<section class="slide" data-phase="wrap" data-title="Homework: v0.8">
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Homework</b> Before L35</p><h2 class="h1">Your shop, version 0.8</h2></div>
+    <span class="sticker">Live link required</span>
+  </div>
+  <div class="hw">
+    <div class="tiers">
+      <div class="tier base"><div class="tier__k"><span>Base</span><span>required</span></div><h3>All server data in the cache</h3>
+        <ul><li>A <code>queryClient</code> module and the provider; <code>queries/</code> with <code>queryOptions</code> for products, categories, one product and search.</li><li>Every key lists what its function uses. No fetch hook and no <code>useEffect</code> that fetches.</li><li>Home, list and product page share one request.</li><li><code>keepPreviousData</code> on a category change, and <code>enabled</code> for the search.</li><li>A "Try again" button (<code>refetch</code>) on an error.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Plus</span><span>recommended</span></div><h3>Faster than the click</h3>
+        <ul><li>Prefetch on hover and focus; a retry rule that skips a 4xx; the DevTools screenshot in the README.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Pro</span><span>fast finishers</span></div><h3>A guest's data</h3>
+        <ul><li><code>/auth/me</code> with the guest in the key, and a cache cleared on sign-out. Two accounts, one browser: no leak.</li></ul></div>
+    </div>
+    <div class="cw__side">
+      <div class="done-when"><p class="k">Before you submit</p><ul class="checks"><li>Network tab: list → product → back is one request</li><li>Search for <code>useEffect</code>: none fetches</li><li>The DevTools show your keys</li><li><code>npm run build</code> passes, the Vercel link works</li></ul></div>
+      <p class="small muted">Full brief and grading: <code>homework.md</code>.</p>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Say:</b> Submit the GitHub link and the Vercel link. DummyJSON answers <code>/products</code>, <code>/products/{id}</code>, <code>/products/search?q=</code>, <code>/products/category/{slug}</code> and <code>/products/categories</code>; its answers carry <code>{ products, total, skip, limit }</code>.</p></aside>
+</section>
+
+<section class="slide" data-phase="wrap" data-tone="dark" data-title="Merci">
+  <div class="merci">
+    <div class="stack" style="--gap:22px">
+      <p class="eyebrow"><b>L34</b> La chambre froide</p>
+      <h2 class="display">Merci!</h2>
+      <p class="lead">Questions now, or in the class chat. See you at L35.</p>
+    </div>
+    <div class="teaser" data-step="1">
+      <p class="k">Next time · L35</p>
+      <h3>Send to the kitchen. Nothing changes.</h3>
+      <p>The guest presses "Send to the kitchen". The server says OK, and the screens that show orders stay exactly as they were, because our cache has no idea that something changed. Press it twice and two orders go out. We'll teach the cache to change: mutations, invalidation, and a button that answers before the server does.</p>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Step 1 shows the next problem. Open the account page (with "My orders" if you have it) and a menu in the same browser, send an order and watch: nothing on the account page changes. The kitchen screen in another window only learns after its five-second poll. That is the hook for L35.</p></aside>
+</section>
+
+</div>
+</div>
+
+<script src="../_shared/vendor/icons.js"></script>
+<script src="../_shared/vendor/prism/prism.min.js" data-manual></script>
+<script src="../_shared/vendor/prism/prism-jsx.min.js"></script>
+<script src="../_shared/vendor/prism/prism-typescript.min.js"></script>
+<script src="../_shared/vendor/prism/prism-tsx.min.js"></script>
+<script src="../_shared/vendor/prism/prism-bash.min.js"></script>
+<script src="../_shared/vendor/prism/prism-json.min.js"></script>
+<script src="../_shared/music/tracks.js"></script>
+<script src="../_shared/bistro-data.js"></script>
+<script src="../_shared/deck.js"></script>
+<script src="../track.js"></script>
+<script>
+(function () {
+  'use strict';
+  Track.init();
+  Deck.init({
+    code: 'L34',
+    lecture: 34,
+    title: 'La chambre froide',
+    footer: 'Le Bistro track · L34 · TanStack Query, reading data',
+    shared: '../_shared/',
+    breakMinutes: 10,
+    breakLine: 'Pause café. Stand up, refill, rest your eyes. Back in',
+    phases: [
+      { id: 'hello', label: 'Hello' }, { id: 'questions', label: 'Questions' },
+      { id: 'problem', label: 'Problem 1' }, { id: 'solution', label: 'Solution 1' }, { id: 'classwork', label: 'Classwork 1' },
+      { id: 'break', label: 'Break' },
+      { id: 'problem2', label: 'Problem 2' }, { id: 'solution2', label: 'Solution 2' }, { id: 'classwork2', label: 'Classwork 2 · AI' }, { id: 'masterclass', label: 'Masterclass' },
+      { id: 'wrap', label: 'Wrap-up' }
+    ]
+  });
+
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = Track.esc, BIS = window.BISTRO;
+  document.querySelectorAll('[data-start-break]').forEach(function (b) { b.addEventListener('click', function () { Deck.openBreak(); }); });
+  function cardHtml(id) { return Track.card(Track.byId(id), { desc: false, foot: '' }); }
+  function skel(n) { var h = ''; for (var i = 0; i < n; i++) h += '<div class="skel"></div>'; return '<div class="skel-grid">' + h + '</div>'; }
+  function setOn(group, btn) { Array.prototype.forEach.call(group.children, function (x) { x.classList.toggle('is-on', x === btn); }); }
+
+  /* ---------- 1 · three pages, one menu ---------- */
+  var WS_MS = 800, WS_FAV = [5, 15, 21], WS_MENU = [1, 2, 5, 10, 15, 25];
+  var ws = { mode: 'api', page: 'home', stack: [], cached: false, inflight: false, req: 0, wait: 0, loading: false, timer: null, tour: [] };
+  function wsLog(t, k) { Track.log($('ws-log'), t, k); }
+  var WS_TITLE = { home: 'Today\'s favourites', menu: 'The menu', dish: 'Coq au Vin' };
+  function wsRender() {
+    var h = '<h3>' + WS_TITLE[ws.page] + '</h3>';
+    if (ws.loading) h += ws.page === 'dish' ? '<div class="skel" style="height:140px"></div>' : skel(3);
+    else if (ws.page === 'home') h += '<div class="mgrid">' + WS_FAV.map(cardHtml).join('') + '</div>';
+    else if (ws.page === 'menu') h += '<div class="mgrid">' + WS_MENU.map(function (id) { return Track.card(Track.byId(id), { noImg: true, desc: false, foot: '' }); }).join('') + '</div>';
+    else h += '<div class="ws__dish">' + cardHtml(5) + '<p class="small muted">The dish page finds Coq au Vin in the list of dishes.</p></div>';
+    $('ws-page').innerHTML = h;
+    Array.prototype.forEach.call(document.querySelectorAll('.ws__nav [data-p]'), function (b) { b.classList.toggle('is-on', b.getAttribute('data-p') === ws.page); });
+    $('ws-req').textContent = ws.req; $('ws-wait').textContent = ws.wait.toFixed(1);
+  }
+  function wsLoad() {
+    var who = { home: 'Home', menu: 'Menu', dish: 'The dish page' }[ws.page];
+    if (ws.mode === 'query' && ws.cached) { wsLog(who + ' asks the cache → fresh: no request', 'ok'); ws.loading = false; wsRender(); return; }
+    if (ws.mode === 'query' && ws.inflight) { wsLog(who + ' asks the cache → a request is already running: it shares it', 'ok'); ws.loading = true; wsRender(); return; }
+    clearTimeout(ws.timer);
+    ws.req++; ws.loading = true; ws.inflight = true;
+    var n = ws.req;
+    wsLog('→ #' + n + ' GET /enterprise/dishes   (' + who + ' asked)', 'dim');
+    ws.timer = setTimeout(function () {
+      ws.inflight = false; ws.wait += WS_MS / 1000; ws.loading = false;
+      if (ws.mode === 'query') ws.cached = true;
+      wsLog('← #' + n + ' 200 OK · 0.8 s', 'ok'); wsRender();
+    }, WS_MS);
+    wsRender();
+  }
+  function wsGo(page) {
+    if (page === 'back') { if (!ws.stack.length) return; page = ws.stack.pop(); }
+    else if (page === ws.page) return;
+    else ws.stack.push(ws.page);
+    ws.page = page;
+    $('ws-url').textContent = 'localhost:5173/' + (page === 'home' ? '' : page === 'menu' ? 'menu' : 'menu/5');
+    wsLoad();
+  }
+  function wsReset() {
+    clearTimeout(ws.timer); ws.tour.forEach(clearTimeout); ws.tour = [];
+    ws.page = 'home'; ws.stack = []; ws.cached = false; ws.inflight = false; ws.req = 0; ws.wait = 0;
+    Track.clear($('ws-log')); $('ws-url').textContent = 'localhost:5173/';
+    wsLog('the guest opens the site: Home mounts', 'dim');
+    wsLoad();
+  }
+  document.querySelector('.ws__nav').addEventListener('click', function (e) { var b = e.target.closest('[data-p]'); if (b) wsGo(b.getAttribute('data-p')); });
+  $('ws-mode').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-m]'); if (!b) return;
+    ws.mode = b.getAttribute('data-m'); setOn($('ws-mode'), b); wsReset();
+  });
+  $('ws-reset').addEventListener('click', wsReset);
+  $('ws-tour').addEventListener('click', function () {
+    wsReset();
+    ['menu', 'dish', 'back'].forEach(function (p, i) { ws.tour.push(setTimeout(function () { wsGo(p); }, 1300 * (i + 1))); });
+  });
+  Deck.onSlide('waste', { enter: wsReset, leave: wsReset });
+  wsReset();
+
+  /* ---------- 2 · fresh, stale, inactive, gone (the clocks are scaled down) ---------- */
+  var STALE = 10, GC = 30, FETCH_MS = 1000;
+  var lc = { off: 0, entry: null, obs: 0, ft: null, tick: null };
+  function lcNow() { return Date.now() / 1000 + lc.off; }
+  function lcLog(t, k) { Track.log($('lc-log'), t, k); }
+  function lcAge() { return lc.entry && lc.entry.data ? lcNow() - lc.entry.at : null; }
+  function lcRender() {
+    var e = lc.entry, age = lcAge();
+    $('lc-age').style.width = age === null ? '0' : Math.min(100, age / 40 * 100) + '%';
+    $('lc-age').classList.toggle('is-stale', age !== null && age >= STALE);
+    $('lc-age-t').textContent = age === null ? 'no data' : Math.floor(age) + ' s · ' + (age >= STALE ? 'stale' : 'fresh');
+    var unused = e && !lc.obs && e.inactiveAt !== null ? lcNow() - e.inactiveAt : null;
+    $('lc-gc').style.width = unused === null ? '0' : Math.min(100, unused / GC * 100) + '%';
+    $('lc-gc-t').textContent = unused === null ? (e ? 'in use' : '—') : Math.floor(unused) + ' s of ' + GC;
+    $('lc-state').innerHTML = !e
+      ? '<span class="k">queryKey: ["dishes","list","all"]</span>\n<span class="bad">(no entry in the cache)</span>\n<span class="k">observers: ' + lc.obs + '</span>'
+      : 'queryKey:    <b>["dishes","list","all"]</b>\n' +
+        'status:      <b>"' + (e.data ? 'success' : 'pending') + '"</b>\n' +
+        'fetchStatus: <b>"' + (e.fetching ? 'fetching' : 'idle') + '"</b>\n' +
+        'isPending:   <b>' + !e.data + '</b>\n' +
+        'isFetching:  <b>' + e.fetching + '</b>\n' +
+        'isStale:     <b>' + (age === null ? '–' : age >= STALE) + '</b>\n' +
+        'observers:   <b>' + lc.obs + '</b>' + (lc.obs ? '' : '  (inactive)');
+    var s = $('lc-screen');
+    if (!lc.obs) s.innerHTML = '<h4>On screen</h4><p class="small muted">No component uses this entry.</p>';
+    else if (!e.data) s.innerHTML = '<h4>On screen · isPending</h4>' + skel(3);
+    else s.innerHTML = '<h4>On screen' + (e.fetching ? ' · isFetching: updating in the background' : '') + '</h4><div class="lc__dishes">' + WS_FAV.map(function (id) { return '<span class="lc__dish">' + esc(Track.byId(id).name) + '</span>'; }).join('') + '</div>';
+  }
+  function lcFetch() {
+    lc.entry.fetching = true; lcRender();
+    clearTimeout(lc.ft);
+    lc.ft = setTimeout(function () {
+      if (!lc.entry) return;
+      lc.entry.fetching = false; lc.entry.data = true; lc.entry.at = lcNow();
+      lcLog('← 200 OK: stored, fresh again', 'ok'); lcRender();
+    }, FETCH_MS);
+  }
+  $('lc-mount').addEventListener('click', function () {
+    if (lc.obs) return;
+    lc.obs = 1;
+    if (!lc.entry) { lc.entry = { data: false, fetching: false, at: 0, inactiveAt: null }; lcLog('mounted: no entry → the cache calls queryFn (GET /dishes)', 'dim'); lcFetch(); }
+    else {
+      lc.entry.inactiveAt = null;
+      if (lcAge() !== null && lcAge() >= STALE) { lcLog('mounted: the data is stale → shown at once, refetched in the background', 'warn'); lcFetch(); }
+      else if (lc.entry.data) lcLog('mounted: the data is fresh → shown at once, no request', 'ok');
+      else lcLog('mounted: a request is already running → it shares it', 'ok');
+    }
+    lcRender();
+  });
+  $('lc-unmount').addEventListener('click', function () {
+    if (!lc.obs) return;
+    lc.obs = 0; lc.entry.inactiveAt = lcNow();
+    lcLog('unmounted: nobody uses it → inactive, the gcTime clock starts', 'dim'); lcRender();
+  });
+  $('lc-ff').addEventListener('click', function () { lc.off += 10; lcLog('⏩ ten seconds pass', 'dim'); lcTick(); });
+  function lcReset() { clearTimeout(lc.ft); lc.off = 0; lc.entry = null; lc.obs = 0; Track.clear($('lc-log')); lcRender(); }
+  $('lc-reset').addEventListener('click', lcReset);
+  function lcTick() {
+    var e = lc.entry;
+    if (e && !lc.obs && e.inactiveAt !== null && lcNow() - e.inactiveAt >= GC) { lc.entry = null; clearTimeout(lc.ft); lcLog('gcTime passed: the entry is gone from the cache', 'err'); }
+    lcRender();
+  }
+  Deck.onSlide('lifecycle', { enter: function () { lcReset(); clearInterval(lc.tick); lc.tick = setInterval(lcTick, 200); }, leave: function () { clearInterval(lc.tick); lcReset(); } });
+  lcRender();
+
+  /* ---------- 3 · the key is the address ---------- */
+  var KL = [['starters', 'Starters', 700], ['main-courses', 'Main Courses', 1500], ['desserts', 'Desserts', 700], ['drinks', 'Drinks', 700]];
+  var kl = { mode: 'good', sel: null, cache: {}, loading: false, hit: null, timer: null };
+  function klName(slug) { return KL.filter(function (c) { return c[0] === slug; })[0][1]; }
+  function klKey(slug) { return kl.mode === 'good' ? JSON.stringify(['dishes', 'list', slug]) : JSON.stringify(['dishes']); }
+  function klNames(slug) { return BIS.dishes.filter(function (d) { return d.categorySlug === slug; }).slice(0, 4).map(function (d) { return d.name; }); }
+  function klLog(t, k) { Track.log($('kl-log'), t, k); }
+  function klRender() {
+    $('kl-chips').innerHTML = KL.map(function (c) { return '<button type="button" class="cbtn' + (kl.sel === c[0] ? ' is-on' : '') + '" data-c="' + c[0] + '">' + c[1] + '</button>'; }).join('');
+    var s = $('kl-screen');
+    if (!kl.sel) s.innerHTML = '<p class="small muted">Click a category.</p>';
+    else if (kl.loading) s.innerHTML = '<h4>You clicked ' + klName(kl.sel) + '</h4>' + skel(3);
+    else {
+      var d = kl.cache[klKey(kl.sel)];
+      s.innerHTML = '<h4>You clicked ' + klName(kl.sel) + '</h4><ul class="kl__list">' + d.names.map(function (n) { return '<li>' + esc(n) + '</li>'; }).join('') + '</ul>' +
+        (d.slug !== kl.sel ? '<p class="kl__bad">✗ The screen shows ' + klName(d.slug) + ' under “' + klName(kl.sel) + '”: same key, same entry.</p>' : '');
+    }
+    var keys = Object.keys(kl.cache);
+    $('kl-cache').innerHTML = '<table><thead><tr><th>Key</th><th>Status</th><th>Data</th></tr></thead><tbody>' + (keys.length
+      ? keys.map(function (k) { return '<tr class="' + (kl.hit === k ? 'is-hit' : '') + '"><td>' + esc(k) + '</td><td>fresh</td><td>' + klName(kl.cache[k].slug) + '</td></tr>'; }).join('')
+      : '<tr><td colspan="3" class="k">(the cache is empty)</td></tr>') + '</tbody></table>';
+  }
+  $('kl-chips').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-c]'); if (!b) return;
+    var slug = b.getAttribute('data-c'), key = klKey(slug);
+    kl.sel = slug; clearTimeout(kl.timer);
+    if (kl.cache[key]) { kl.hit = key; kl.loading = false; klLog(key + ' → hit (fresh): no request', 'ok'); klRender(); return; }
+    kl.hit = null; kl.loading = true; klLog(key + ' → miss: GET /dishes?category=' + slug, 'dim'); klRender();
+    var ms = KL.filter(function (c) { return c[0] === slug; })[0][2];
+    kl.timer = setTimeout(function () { kl.cache[key] = { slug: slug, names: klNames(slug) }; kl.loading = false; klLog('← 200: stored under ' + key, 'ok'); klRender(); }, ms);
+  });
+  function klReset() { clearTimeout(kl.timer); kl.sel = null; kl.cache = {}; kl.loading = false; kl.hit = null; Track.clear($('kl-log')); klRender(); }
+  $('kl-key').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-m]'); if (!b) return;
+    kl.mode = b.getAttribute('data-m'); setOn($('kl-key'), b); klReset();
+  });
+  Deck.onSlide('keylab', { leave: klReset });
+  klRender();
+
+  /* ---------- 4 · a category switch: blank screen, or not ---------- */
+  var SW = [['all', 'Everything', 500], ['starters', 'Starters', 500], ['main-courses', 'Main Courses', 3000], ['desserts', 'Desserts', 500], ['drinks', 'Drinks', 450]];
+  function swIds(slug) { return slug === 'all' ? [1, 5, 10, 15, 21, 25] : BIS.dishes.filter(function (d) { return d.categorySlug === slug; }).slice(0, 6).map(function (d) { return d.id; }); }
+  function swMs(slug) { return SW.filter(function (c) { return c[0] === slug; })[0][2]; }
+  function swName(slug) { return SW.filter(function (c) { return c[0] === slug; })[0][1]; }
+  function makeSwitch(rootId, withToggles) {
+    var root = $(rootId), opt = { keep: false, pre: false };
+    var S = { sel: 'all', shown: 'all', loading: false, since: 0, clickAt: 0, cache: { all: true }, fly: {}, req: 0, blank: 0, last: '—', timers: [], tick: null };
+    root.innerHTML =
+      '<div class="sw__left">' + (withToggles
+        ? '<div class="ph__opts"><label class="ph__opt"><input type="checkbox" data-opt="keep"><span><b>Keep the old dishes</b> <code>placeholderData: keepPreviousData</code></span></label>' +
+          '<label class="ph__opt"><input type="checkbox" data-opt="pre"><span><b>Prefetch on hover</b> <code>prefetchQuery</code></span></label></div>' : '') +
+      '<div class="chips-row" data-r="chips"></div><div class="sw__screen" data-r="screen"></div></div>' +
+      '<div class="sw__right"><div class="counters"><div><b data-r="n-req">0</b><span>requests</span></div><div><b data-r="n-blank">0.0</b><span>seconds of blank screen</span></div><div><b data-r="n-last">—</b><span>last click → dishes</span></div></div>' +
+      '<div class="devtools" data-r="log"><div class="devtools__head"><b>Network</b><span>GET /dishes?category=…</span></div><div class="devtools__body"></div></div>' +
+      '<p class="ph__verdict" data-r="verdict"></p></div>';
+    var r = function (k) { return root.querySelector('[data-r="' + k + '"]'); };
+    var log = function (t, k) { Track.log(r('log'), t, k); };
+    function blankNow() { return S.blank + (S.since ? (Date.now() - S.since) / 1000 : 0); }
+    function render() {
+      r('chips').innerHTML = SW.map(function (c) { return '<button type="button" class="cbtn' + (S.sel === c[0] ? ' is-on' : '') + '" data-c="' + c[0] + '">' + c[1] + '<small>' + (c[2] / 1000).toFixed(c[2] % 1000 ? 2 : 0).replace(/0$/, '').replace(/\.$/, '') + ' s</small></button>'; }).join('');
+      var scr = r('screen'), grid = '<div class="sw__grid">' + swIds(S.shown).map(cardHtml).join('') + '</div>';
+      if (S.loading && !(opt.keep && S.shown)) { scr.className = 'sw__screen'; scr.innerHTML = '<p class="sw__h">' + swName(S.sel) + '</p>' + skel(6); }
+      else if (S.loading) { scr.className = 'sw__screen is-dim'; scr.innerHTML = '<span class="sw__badge">Loading ' + swName(S.sel) + '…</span>' + grid; }
+      else { scr.className = 'sw__screen'; scr.innerHTML = '<p class="sw__h">' + swName(S.shown) + '</p>' + grid; }
+      r('n-req').textContent = S.req; r('n-blank').textContent = blankNow().toFixed(1); r('n-last').textContent = S.last;
+    }
+    function stopBlank() { if (S.since) { S.blank += (Date.now() - S.since) / 1000; S.since = 0; } }
+    function show(slug, source) {
+      S.shown = slug; S.loading = false; stopBlank();
+      var ms = Date.now() - S.clickAt;
+      S.last = ms < 1000 ? ms + ' ms' : (ms / 1000).toFixed(1) + ' s';
+      var v = r('verdict');
+      v.className = 'ph__verdict ' + (ms < 300 ? 'is-good' : 'is-bad');
+      v.textContent = swName(slug) + ': dishes after ' + S.last + (source === 'cache' ? ' (from the cache)' : ' (waited for the server)');
+      render();
+    }
+    function fetchCat(slug, why) {
+      if (S.fly[slug]) return;
+      var n = ++S.req, t0 = Date.now();
+      S.fly[slug] = true;
+      log('→ #' + n + ' ' + slug + (why === 'hover' ? '  (prefetch on hover)' : ''), 'dim');
+      S.timers.push(setTimeout(function () {
+        delete S.fly[slug]; S.cache[slug] = true;
+        log('← #' + n + ' ' + slug + ' · ' + ((Date.now() - t0) / 1000).toFixed(1) + ' s', 'ok');
+        if (S.loading && S.sel === slug) show(slug, 'server'); else render();
+      }, swMs(slug)));
+    }
+    root.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-c]'); if (!b) return;
+      var slug = b.getAttribute('data-c');
+      S.sel = slug; S.clickAt = Date.now();
+      if (S.cache[slug]) { show(slug, 'cache'); log('click ' + slug + ' → in the cache: no request', 'ok'); return; }
+      S.loading = true;
+      if (!(opt.keep && S.shown) && !S.since) S.since = Date.now();
+      if (S.fly[slug]) log('click ' + slug + ' → its request is already running: waits for it', 'warn'); else fetchCat(slug, 'click');
+      render();
+    });
+    root.addEventListener('mouseover', function (e) {
+      var b = e.target.closest('[data-c]'); if (!b || b.contains(e.relatedTarget)) return;
+      var slug = b.getAttribute('data-c');
+      if (opt.pre && !S.cache[slug] && !S.fly[slug]) { fetchCat(slug, 'hover'); render(); }
+    });
+    root.addEventListener('change', function (e) { var o = e.target.getAttribute && e.target.getAttribute('data-opt'); if (!o) return; opt[o] = e.target.checked; reset(); });
+    function reset() {
+      S.timers.forEach(clearTimeout); S.timers = []; clearInterval(S.tick);
+      S.sel = 'all'; S.shown = 'all'; S.loading = false; S.since = 0; S.cache = { all: true }; S.fly = {}; S.req = 0; S.blank = 0; S.last = '—';
+      Track.clear(r('log')); r('verdict').className = 'ph__verdict'; r('verdict').textContent = '';
+      S.tick = setInterval(function () { if (S.since) r('n-blank').textContent = blankNow().toFixed(1); }, 100);
+      render();
+    }
+    reset();
+    return { reset: reset };
+  }
+  var sw1 = makeSwitch('sw1', false), sw2 = makeSwitch('sw2', true);
+  Deck.onSlide('switch', { enter: sw1.reset, leave: sw1.reset });
+  Deck.onSlide('switch2', { enter: sw2.reset, leave: sw2.reset });
+
+  /* ---------- 5 · the kitchen's queue ---------- */
+  var QU_WHO = ['Nino K.', 'Giorgi M.', 'Ana T.', 'Beso L.', 'Maia B.', 'Sandro P.', 'Tamar G.', 'Luka D.', 'Eka S.', 'Zura N.', 'Mari K.', 'Dato C.', 'Salome R.', 'Irakli V.'];
+  function quOrder(i) { return { id: 100 + i, who: QU_WHO[i % QU_WHO.length], items: 1 + (i % 3), status: i % 2 ? 'COOKING' : 'PENDING' }; }
+  function makeQueue(rootId, withToggles) {
+    var root = $(rootId), opt = { poll: false, focus: false };
+    var S = { server: [], copy: [], at: 0, fetching: false, srv: null, poll: null, tick: null, fresh: 0 };
+    root.innerHTML =
+      '<div class="qu__left">' + (withToggles
+        ? '<div class="ph__opts"><label class="ph__opt"><input type="checkbox" data-opt="poll"><span><b>Refetch every 5 seconds</b> <code>refetchInterval: 5_000</code></span></label>' +
+          '<label class="ph__opt"><input type="checkbox" data-opt="focus"><span><b>Refetch when the guest comes back</b> <code>refetchOnWindowFocus</code></span></label></div>' : '') +
+      '<div class="qu__page"><div class="qu__head"><b>The pass</b><span class="qu__chip" data-r="chip"></span></div><ul class="qu__list" data-r="list"></ul>' +
+      '<div class="row" style="--gap:10px;flex-wrap:wrap"><button type="button" class="btn is-ghost" data-r="reload">Reload the page (F5)</button>' + (withToggles ? '<button type="button" class="btn is-ghost" data-r="focus">Switch to another tab and back</button>' : '') + '</div></div></div>' +
+      '<div class="qu__right"><div class="counters"><div><b data-r="n-srv">3</b><span>orders at the server</span></div><div><b data-r="n-page">3</b><span>orders on the page</span></div><div><b data-r="n-behind">0</b><span>the page is behind</span></div></div>' +
+      '<div class="devtools" data-r="log"><div class="devtools__head"><b>Network</b><span>GET /orders/queue</span></div><div class="devtools__body"></div></div></div>';
+    var r = function (k) { return root.querySelector('[data-r="' + k + '"]'); };
+    var log = function (t, k) { Track.log(r('log'), t, k); };
+    function render() {
+      var age = Math.floor((Date.now() - S.at) / 1000);
+      r('chip').textContent = S.fetching ? 'Updating…' : 'updated ' + age + ' s ago';
+      r('chip').className = 'qu__chip' + (S.fetching ? ' is-busy' : '');
+      var rows = S.copy.slice(-5).reverse();
+      r('list').innerHTML = rows.map(function (o) { return '<li class="qu__order' + (o.id > S.fresh ? ' is-new' : '') + '"><span><b>' + esc(o.who) + '</b> · ' + o.items + ' item' + (o.items > 1 ? 's' : '') + '<em>' + o.status + '</em></span><i>#' + o.id + '</i></li>'; }).join('');
+      r('n-srv').textContent = S.server.length; r('n-page').textContent = S.copy.length; r('n-behind').textContent = S.server.length - S.copy.length;
+    }
+    function fetchQueue(why) {
+      if (S.fetching) return;
+      S.fetching = true; log('→ GET /orders/queue  (' + why + ')', 'dim'); render();
+      setTimeout(function () {
+        S.fresh = S.copy.length ? S.copy[S.copy.length - 1].id : 0;
+        S.copy = S.server.slice(); S.at = Date.now(); S.fetching = false;
+        log('← 200 · ' + S.copy.length + ' orders', 'ok'); render();
+      }, 400);
+    }
+    function armPoll() { clearInterval(S.poll); if (opt.poll) S.poll = setInterval(function () { fetchQueue('every 5 s'); }, 5000); }
+    function reset() {
+      clearInterval(S.srv); clearInterval(S.poll); clearInterval(S.tick);
+      S.server = [quOrder(0), quOrder(1), quOrder(2)]; S.copy = S.server.slice(); S.at = Date.now(); S.fetching = false; S.fresh = 102;
+      Track.clear(r('log')); log('the page opens: GET /orders/queue → 3 orders', 'ok');
+      S.srv = setInterval(function () { if (S.server.length < 14) { S.server.push(quOrder(S.server.length)); log('(at the server) a new order arrives: #' + S.server[S.server.length - 1].id, 'dim'); render(); } }, 4000);
+      S.tick = setInterval(render, 500); armPoll(); render();
+    }
+    function stop() { clearInterval(S.srv); clearInterval(S.poll); clearInterval(S.tick); }
+    r('reload').addEventListener('click', function () { fetchQueue('F5'); });
+    if (withToggles) r('focus').addEventListener('click', function () {
+      if (opt.focus) fetchQueue('window focus'); else log('back on the tab: nothing happens (refetchOnWindowFocus is off)', 'warn');
+    });
+    root.addEventListener('change', function (e) { var o = e.target.getAttribute && e.target.getAttribute('data-opt'); if (!o) return; opt[o] = e.target.checked; armPoll(); });
+    reset(); stop();
+    return { start: reset, stop: stop };
+  }
+  var qu1 = makeQueue('qu1', false), qu2 = makeQueue('qu2', true);
+  Deck.onSlide('queue', { enter: qu1.start, leave: qu1.stop });
+  Deck.onSlide('queue2', { enter: qu2.start, leave: qu2.stop });
+
+  /* ---------- 6 · retry ---------- */
+  var RT_SCALE = 0.4, RT_AXIS = 8; // 1 nominal second = 0.4 real seconds; the axis shows 0 to 8 s
+  var rt = { policy: 'ours', run: 0, timers: [], n: 0, marks: [], end: null };
+  var RT_LABEL = { '500': '500 Server error', net: 'no network', '404': '404 Not found', '429': '429 Too many requests' };
+  function rtLog(t, k) { Track.log($('rt-log'), t, k); }
+  function rtShould(count, kind) { return rt.policy === 'ours' ? (kind !== '404' && kind !== '429' && count < 2) : count < 3; }
+  function rtDraw() {
+    var h = '<div class="rt__axis"></div>';
+    var pos = function (t) { return (4 + Math.min(t, RT_AXIS) / RT_AXIS * 92).toFixed(1); };
+    for (var s = 0; s <= RT_AXIS; s++) h += '<span class="rt__tick" style="left:' + pos(s) + '%">' + s + ' s</span>';
+    h += rt.marks.map(function (t, i) { return '<b class="rt__dot" style="left:' + pos(t) + '%">' + (i + 1) + '</b>'; }).join('');
+    if (rt.end) h += '<b class="rt__end is-' + rt.end.kind + '" style="left:' + pos(rt.end.t) + '%">' + (rt.end.kind === 'ok' ? '✓' : '✗') + '</b>';
+    $('rt-line').innerHTML = h;
+  }
+  function rtStop() { rt.run++; rt.timers.forEach(clearTimeout); rt.timers = []; }
+  function rtRun(kind) {
+    rtStop(); Track.clear($('rt-log')); rt.n = 0; rt.marks = []; rt.end = null;
+    $('rt-n').textContent = '0'; $('rt-t').textContent = '0';
+    var run = rt.run, t = 0, count = 0;
+    function attempt() {
+      if (run !== rt.run) return;
+      rt.n++; rt.marks.push(t); $('rt-n').textContent = rt.n;
+      rtLog('→ attempt ' + rt.n + ' at ' + t + ' s', 'dim'); rtDraw();
+      rt.timers.push(setTimeout(function () {
+        if (run !== rt.run) return;
+        if (kind === '200') { rtLog('← 200 OK: the page shows the dishes', 'ok'); rt.end = { t: t, kind: 'ok' }; rtDraw(); return; }
+        if (rtShould(count, kind)) {
+          var delay = Math.min(1000 * Math.pow(2, count), 30000) / 1000;
+          rtLog('← ' + RT_LABEL[kind] + ' → retry in ' + delay + ' s', 'warn');
+          count++; t += delay;
+          rt.timers.push(setTimeout(attempt, delay * 1000 * RT_SCALE));
+        } else {
+          rtLog('← ' + RT_LABEL[kind] + ' → gives up: the error is shown', 'err');
+          $('rt-t').textContent = String(t); rt.end = { t: t, kind: 'err' }; rtDraw();
+        }
+      }, 120));
+    }
+    attempt();
+  }
+  document.querySelector('.rt__btns').addEventListener('click', function (e) { var b = e.target.closest('[data-f]'); if (b) rtRun(b.getAttribute('data-f')); });
+  $('rt-policy').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-m]'); if (!b) return;
+    rt.policy = b.getAttribute('data-m'); setOn($('rt-policy'), b); rtReset();
+  });
+  function rtReset() { rtStop(); rt.n = 0; rt.marks = []; rt.end = null; $('rt-n').textContent = '0'; $('rt-t').textContent = '0'; Track.clear($('rt-log')); rtDraw(); }
+  Deck.onSlide('retry', { leave: rtReset });
+  rtDraw();
+
+  /* ---------- 7 · two guests, one cache ---------- */
+  var LK_USERS = { Maia: { email: 'maia@example.ge', name: 'Maia Beridze' }, Beso: { email: 'beso@example.ge', name: 'Beso Kapanadze' } };
+  var lk = { user: null, cache: {}, opt: { key: false, clear: false }, loading: false, timer: null };
+  function lkKey(u) { return lk.opt.key ? '["profile","' + LK_USERS[u].email + '"]' : '["profile"]'; }
+  function lkRender() {
+    var s = $('lk-screen');
+    if (!lk.user) s.innerHTML = '<h4>Signed out</h4><p class="small muted">RequireAuth sends the guest to /login.</p>';
+    else if (lk.loading) s.innerHTML = '<h4>My account · ' + lk.user + '</h4>' + skel(3);
+    else {
+      var d = lk.cache[lkKey(lk.user)], o = LK_USERS[d.owner];
+      s.innerHTML = '<h4>My account · signed in as ' + lk.user + '</h4><dl class="lk__dl"><dt>Name</dt><dd>' + esc(o.name) + '</dd><dt>Email</dt><dd>' + esc(o.email) + '</dd><dt>Role</dt><dd>student</dd></dl>' +
+        (d.owner !== lk.user ? '<p class="kl__bad">✗ ' + lk.user + ' is looking at ' + d.owner + '\'s profile!</p>' : '');
+    }
+    var keys = Object.keys(lk.cache);
+    $('lk-cache').innerHTML = '<table><thead><tr><th>Key</th><th>Status</th><th>Belongs to</th></tr></thead><tbody>' + (keys.length
+      ? keys.map(function (k) { return '<tr><td>' + esc(k) + '</td><td>fresh</td><td>' + lk.cache[k].owner + '</td></tr>'; }).join('')
+      : '<tr><td colspan="3" class="k">(the cache is empty)</td></tr>') + '</tbody></table>';
+  }
+  function lkReset() { clearTimeout(lk.timer); lk.user = null; lk.cache = {}; lk.loading = false; lkRender(); }
+  document.querySelectorAll('[data-u]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var u = b.getAttribute('data-u'), key = lkKey(u);
+      clearTimeout(lk.timer); lk.user = u;
+      if (lk.cache[key]) { lk.loading = false; lkRender(); return; }
+      lk.loading = true; lkRender();
+      lk.timer = setTimeout(function () { lk.cache[key] = { owner: u }; lk.loading = false; lkRender(); }, 700);
+    });
+  });
+  $('lk-out').addEventListener('click', function () { clearTimeout(lk.timer); lk.user = null; lk.loading = false; if (lk.opt.clear) lk.cache = {}; lkRender(); });
+  $('lk-reset').addEventListener('click', lkReset);
+  document.querySelector('.lk__left').addEventListener('change', function (e) { var o = e.target.getAttribute && e.target.getAttribute('data-opt'); if (!o) return; lk.opt[o] = e.target.checked; lkReset(); });
+  Deck.onSlide('leak', { leave: lkReset });
+  lkRender();
+})();
+</script>
+</body>
+</html>

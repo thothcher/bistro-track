@@ -2,6 +2,8 @@
 
 For lecturers who teach L27–L31 and are new to React, or new to these decks. Read it once; after that, each lecture's `guide.md` is all you need.
 
+> The track now continues with **L32–L36** (Zustand, forms, TanStack Query, accessible UI) and **L37–** (testing and what follows). Everything below applies to them too; section 9 adds what is specific to the second five, and section 10 what is specific to the third.
+
 ---
 
 ## 1. Set up once
@@ -135,3 +137,101 @@ Running late? Each guide names the slides you can skip.
 | `npm warn EBADENGINE … react-router … node: '>=22.22.0'` | Node is too old: install Node 24 LTS |
 
 Further reading: [react.dev/learn](https://react.dev/learn) (the official tutorial, chapters "Describing the UI" to "Escape Hatches") and [reactrouter.com](https://reactrouter.com) (declarative mode).
+
+---
+
+## 9. The second five (L32–L36) in one page
+
+**What each lecture adds to Le Bistro.** L32 Zustand stores for the cart and the session. L33 forms with React Hook Form and Zod. L34 TanStack Query for reading data. L35 TanStack Query for changing data: mutations, optimistic updates, infinite lists. L36 accessible UI with shadcn/ui. The students' versions are v0.6 to v1.0.
+
+**Versions the snapshots were checked with** (npm, October 2026): React 19.3.1, React Router 8.5.0, Vite 8.3.4, TypeScript 6.0.3 (TypeScript 7 exists; the snapshots stay on 6.0), Tailwind CSS 4.3.3, Zustand 5.0.15, React Hook Form 7.90.0, Zod 4.6.7, `@hookform/resolvers` **5.9.2**, TanStack Query 5.104.5, Radix UI 1.8.1, shadcn CLI 4.22.1, Sonner 2.0.8. Install `@hookform/resolvers@5`: version 6 fails with `ERESOLVE` on npm 11. Node 24 and npm 11 were used.
+
+**Where does this state live? (the full table)**
+
+| Kind | Example | Where |
+|---|---|---|
+| UI of one component | Is the cart panel open? | `useState` in that component |
+| Shared by nearby components | Selected category and the list | Lifted to the closest common parent |
+| Should survive F5 or be shareable | `?category=drinks`, `/menu/5` | The URL (router) |
+| Many readers, changes now and then | The cart, the session | A Zustand store, read with selectors (L32); Context is fine for rare changes |
+| A form while it is being filled | A sign-up | React Hook Form, with a Zod schema (L33) |
+| Data from a server | The menu, my orders | TanStack Query: reading (L34), changing (L35) |
+
+**Errors you will meet in the second five**
+
+| Message | Cause |
+|---|---|
+| `npm error ERESOLVE … @hookform/resolvers` | version 6 of the resolvers: install `@hookform/resolvers@5` |
+| `TS2769 · Property 'queryKey' is missing in type 'string[]'` | TanStack Query v4 syntax: `useQuery` takes one options object |
+| `No QueryClient set, use QueryClientProvider to set one` | the provider is missing from `main.tsx` |
+| `TS2559 · … has no properties in common with type 'UseMutationOptions<…>'` | `useMutation(fn, { … })`: v4 syntax; one options object |
+| `Uncaught (in promise) ApiError` | `mutateAsync` without a `try`/`catch` |
+| `✖ Validating import alias. Could not find valid path aliases…` | `shadcn init` before the `@/` alias exists (L36) |
+| `TS2307 · Cannot find module '@/…'` | the alias `paths` are missing from a `tsconfig` file |
+
+**Practical notes**
+
+- **The API's account endpoints were not tested live.** Sign-in, the server's cart, orders, the kitchen queue and the profile are built from the Swagger description. Run the flow once with a test account before L32, L35 and L36. Tokens live 2 minutes.
+- **L36 needs internet** for the live shadcn setup (the CLI contacts its registry) and, for the audit moment, the axe DevTools extension (or Lighthouse) in Chrome.
+- **Accessibility lint:** `npx oxlint --jsx-a11y-plugin -D jsx-a11y src` (the rules are off in `npm run lint`).
+- **Keyboard demos** in L36 use real keys: click once inside a demo before you press them.
+
+---
+
+## 10. The third five (L37–L41) in one page
+
+**What each lecture adds to Le Bistro.** L37 (syllabus L39) tests: a net of 115 tests, a fake kitchen and a CI workflow. The students' version is v1.1.
+
+**Every deck has its own look, on purpose.** The decks of the third five share the engine (`_shared/`), the track's component styles (through `_kit/kit.css`) and the lecture flow, but each has its own colours, fonts, cover and motifs, so that a lecture is recognised from the other side of the room. The look lives in the deck's `skin.css`; if a slide looks different from L27–L36, that is not a bug.
+
+**Hands-on demos and real websites.** Each deck has eight to ten demos you or the students work with (the guide's "The demos" table says what to do in each) and one or two slides that compare with a real website or project. The numbers on those slides were measured on a given day (the date is on the slide); pages change, so open the real thing before you promise what it shows.
+
+**Versions the L37 snapshot was checked with** (npm, October 2026): Vitest 5.0.5 and `@vitest/coverage-v8` 5.0.5, jsdom 30.1.3, `@testing-library/react` 16.3.3, `@testing-library/dom` 10.4.2, `@testing-library/user-event` 14.6.8, `@testing-library/jest-dom` 7.0.1, MSW 3.0.3 (React and the rest as in section 9). Vitest 5 needs Node 22.12, 24 or 26 and newer; React Router 8 needs 22.22 or newer. Node 24 was used.
+
+**Errors you will meet in L37**
+
+| Message | Cause |
+|---|---|
+| `No test files found, exiting with code 1` | the file is not called `*.test.ts(x)` (or the filter matches nothing) |
+| `ReferenceError: describe is not defined` | globals are off: import `describe`, `it`, `expect` from `"vitest"` |
+| `Invalid Chai property: toBeInTheDocument` | the jest-dom matchers are not loaded in `src/test/setup.ts` |
+| `Found multiple elements with the role "button"` in the second test | no `cleanup()` after each test |
+| `expected "vi.fn()" to be called 1 times, but got 0 times` | a `user.click` without `await` |
+| `[MSW] Error: intercepted a request without a matching request handler` | a request nobody planned (that is what `onUnhandledFrame: "error"` is for): add a handler |
+| `MISSING DEPENDENCY  Cannot find dependency 'jsdom'` | `npm install -D jsdom` |
+
+The guide's "When something breaks" has the full table.
+
+**Practical notes**
+
+- **The tests never call the real API.** They run against a fake (MSW), so they need no internet. The login, cart and order shapes come from the Swagger description and were not checked on the live server.
+- **The search endpoint of the Le Bistro API answers `429` after ten requests a minute** (with `Retry-After: 60`): do not run live searches in a loop during class.
+- **The CI workflow has not been run on GitHub.** Push `code/after-L37` to a practice repository, open a pull request and watch the checks once before class; slide 36 (a pull-request simulator) is the fallback.
+- **`npm audit` reports seven high-severity findings** in the L37 snapshot, all through the `shadcn` command-line tool (a dependency chain down to `braces`). They never reach the browser bundle; the Security Day uses them as a practice case.
+
+**L38 (syllabus L40) adds speed and resilience.** Le Bistro gets the React Compiler, lazy pages, three levels of error boundary, a search box that does not lose letters, a kitchen page that stays light with 800 orders, and a size budget that the L37 robot enforces. The students' version is v1.2: a before/after table of numbers in the README.
+
+**Versions the L38 snapshot was checked with** (npm, October 2026): `babel-plugin-react-compiler` 1.0.0, `@rolldown/plugin-babel` 0.2.4, `@babel/core` 7.29, `react-error-boundary` 6.1.6, `@tanstack/react-virtual` 3.14, Vite 8.3.5 (React and the rest as in sections 9 and 10).
+
+**Errors you will meet in L38**
+
+| Message | Cause |
+|---|---|
+| `Error: Cannot find package '@babel/core'` | the compiler needs all four packages installed |
+| `lazy: Expected the result of a dynamic import() call` then `Element type is invalid. Received a promise that resolves to: undefined` | a lazy page with no default export: `.then((m) => ({ default: m.Page }))` |
+| the Profiler says **Profiling not supported** | the page is a plain production build: use `npm run dev` for the Profiler, or a profiling build |
+| `TypeError: Failed to fetch dynamically imported module` | the file is gone after a deploy: the `vite:preloadError` handler |
+| `Cannot access refs during render` | the compiler's (and the linter's) message for a render counter written with a ref |
+| `Over budget by … kB` (from `npm run size`) | something got heavier: read the treemap, `lazy()` it, or raise the budget with a reason |
+| a virtual list shows no rows in a test | jsdom has no layout: `giveElementsASize()` in `src/test/layout.ts` |
+
+The guide's "When something breaks" has the full table.
+
+**Practical notes**
+
+- **Measure on a preview, not on `npm run dev`.** React Scan works on `npm run build && npm run preview`; the React Developer Tools Profiler works with `npm run dev` (and its milliseconds are not the guests'). The numbers on the slides come from one laptop on 2026-10-22: tell the students that theirs will differ and that the proportions will not.
+- **Five demos run real React** inside the slides (`L38-performance/vendor/perf-lab.js`, 340 kB). They count renders and milliseconds in the browser that shows them.
+- **The photos are not part of the measured waterfall.** The test harness served them from disk, outside the network throttle: the slide gives only when they were asked for, and the seconds are arithmetic. Say so if someone asks.
+- **The staff kitchen page** (`/kitchen`, `kitchen@itstep.ge` or `waiter@itstep.ge`) and its order queue were **not** called on the live server. `/kitchen?rush=800` (development only) adds 800 pretend orders. If the live login fails, `npm test -- KitchenPage` runs the page against a fake kitchen, and the slides do not need it.
+- **The CI workflow has a new step, `npm run size`, and has still not run on GitHub.**
+- **The build prints a Rolldown notice about slow plugin callbacks** after the compiler is on. It is not an error.
