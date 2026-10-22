@@ -1,0 +1,1646 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Le serveur · L35</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Karla:ital,wght@0,400..800;1,400..800&family=JetBrains+Mono:wght@400..700&display=swap">
+<link rel="stylesheet" href="../_shared/deck.css">
+<link rel="stylesheet" href="../track.css">
+<style>
+/* ---------- L33 only ---------- */
+.sofar { display: flex; align-items: center; gap: 12px; margin-top: 18px; font: 700 14px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+.sofar b { color: var(--good); }
+.sofar span { padding: 8px 12px; background: color-mix(in srgb, var(--good) 12%, transparent); color: var(--good); border-radius: 999px; }
+
+.state { background: #1d1816; color: #e9dcc8; border-radius: 12px; padding: 16px 20px; font: 500 18px/1.55 var(--f-mono); white-space: pre; box-shadow: var(--shadow-1); overflow: hidden; }
+.state b { color: #f3cd83; font-weight: 600; }
+.state .k { color: #9c8f84; }
+.state .bad { color: #ffb4a8; }
+.state .ok { color: #b9d89a; }
+.why3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 24px; }
+.why3 .takeaway { padding: 16px 22px; }
+.why3 .takeaway p { font-size: 21px; line-height: 1.4; }
+.idea__side.is-tight .takeaway { padding: 16px 22px; }
+.idea__side.is-tight .takeaway p { font-size: 21px; line-height: 1.4; }
+.ph__verdict:empty { display: none; }
+.is-render { animation: rflash .9s ease; }
+@keyframes rflash { 0% { box-shadow: 0 0 0 5px #f3cd83; background: #fbe9c2; } 100% { box-shadow: 0 0 0 0 transparent; } }
+.counters { display: flex; gap: 12px; }
+.counters div { flex: 1; padding: 12px 14px; background: var(--surface-2); border-radius: 10px; }
+.counters b { display: block; font: 700 34px/1 var(--f-mono); color: var(--wine); }
+.counters span { font: 700 12px/1.3 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+.seg.is-modes button { font-size: 17px; padding: 12px 16px; }
+
+/* diagrams */
+.stor .node { min-width: 0; }
+.stor .node.is-sub { box-shadow: var(--shadow-1), 0 0 0 3px var(--good); background: color-mix(in srgb, var(--good) 12%, var(--surface)); }
+.stor .node.is-quiet { opacity: .45; }
+
+/* the little Le Bistro form used in the demos: the same look as the real one */
+.fm { position: relative; display: flex; flex-direction: column; gap: 12px; padding: 22px 26px 24px; background: #fdfaf2; border: 1px solid #ddd2bf; border-radius: 6px; box-shadow: var(--shadow-1); color: #2e2a26; font-family: var(--f-body); }
+.fm--wide { min-height: 440px; }
+.fm__field { display: flex; flex-direction: column; gap: 6px; font: 600 16px/1.2 var(--f-body); color: #2e2a26; }
+.fm__input { width: 100%; box-sizing: border-box; padding: 11px 13px; border: 1px solid #ddd2bf; border-radius: 0; background: #f6f1e7; font: 400 20px/1.2 var(--f-body); color: #2e2a26; outline: none; }
+.fm__input:focus { border-color: #2e2a26; box-shadow: 0 0 0 3px rgba(46, 42, 38, .12); }
+.fm__input.is-bad { border-color: #a93b2c; }
+.fm__slot { min-height: 22px; font: 400 16px/1.35 var(--f-body); color: #a93b2c; }
+.fm__slot.is-hint { color: #6e645a; }
+.fm__slot.is-ok { color: #3f6b4a; }
+.fm__btn { appearance: none; border: 0; cursor: pointer; padding: 15px 18px; border-radius: 0; background: #5c1a23; color: #fdfaf2; font: 700 17px/1 var(--f-body); }
+.fm__ghost { appearance: none; cursor: pointer; padding: 13px 18px; background: transparent; border: 1px solid #5c1a23; color: #5c1a23; font: 700 16px/1 var(--f-body); border-radius: 0; }
+.fm__step { margin: 0; font: 700 14px/1 var(--f-mono); letter-spacing: .14em; text-transform: uppercase; color: #a98545; }
+.fm__done { margin: 0; min-height: 20px; font: 600 16px/1.3 var(--f-body); color: #3f6b4a; }
+.fm__actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: auto; padding-top: 10px; }
+.fm__stepper { display: inline-flex; align-items: center; align-self: flex-start; border: 1px solid #ddd2bf; background: #f6f1e7; }
+.fm__stepper button { appearance: none; border: 0; background: transparent; cursor: pointer; padding: 8px 16px; font: 700 22px/1 var(--f-body); color: #2e2a26; }
+.fm__stepper output { min-width: 40px; text-align: center; font: 700 22px/1 var(--f-body); }
+.fm__guests { display: flex; flex-direction: column; gap: 10px; }
+.fm__guest { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+.fm__guest .fm__input { font-size: 18px; padding: 9px 11px; }
+.fm__x { appearance: none; border: 0; background: transparent; cursor: pointer; padding: 6px 10px; font: 400 20px/1 var(--f-body); color: #6e645a; }
+.fm__review { padding: 14px 16px; background: #f6f1e7; border: 1px solid #ddd2bf; }
+.fm__review p { margin: 0; font: 500 20px/1.4 var(--f-body); }
+.fm__review .fm__k { font: 700 13px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: #a98545; margin-bottom: 8px; }
+.fm.is-render { animation: rflash .9s ease; }
+
+/* problem 1: type, count the renders */
+.kd { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 430px; gap: 34px; margin-top: 20px; align-items: start; }
+.kd__col { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.kd__h { margin: 0; display: flex; flex-direction: column; gap: 4px; }
+.kd__h b { font: 700 24px/1.1 var(--f-body); color: var(--wine); }
+.kd__h span { font: 500 17px/1.2 var(--f-mono); color: var(--ink-3); }
+.kd__num { display: flex; align-items: baseline; gap: 16px; padding: 12px 22px; background: var(--surface); border-radius: var(--card-r); box-shadow: var(--shadow-1); border-left: 5px solid var(--wine); }
+.kd__num b { font: 700 84px/1 var(--f-mono); color: var(--wine); }
+.kd__num.is-good { border-left-color: var(--good); }
+.kd__num.is-good b { color: var(--good); }
+.kd__num span { font: 700 14px/1.3 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+.kd__side { display: flex; flex-direction: column; gap: 16px; }
+.kd .state { font-size: 17px; min-height: 126px; }
+
+/* solution 1: when does the error show / the click that disappears */
+.md, .sl, .wz, .ph { display: grid; grid-template-columns: 600px minmax(0, 1fr); gap: 40px; margin-top: 20px; align-items: start; }
+.wz { grid-template-columns: 640px minmax(0, 1fr); }
+.md__left, .sl__left, .wz__left, .ph__left { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.md__right, .sl__right, .wz__right, .ph__right { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.md .state { font-size: 19px; }
+.md .devtools__body, .sl .devtools__body, .ph .devtools__body { min-height: 290px; max-height: 290px; }
+#sl-msg { min-height: 0; }
+#sl-msg.is-open, .sl.is-slot #sl-msg { min-height: 56px; }
+.sl .fm { gap: 10px; }
+
+/* problem 2: the wizard and the phone number */
+.wz .state { font-size: 19px; min-height: 150px; }
+.ph__opts { display: flex; flex-direction: column; gap: 8px; }
+.ph__opt { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: var(--surface); border-radius: 10px; box-shadow: var(--shadow-1); font: 600 19px/1.25 var(--f-body); cursor: pointer; }
+.ph__opt input { width: 22px; height: 22px; accent-color: var(--wine); flex: none; }
+.ph__opt code { font-size: 16px; }
+.ph__verdict { margin: 0; padding: 12px 16px; border-radius: 10px; font: 600 19px/1.35 var(--f-body); background: var(--surface); box-shadow: var(--shadow-1); min-height: 30px; color: var(--ink-2); }
+.ph__verdict.is-bad { color: var(--bad); }
+.ph__verdict.is-good { color: var(--good); }
+
+/* the page at the end */
+.map2 { display: grid; grid-template-columns: 560px minmax(0, 1fr); gap: 44px; margin-top: 24px; align-items: start; }
+.statemap { width: 100%; border-collapse: collapse; font-size: 20px; }
+.statemap th { text-align: left; font: 700 13px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--brass); padding: 0 12px 10px 0; }
+.statemap td { padding: 10px 12px 10px 0; border-top: 1px solid var(--line); vertical-align: top; line-height: 1.35; }
+.statemap td:first-child { font-weight: 600; }
+.statemap code { font-size: 16px; }
+.flips.is-small .flip__face .code { --code-size: 17px; }
+
+/* ---------- L34 only ---------- */
+.skel { background: linear-gradient(90deg, #ece4d3 0%, #f6f1e7 50%, #ece4d3 100%); background-size: 200% 100%; animation: shimmer 1.2s linear infinite; border-radius: 6px; min-height: 22px; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+.skel-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.skel-grid .skel { height: 110px; }
+.chips-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.cbtn { appearance: none; cursor: pointer; padding: 11px 18px; border-radius: 999px; border: 1px solid #ddd2bf; background: #fdfaf2; color: #2e2a26; font: 600 18px/1 var(--f-body); }
+.cbtn.is-on { background: #5c1a23; border-color: #5c1a23; color: #fdfaf2; }
+.cbtn small { font: 500 13px/1 var(--f-mono); opacity: .65; margin-left: 8px; }
+
+/* problem 1: home, menu, a dish */
+.ws { display: grid; grid-template-columns: 700px minmax(0, 1fr); gap: 40px; margin-top: 20px; align-items: start; }
+.ws__left, .ws__right { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.ws__nav { display: flex; gap: 8px; padding: 12px 16px; background: #efe7d8; border-bottom: 1px solid #ddd2bf; }
+.ws__nav button { appearance: none; border: 1px solid #5c1a23; background: transparent; color: #5c1a23; padding: 9px 16px; font: 700 16px/1 var(--f-body); cursor: pointer; }
+.ws__nav button.is-ghost { border-color: #ddd2bf; color: #6e645a; }
+.ws__nav button.is-on { background: #5c1a23; color: #fdfaf2; }
+.ws__page { min-height: 300px; }
+.ws__page h3 { margin: 0 0 12px; font: 600 28px/1 var(--f-display); color: #5c1a23; }
+.ws__page .mgrid .mcard img { aspect-ratio: 16 / 8; }
+.ws__page .mcard__body { padding: 8px 10px 10px; gap: 3px; }
+.ws__page .mcard__title { font-size: 17px; }
+.ws__dish { max-width: 340px; display: flex; flex-direction: column; gap: 8px; }
+
+/* solution 1: the lifecycle */
+.lc, .kl, .sw, .qu, .rt, .lk { display: grid; gap: 40px; margin-top: 20px; align-items: start; }
+.lc { grid-template-columns: 700px minmax(0, 1fr); }
+.lc__left, .lc__right, .kl__left, .kl__right, .sw__left, .sw__right, .qu__left, .qu__right, .rt__left, .rt__right, .lk__left, .lk__right { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.lcbars { display: flex; flex-direction: column; gap: 18px; padding: 18px 22px; background: var(--surface); border-radius: var(--card-r); box-shadow: var(--shadow-1); }
+.lcbar { display: grid; grid-template-columns: minmax(0, 1fr) 150px; column-gap: 14px; row-gap: 8px; align-items: center; }
+.lcbar__k { grid-column: 1 / -1; margin: 0; font: 700 15px/1.2 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+.lcbar__k small { font: 500 14px/1 var(--f-mono); color: var(--ink-3); letter-spacing: 0; text-transform: none; margin-left: 10px; }
+.lcbar__track { position: relative; height: 32px; background: #ece4d3; border-radius: 6px; overflow: hidden; }
+.lcbar__ok { position: absolute; left: 0; top: 0; bottom: 0; width: 25%; background: color-mix(in srgb, var(--good) 24%, transparent); }
+.lcbar__fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--good); transition: width .2s linear, background-color .3s; }
+.lcbar__fill.is-stale { background: var(--warn); }
+.lcbar__fill.is-gc { background: var(--brass); }
+.lcbar__mark { position: absolute; top: 50%; transform: translateY(-50%); padding: 0 8px; font: 700 13px/1 var(--f-mono); color: var(--ink-2); z-index: 1; }
+.lcbar__mark[style*="left:100%"] { transform: translate(-100%, -50%); }
+.lcbar b { font: 700 18px/1.1 var(--f-mono); color: var(--wine); text-align: right; }
+.lc__screen { min-height: 200px; padding: 16px 20px; background: #fdfaf2; border: 1px solid #ddd2bf; border-radius: 6px; color: #2e2a26; }
+.lc__screen h4, .kl__screen h4, .lk__screen h4 { margin: 0 0 12px; font: 700 14px/1.2 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: #a98545; }
+.lc__dishes { display: flex; flex-direction: column; gap: 8px; }
+.lc__dish { padding: 10px 14px; background: #f6f1e7; border: 1px solid #ddd2bf; font: 600 20px/1.2 var(--f-body); }
+.lc .state { font-size: 18px; }
+.lc .devtools__body, .kl .devtools__body, .rt .devtools__body, .sw .devtools__body, .qu .devtools__body, .ws .devtools__body { min-height: 190px; max-height: 190px; }
+
+/* solution 1: the key lab */
+.kl { grid-template-columns: 640px minmax(0, 1fr); }
+.kl__screen { min-height: 250px; padding: 16px 20px; background: #fdfaf2; border: 1px solid #ddd2bf; border-radius: 6px; color: #2e2a26; }
+.kl__list { margin: 0; padding-left: 22px; font: 600 21px/1.5 var(--f-body); }
+.kl__bad { margin: 12px 0 0; padding: 10px 14px; background: color-mix(in srgb, var(--bad) 12%, transparent); color: var(--bad); font: 700 18px/1.3 var(--f-body); border-radius: 6px; }
+.kl__cache { background: #1d1816; color: #e8dccb; border-radius: 12px; box-shadow: var(--shadow-2); overflow: hidden; font: 500 17px/1.45 var(--f-mono); }
+.kl__cache table { width: 100%; border-collapse: collapse; }
+.kl__cache th { text-align: left; padding: 10px 16px; background: #2a2320; color: #9c8f84; font: 700 13px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; }
+.kl__cache td { padding: 10px 16px; border-top: 1px solid rgba(255, 255, 255, .06); }
+.kl__cache td.k { color: #9c8f84; }
+.kl__cache tr.is-hit td { background: rgba(185, 216, 154, .16); }
+
+/* solution 1: the devtools screenshot */
+.dt { display: grid; grid-template-columns: 1040px minmax(0, 1fr); gap: 40px; margin-top: 16px; align-items: start; }
+.dt__side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+/* problem 2 and solution 2: switching a category */
+.sw { grid-template-columns: 740px minmax(0, 1fr); }
+.sw__screen { position: relative; min-height: 300px; padding: 14px 16px; background: #fdfaf2; border: 1px solid #ddd2bf; border-radius: 6px; color: #2e2a26; }
+.sw__h { margin: 0 0 10px; font: 600 26px/1 var(--f-display); color: #5c1a23; }
+.sw__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; transition: opacity .25s; }
+.sw__screen.is-dim .sw__grid { opacity: .4; }
+.sw__grid .mcard img { aspect-ratio: 16 / 7; }
+.sw__grid .mcard__body { padding: 8px 10px 10px; gap: 3px; }
+.sw__grid .mcard__title { font-size: 16px; }
+.sw__badge { position: absolute; top: 12px; right: 14px; z-index: 3; padding: 8px 14px; background: #1d1816; color: #f3cd83; font: 700 15px/1 var(--f-mono); border-radius: 999px; }
+.sw .counters b { font-size: 30px; }
+.sw .cbtn { font-size: 16px; padding: 10px 14px; }
+.sw .cbtn small { margin-left: 6px; font-size: 12px; }
+
+/* problem 2 and solution 2: the kitchen's queue */
+.qu { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.qu__page { padding: 16px 20px 18px; background: #fdfaf2; border: 1px solid #ddd2bf; border-radius: 6px; color: #2e2a26; display: flex; flex-direction: column; gap: 12px; }
+.qu__head { display: flex; justify-content: space-between; align-items: center; }
+.qu__head b { font: 600 28px/1 var(--f-display); color: #5c1a23; }
+.qu__chip { padding: 7px 12px; background: #ece4d3; font: 700 14px/1 var(--f-mono); border-radius: 999px; color: #6e645a; }
+.qu__chip.is-busy { background: #1d1816; color: #f3cd83; }
+.qu__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; min-height: 250px; }
+.qu__order { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #f6f1e7; border: 1px solid #ddd2bf; font: 500 19px/1.2 var(--f-body); }
+.qu__order em { margin-left: 12px; font: 700 12px/1 var(--f-mono); font-style: normal; letter-spacing: .08em; color: #a98545; }
+.qu__order i { font: 700 15px/1 var(--f-mono); font-style: normal; color: #6e645a; }
+.qu__order.is-new { animation: rflash 1.2s ease; }
+
+/* solution 2: the retry rule */
+.rt { grid-template-columns: 700px minmax(0, 1fr); }
+.rt__btns { display: flex; flex-wrap: wrap; gap: 10px; }
+.rt__btns .btn { height: 48px; font-size: 14px; padding: 0 16px; }
+.rt__line { position: relative; height: 110px; background: var(--surface); border-radius: var(--card-r); box-shadow: var(--shadow-1); margin: 0 0 0 0; overflow: hidden; }
+.rt__axis { position: absolute; left: 4%; right: 4%; top: 46px; height: 3px; background: #ddd2bf; }
+.rt__tick { position: absolute; top: 76px; transform: translateX(-50%); font: 700 13px/1 var(--f-mono); color: var(--ink-3); }
+.rt__dot, .rt__end { position: absolute; top: 31px; transform: translateX(-50%); width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font: 700 16px/1 var(--f-mono); }
+.rt__dot { background: var(--wine); color: #fff; }
+.rt__end { background: var(--bad); color: #fff; box-shadow: 0 0 0 5px color-mix(in srgb, var(--bad) 25%, transparent); }
+.rt__end.is-ok { background: var(--good); box-shadow: 0 0 0 5px color-mix(in srgb, var(--good) 25%, transparent); }
+
+/* solution 2: two guests, one cache */
+.lk { grid-template-columns: 640px minmax(0, 1fr); }
+.lk__screen { min-height: 230px; padding: 16px 20px; background: #fdfaf2; border: 1px solid #ddd2bf; border-radius: 6px; color: #2e2a26; }
+.lk__dl { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 8px 14px; margin: 0; font: 500 20px/1.3 var(--f-body); }
+.lk__dl dt { font: 700 13px/1.6 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: #a98545; }
+.lk__dl dd { margin: 0; font-weight: 600; }
+
+/* the numbers at the end */
+.bn { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; margin-top: 24px; }
+.bn__c { padding: 18px 22px; background: var(--surface); border-radius: var(--card-r); box-shadow: var(--shadow-1); border-top: 5px solid var(--wine); display: flex; flex-direction: column; gap: 6px; }
+.bn__c b { font: 700 64px/1 var(--f-mono); color: var(--wine); }
+.bn__c span { font: 600 21px/1.3 var(--f-body); }
+.bn__c small { font: 500 17px/1.35 var(--f-body); color: var(--ink-3); }
+.bn__c small code { font-size: 15px; }
+
+/* ---------- L35 only ---------- */
+.sd, .iv, .op, .hist { display: grid; gap: 40px; margin-top: 20px; align-items: start; }
+.sd, .hist { grid-template-columns: 700px minmax(0, 1fr); }
+.op { grid-template-columns: 760px minmax(0, 1fr); }
+.iv { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 36px; }
+.sd__left, .sd__right, .iv__left, .iv__right, .op__left, .op__right, .lg__left, .lg__right { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+/* problem 1: send to the kitchen */
+.sd__mock { position: relative; }
+.sd__cart { padding: 18px 22px 20px; display: flex; flex-direction: column; gap: 10px; min-height: 270px; background: #fdfaf2; color: #2e2a26; }
+.sd__line { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 14px; padding: 8px 12px; background: #f6f1e7; border: 1px solid #ddd2bf; font: 600 19px/1.2 var(--f-body); }
+.sd__line i { font: 700 15px/1 var(--f-mono); font-style: normal; color: #5c1a23; }
+.sd__total { display: flex; justify-content: space-between; font: 700 20px/1 var(--f-body); padding: 6px 2px; }
+.sd__btn { width: 100%; }
+.sd__btn[disabled] { opacity: .55; cursor: default; }
+.sd__toasts { position: absolute; right: 14px; bottom: 14px; display: flex; flex-direction: column; gap: 8px; z-index: 3; }
+.sd__toast { padding: 10px 14px; background: #fdfaf2; border: 1px solid #ddd2bf; border-left: 4px solid #3f6b4a; box-shadow: var(--shadow-2); font: 600 16px/1.3 var(--f-body); color: #2e2a26; }
+.sd__toast.is-error { border-left-color: #a93b2c; }
+.sd__fail { padding: 8px 14px; font-size: 16px; }
+.sd .counters b { font-size: 34px; }
+.sd .devtools__body { min-height: 250px; max-height: 250px; }
+
+/* solution 1: which entries does it mark */
+.iv__cap { margin: 0; font: 600 20px/1.3 var(--f-mono); color: var(--ink-2); }
+.iv__cap b { color: var(--wine); }
+.iv__table td, .iv__table th { padding: 9px 12px; }
+.iv__st { font: 700 14px/1 var(--f-mono); letter-spacing: .06em; text-transform: uppercase; }
+.iv__st.is-fresh { color: #b9d89a; }
+.iv__st.is-stale { color: #f3cd83; }
+.iv__st.is-fetching { color: #8ec9ff; }
+.iv__use { appearance: none; cursor: pointer; min-width: 34px; padding: 4px 10px; background: #2a2320; color: #f3cd83; border: 1px solid #4a4038; border-radius: 6px; font: 700 16px/1 var(--f-mono); }
+.iv tr.is-fetching td { background: rgba(142, 201, 255, .14); }
+.iv .devtools__body { min-height: 330px; max-height: 330px; }
+
+/* problem 2 and solution 2: the kitchen's cards */
+.op__board { display: flex; flex-direction: column; gap: 10px; padding: 16px 18px; background: #fdfaf2; border: 1px solid #ddd2bf; border-radius: 6px; }
+.op__card { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f6f1e7; border: 1px solid #ddd2bf; font: 500 20px/1.2 var(--f-body); color: #2e2a26; }
+.op__card.is-flash { animation: rflash .9s ease; }
+.op__st { margin-left: 12px; padding: 4px 9px; border-radius: 999px; background: #ece4d3; font: 700 12px/1 var(--f-mono); font-style: normal; letter-spacing: .08em; }
+.op__st.is-cooking { background: #f3cd83; }
+.op__st.is-ready { background: #b9d89a; }
+.op__st.is-delivered { background: #cfd8cf; }
+.op__act { display: flex; align-items: center; gap: 14px; }
+.op__act i { font: 700 17px/1 var(--f-mono); font-style: normal; color: #5c1a23; }
+.op .devtools__body { min-height: 230px; max-height: 230px; }
+.op__toasts { position: static; min-height: 56px; }
+
+/* the history */
+.lg__box { height: 380px; overflow-y: auto; padding: 14px 16px; background: #fdfaf2; border: 1px solid #ddd2bf; border-radius: 6px; color: #2e2a26; }
+.lg__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.lg__row { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f6f1e7; border: 1px solid #ddd2bf; font: 500 19px/1.2 var(--f-body); }
+.lg__row em { margin-left: 12px; font: 700 12px/1 var(--f-mono); font-style: normal; letter-spacing: .08em; color: #3f6b4a; }
+.lg__row i { font: 700 16px/1 var(--f-mono); font-style: normal; color: #5c1a23; }
+.lg__sentinel { height: 1px; }
+.lg__more { padding: 12px 0 4px; display: flex; justify-content: center; }
+.lg__end { text-align: center; margin: 12px 0 4px; }
+.hist .devtools__body { min-height: 150px; max-height: 150px; }
+.hist .state { font-size: 17px; }
+</style>
+</head>
+<body>
+<div class="deck">
+<div class="stage">
+
+<!-- ============================== HELLO ============================== -->
+
+<section class="slide" data-phase="hello" id="cover" data-title="Le serveur">
+  <div class="cover">
+    <div class="stack" style="--gap:24px">
+      <p class="cover__hello">Bonjour!</p>
+      <p class="eyebrow"><b>L35</b> React · lecture 10 · track 9 of 10 · syllabus L37</p>
+      <h1 class="display" style="font-size:150px">Le<br>serveur</h1>
+      <p class="lead" style="max-width:930px">In French the waiter and the server are the same word. Le serveur carries the order from the table to the kitchen and the plate back, and must be honest about it: it is sent, it is cooking, it is late. Today our app learns to carry changes, and to say what happened.</p>
+      <dl class="cover__meta">
+        <div><dt>Theme</dt><dd>TanStack Query: changing data</dd></div>
+        <div><dt>Le Bistro today</dt><dd>Send to the kitchen, My orders, the kitchen's buttons</dd></div>
+        <div><dt>Your project</dt><dd>v0.9 · orders and optimistic UI</dd></div>
+        <div><dt>Length</dt><dd>2 hours · one break</dd></div>
+      </dl>
+    </div>
+    <div class="plate">
+      <div class="plate__rim"></div>
+      <div class="plate__food"><img src="../_shared/img/dishes/espresso.jpg" alt=""></div>
+      <div class="plate__tag"><small>le serveur</small>“it is sent, it is cooking”</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Bonjour! Last time we learned to read data well: a cache, keys, fresh and stale. Today the other direction: the guest changes something. An order, a status. Reading was half of the story.</p>
+    <p><b>The title:</b> "le serveur" is the waiter, and in English the same word is the machine at the other end of the network. The waiter carries a change from the table to the kitchen, and is honest about it. A good server does too: it says sent, failed, or too late.</p>
+    <p><b>Numbers:</b> this deck is lecture L35 of the track and L37 in the syllabus. Your project is at v0.8 and moves to v0.9 today.</p>
+  </aside>
+</section>
+
+<section class="slide v-center" data-phase="hello" data-title="Today's menu">
+  <div class="menu-card">
+    <div class="menu-card__head"><p class="eyebrow">Le Bistro · L35 · 120 minutes</p><h2>Today's menu</h2></div>
+    <ol class="menu-card__list">
+      <li class="course"><span class="course__k">Accueil</span><span class="course__name">Hello <small>where Le Bistro is today</small></span><span class="course__t">3′</span></li>
+      <li class="course"><span class="course__k">Apéritif</span><span class="course__name">Questions <small>and two homework demos</small></span><span class="course__t">8′</span></li>
+      <li class="course"><span class="course__k">Entrée</span><span class="course__name">Problem 1 <small>send to the kitchen: nothing changes</small></span><span class="course__t">5′</span></li>
+      <li class="course"><span class="course__k">Plat</span><span class="course__name">Changing data <small>useMutation, invalidation, toasts</small></span><span class="course__t">24′</span></li>
+      <li class="course"><span class="course__k">Atelier</span><span class="course__name">Classwork 1 <small>a button that changes data, in your shop</small></span><span class="course__t">15′</span></li>
+      <li class="course is-pause"><span class="course__k">Pause café</span><span class="course__name">Break <small>music on, screens off</small></span><span class="course__t">10′</span></li>
+      <li class="course"><span class="course__k">Second plat</span><span class="course__name">Problem 2 and a button that answers first <small>optimistic updates, endless lists</small></span><span class="course__t">27′</span></li>
+      <li class="course"><span class="course__k">Atelier</span><span class="course__name">Classwork 2 with AI <small>prompt it, then check it</small></span><span class="course__t">15′</span></li>
+      <li class="course"><span class="course__k">Masterclass</span><span class="course__name">One prompt, the whole Le Bistro <small>CRAFT, then the short version</small></span><span class="course__t">8′</span></li>
+      <li class="course"><span class="course__k">Dessert</span><span class="course__name">Wrap-up <small>recap, homework, what comes next</small></span><span class="course__t">5′</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-phase="hello" data-title="Le Bistro, lecture by lecture">
+  <p class="eyebrow"><b>Route</b> The second five lectures</p>
+  <h2 class="h2 mt-s">Le Bistro, lecture by lecture</h2>
+  <p class="sofar"><b>Done</b><span>L27 components</span><span>L28 state</span><span>L29 effects</span><span>L30 routing</span><span>L31 context</span><span>L32 stores</span><span>L33 forms</span><span>L34 cache</span></p>
+  <div class="road" style="margin-top:30px">
+    <div class="stop is-done"><div class="stop__shot"><img src="../img/l32-cart.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L32 · done</p><p class="stop__t">Stores</p><p class="stop__d">Zustand. One cart and one session, outside React.</p></div>
+    <div class="stop is-done"><div class="stop__shot"><img src="../img/l33-register.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L33 · done</p><p class="stop__t">Forms</p><p class="stop__d">React Hook Form and Zod. A sign-up and a table slip.</p></div>
+    <div class="stop is-done"><div class="stop__shot"><img src="../img/l34-devtools.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L34 · done</p><p class="stop__t">Cache</p><p class="stop__d">TanStack Query. The menu is fetched once.</p></div>
+    <div class="stop is-now"><div class="stop__shot"><img src="../img/l35-kitchen.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L35 · today</p><p class="stop__t">Changes</p><p class="stop__d">Mutations, optimistic updates, endless lists.</p></div>
+    <div class="stop"><div class="stop__shot"><img src="../img/l36-sheet.jpg" alt=""></div><i class="stop__dot"></i><p class="stop__n">L36</p><p class="stop__t">UI</p><p class="stop__d">Accessible dialogs and shadcn/ui.</p></div>
+  </div>
+  <div class="lane" style="margin-top:28px">
+    <span class="lane__k">Your project</span>
+    <span class="lane__v"><b>v0.6 ✓</b>a store, not a provider</span>
+    <span class="lane__v"><b>v0.7 ✓</b>forms with a schema</span>
+    <span class="lane__v"><b>v0.8 ✓</b>a cache for the API</span>
+    <span class="lane__v"><b>v0.9 · today</b>orders and optimistic UI</span>
+    <span class="lane__v"><b>v1.0</b>accessible components</span>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Three lectures ago the cart got a pantry, then the guests got forms, then the server's data got a cold room. Today the kitchen finally gets orders: the guest sends one, the cook changes its status. Both are changes of data, and both must feel right.</p>
+    <p><b>Do:</b> Point at today's picture: the kitchen's screen, "The pass", with its buttons. By the end of the lecture the buttons answer before the server does.</p>
+  </aside>
+</section>
+
+<section class="slide" id="goal" data-phase="hello" data-title="Before and after today">
+  <div class="split-4-8 fill items-center" style="gap:56px">
+    <div class="stack" style="--gap:22px">
+      <p class="eyebrow"><b>Today's goal</b> Press next to unveil it</p>
+      <h2 class="h2">A button that carries a change</h2>
+      <p class="lead">Under the blind: the "Send to the kitchen" button, written by hand and then with a mutation. Red goes, green comes.</p>
+      <ul class="checks is-done" data-step="1"><li>Press it twice: <b>one</b> order</li><li>"My orders" (and the kitchen page, if it is open) refresh by themselves</li><li>Every failed change shows a toast</li><li>The kitchen's buttons answer before the server does</li></ul>
+    </div>
+    <div data-step="1" data-fx="curtain" data-curtain="CartPanel.tsx · after today">
+      <script type="text/plain" data-lang="tsx" data-file="src/components/CartPanel.tsx (red = by hand, green = new)" data-del="1-9" data-add="11-14" style="--code-size:21px">
+        const [sending, setSending] = useState(false);
+        const [error, setError] = useState("");
+        async function send() {
+          if (sending) return;
+          setSending(true);
+          try { await sendOrder(); clear(); await refetchEverything(); }
+          catch { setError("Try again."); }
+          finally { setSending(false); }
+        }
+
+        const send = useSendOrder();
+        <button disabled={send.isPending} onClick={() => send.mutate()}>
+          Send to the kitchen
+        </button>
+      </script>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Press next: the blind rolls up. On the left, the button as we would write it by hand: a flag, an error, a guard, a refresh of everything that holds a copy. On the right, the mutation we write today: <code>useSendOrder()</code> carries the change, <code>isPending</code> is the guard, the rest is in the hook.</p><p><b>Say:</b> The red code is not wrong, it is what every button would need. The point of the lecture is to write it once.</p></aside>
+</section>
+
+<!-- ============================== QUESTIONS ============================== -->
+
+<section class="slide" data-phase="questions" data-title="Questions from last time">
+  <div class="qa">
+    <div class="stack" style="--gap:26px">
+      <p class="eyebrow"><b>Apéritif</b> Before we start</p>
+      <h2 class="display">Questions from last time?</h2>
+      <p class="lead">TanStack Query, keys, fresh and stale, prefetching.</p>
+    </div>
+    <div class="qa-list">
+      <div class="qa-card" data-step="1"><span class="n">01</span><h3>Why does <code>queryKey: ["dishes"]</code> show the wrong dishes?</h3>
+        <div class="reveal-box" data-reveal><button class="reveal-box__cover">[ show answer ]</button><p>For <code>fetchDishes(category)</code> every category shares one entry: same key, same entry. The key must list everything the function uses.</p></div></div>
+      <div class="qa-card" data-step="2"><span class="n">02</span><h3>What is the difference between <code>staleTime</code> and <code>gcTime</code>?</h3>
+        <div class="reveal-box" data-reveal><button class="reveal-box__cover">[ show answer ]</button><p><code>staleTime</code>: how long an answer is fresh. <code>gcTime</code>: how long an entry nobody uses stays in the cache.</p></div></div>
+      <div class="qa-card" data-step="3"><span class="n">03</span><h3>Why is the guest in the profile's key?</h3>
+        <div class="reveal-box" data-reveal><button class="reveal-box__cover">[ show answer ]</button><p>A cache does not know who is looking. Without the guest in the key, the next guest in the same browser gets the previous guest's fresh entry.</p></div></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Wait for real questions first. If nobody asks, press next for the backup questions, and ask the room before you reveal each answer.</p>
+    <p><b>Why these three:</b> question 2 is the bridge. A fresh answer is trusted for a minute. What happens when the guest <i>changes</i> something during that minute? The cache has no idea. Today's first problem.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="questions" data-title="Homework: show your v0.8">
+  <div class="split-7-5 fill items-center" style="gap:64px">
+    <div class="stack" style="--gap:22px">
+      <p class="eyebrow"><b>Homework check</b> Two volunteers, two minutes each</p>
+      <h2 class="h1">Show us your v0.8</h2>
+      <p class="lead">Open the Network tab and go Home → list → a product → Back: how many requests for the list? Then open the DevTools and click a category.</p>
+    </div>
+    <div class="done-when">
+      <p class="k">Look for</p>
+      <ul class="checks">
+        <li>The list is requested <b>once</b> for three pages</li>
+        <li>Every key lists what its function uses</li>
+        <li>The old products stay, dimmed, on a category change</li>
+        <li>No fetch hook and no <code>useEffect</code> that fetches</li>
+        <li>The live Vercel link works</li>
+      </ul>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> For each volunteer, open their shop with the Network tab and the DevTools. Count the requests aloud, then ask: "your shop sends something to a server, a review, an order: what should refresh afterwards?". Hold the answers for the next slides.</p><p><b>Expect:</b> blank looks, then "the list". That is invalidation, and it starts on slide 15.</p></aside>
+</section>
+
+<!-- ============================== PROBLEM 1 ============================== -->
+
+<section class="slide" data-phase="problem" data-tone="dark" data-title="Send to the kitchen. Nothing changes.">
+  <div class="problem-cover">
+    <div class="problem-cover__text">
+      <p class="eyebrow"><b>Entrée · Problem 1</b> Before the new tool</p>
+      <h2 class="display">Send to<br>the kitchen.<br>Nothing<br>changes.</h2>
+      <p class="lead">The guest presses the button. The server says OK. What does the guest see, and what does the kitchen see?</p>
+    </div>
+    <div class="problem-cover__photo"><img src="../img/photo-cafe-au-lait.jpg" alt=""></div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> We built the kitchen's screen last time: it asks the queue every five seconds. And "My orders" shows the guest's history. Now the guest sends an order. Think about the three screens: the guest's, the kitchen's, the history. Which of them change, and when?</p>
+    <p><b>Ask:</b> Collect two or three answers. "All of them, at once" is what we want. What we get is on the next slide.</p>
+  </aside>
+</section>
+
+<section class="slide" id="send" data-phase="problem" data-title="The order that goes nowhere">
+  <p class="eyebrow"><b>Problem 1</b> Press "Send to the kitchen", then try the other buttons</p>
+  <h2 class="h2 mt-s">The order that goes nowhere</h2>
+  <div class="sd" id="sd1"></div>
+  <div class="why3">
+    <div class="takeaway" data-step="1"><p class="k">Pressed twice, sent twice</p><p>Nothing stops a second press while the first request is still running.</p></div>
+    <div class="takeaway" data-step="2"><p class="k">The other screens do not know</p><p>"My orders" never changes. A kitchen on another screen waits for its next five-second look.</p></div>
+    <div class="takeaway" data-step="3"><p class="k">A failure is silent</p><p>The request fails, the button does nothing, and the guest gets no word.</p></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> With "By hand" selected, press "Send to the kitchen": a request runs for about a second. The server's counter goes to 1. "My orders" (this browser) stays at 0 for good. The kitchen's screen is another browser: it learns about the order at its next five-second look (L34's polling). Press Reset, refill, then "Press it twice": the server has <b>two</b> orders. Reset and tick "Make the server fail once": the button seems to do nothing, and no message comes.</p>
+    <p><b>Say:</b> Nothing here is exotic. Each problem is a line we forgot: a guard, a refresh, a catch. And every button in the app would need the same three lines.</p>
+    <p><b>Then:</b> switch to "useMutation + invalidate" (it resets) and repeat the three experiments: "My orders" updates at once, the button is disabled while it sends, a failure shows a toast. The kitchen on another machine still waits for its poll: invalidation refreshes <i>this browser's</i> cache. (If the kitchen page is open in the same app, a waiter's tablet, it refreshes too.) We will build exactly that.</p>
+    <p><b>Honest detail:</b> the demo simulates both versions. The "one order after a double press" behaviour was measured in the real app against our local copy of the API.</p>
+  </aside>
+</section>
+
+<section class="slide" id="byhand" data-phase="problem" data-title="A button that changes data, by hand">
+  <p class="eyebrow"><b>Problem 1</b> What every such button needs</p>
+  <h2 class="h3 mt-s">Four things to remember, in every button</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>A guard against a second press</b><span>A flag, checked first and set before the request.</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>The work itself</b><span>The request, and what to do with the cart when it worked.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Tell everybody who holds a copy</b><span>The kitchen's queue, "My orders": refetch each one, by name.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Say when it fails</b><span>A state for the message, a <code>catch</code>, and the flag back to false.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="CartPanel.tsx · by hand" data-walk="1:1,5-6,15;2:8-9;3:10-11;4:2,12-14" style="--code-size:16px">
+        const [sending, setSending] = useState(false);
+        const [error, setError] = useState("");
+
+        async function send() {
+          if (sending) return;                // a second press
+          setSending(true);                   // the button must say so
+          try {
+            await sendOrder();
+            clear();
+            await refetchQueue();             // who else holds a copy?
+            await refetchMine();
+          } catch {
+            setError("Try again.");           // and when it fails
+          } finally {
+            setSending(false);
+          }
+        }
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> This is a good button. It has a guard, it clears the cart, it refreshes the two screens that hold a copy, and it handles the error. Now imagine the kitchen's "Start cooking" button, a "Cancel order" button, a profile form, a favourites heart. The same fifteen lines, with different names.</p>
+    <p><b>Step 3:</b> look at the names: <code>refetchQueue</code>, <code>refetchMine</code>. The button knows who holds a copy of the data. A new screen with a copy means editing every button that changes it.</p>
+    <p><b>Ask:</b> what would you want? <b>Expect:</b> "write it once", and "tell the cache that something changed instead of telling each screen". Both are today.</p>
+  </aside>
+</section>
+
+<section class="slide v-center" data-phase="problem" data-title="What would we need?">
+  <p class="eyebrow"><b>Problem 1</b> Your turn</p>
+  <h2 class="display mt-m" style="font-size:112px;max-width:1500px;color:var(--wine)">What would we need?</h2>
+  <div class="need">
+    <span class="chip" data-step="1" data-fx="pop">One call that carries the change</span>
+    <span class="chip" data-step="2" data-fx="pop">Know: running, done or failed?</span>
+    <span class="chip" data-step="3" data-fx="pop">Tell the cache that its copies are old</span>
+    <span class="chip" data-step="4" data-fx="pop">Tell the guest when it fails, in one place</span>
+    <span class="chip is-answer" data-step="5" data-fx="pop"><i data-icon="send"></i>That is a mutation</span>
+  </div>
+  <aside class="notes">
+    <p><b>Ask:</b> If you could design the tool, what would it give the button? Collect two or three answers before pressing next. "Something that knows it is running" is the guard; "something that says what is old" is the invalidation.</p>
+    <p><b>Step 5:</b> the name of today's tool. A <b>query</b> reads data. A <b>mutation</b> changes it. Both are in TanStack Query, and they talk to the same cache.</p>
+  </aside>
+</section>
+
+<!-- ============================== SOLUTION 1 ============================== -->
+
+<section class="slide" data-phase="solution" id="mutidea" data-title="A mutation, then tell the cache">
+  <div class="idea">
+    <div class="schema stor" data-wire-sides="r l" style="width:1040px;height:720px">
+      <div class="region" style="left:0;top:26px;width:330px;height:690px"></div>
+      <span class="box-label" style="left:20px;top:0">The component tree</span>
+      <div class="node" id="mi-c" style="left:30px;top:96px;width:270px">Cart panel<small>Send to the kitchen</small></div>
+      <div class="node" id="mi-k" style="left:30px;top:316px;width:270px">Kitchen page<small>the queue</small></div>
+      <div class="node" id="mi-h" style="left:30px;top:516px;width:270px">My orders<small>the history</small></div>
+      <div class="node is-wine lg" id="mi-m" style="left:450px;top:80px;width:250px;height:170px" data-step="1">useMutation<small>useSendOrder()</small></div>
+      <div class="node is-ghost" id="mi-s" style="left:860px;top:96px;width:180px;height:140px" data-step="2">The API<small>POST /orders</small></div>
+      <div class="node is-brass lg" id="mi-q" style="left:450px;top:420px;width:250px;height:200px" data-step="4">The cache<small>orders · queue<br>orders · mine</small></div>
+      <b class="wire is-wine" data-id="mw-a" data-from="mi-c" data-to="mi-m" data-step="1" data-label="mutate()" data-lx="-10" data-ly="-22"></b>
+      <b class="wire is-wine" data-id="mw-b" data-from="mi-m" data-to="mi-s" data-step="2" data-label="mutationFn" data-lx="0" data-ly="-16"></b>
+      <b class="packet is-wine" data-wire="mw-b" data-on="2-2:go" style="--dur:1.5s">POST</b>
+      <b class="wire is-good" data-id="mw-c" data-from="mi-s" data-to="mi-m" data-sides="l r" data-step="3" data-nohead></b>
+      <b class="packet is-good" data-wire="mw-c" data-on="3-3:go" style="--dur:1.5s">201 Created</b>
+      <b class="wire is-wine" data-id="mw-d" data-from="mi-m" data-to="mi-q" data-sides="b t" data-step="4" data-label="invalidate" data-lx="70" data-ly="0"></b>
+      <b class="wire is-good" data-id="mw-e" data-from="mi-q" data-to="mi-k" data-sides="l r" data-step="4" data-label="refetch" data-lx="-10" data-ly="-16"></b>
+      <b class="wire is-good" data-id="mw-f" data-from="mi-q" data-to="mi-h" data-sides="l r" data-step="4"></b>
+      <b class="packet is-good" data-wire="mw-e" data-on="4-4:go" style="--dur:1.5s">new queue</b>
+      <b class="packet is-good" data-wire="mw-f" data-on="4-4:go" style="--dur:1.5s">new history</b>
+    </div>
+    <div class="idea__side is-tight">
+      <p class="eyebrow"><b>Solution 1</b> The waiter</p>
+      <h2 class="h2">A mutation carries a change</h2>
+      <div class="takeaway" data-step="1"><p class="k">A query reads, a mutation changes</p><p><code>useMutation</code> is the other half of the library: the same cache, a different job.</p></div>
+      <div class="takeaway" data-step="2"><p class="k">You say when</p><p>A query runs when a component needs it. A mutation runs when <b>you</b> call <code>mutate()</code>.</p></div>
+      <div class="takeaway" data-step="3"><p class="k">The server answers</p><p><code>isPending</code>, <code>isError</code>, and the callbacks <code>onSuccess</code>, <code>onError</code>, <code>onSettled</code>.</p></div>
+      <div class="takeaway" data-step="4" style="border-color:var(--good)"><p class="k" style="color:var(--good)">Then tell the cache</p><p><code>invalidateQueries</code> marks what is old, and every screen that shows it asks again.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> One press per idea. Step 1: the button calls <code>mutate()</code> on the mutation. Step 2: the mutation runs its <code>mutationFn</code>: a request goes to the API. Step 3: the answer comes back. Step 4: <code>onSuccess</code> tells the cache that everything starting with "orders" is old, and the kitchen page and "My orders", both reading from the cache, refetch.</p>
+    <p><b>Say:</b> The button never talks to the kitchen page. It talks to the cache, and the screens that share that cache follow. That is why a new screen with the same data needs no change in the button.</p>
+    <p><b>Honest detail:</b> the cache lives in <i>this browser</i>. A waiter's tablet shows both the kitchen page and "My orders" and refreshes both. A guest's phone has only "My orders". A kitchen screen on another machine has its own cache: it learns about the order from its own five-second polling (L34). Invalidation does not reach other browsers.</p>
+  </aside>
+</section>
+
+<section class="slide" id="usemutation" data-phase="solution" data-title="useMutation in one picture">
+  <p class="eyebrow"><b>Solution 1</b> What you give, what you get</p>
+  <h2 class="h2 mt-s">Something to run, and a few flags</h2>
+  <div class="anatomy" style="margin-top:34px">
+    <div class="anatomy__code" style="display:block;font-size:28px;line-height:1.6"><span class="part" data-on="1:is-on">const send = useMutation({</span>
+  <span class="part" data-on="1:is-on">mutationFn: (order: NewOrder) =&gt; api&lt;Order&gt;("/orders", …),</span>
+  <span class="part" data-on="4:is-on">onSuccess: () =&gt; { … },</span>
+<span class="part" data-on="1:is-on">});</span>
+
+<span class="part" data-on="2:is-on">send.mutate(order);</span>
+<span class="part" data-on="3:is-on">send.isPending · send.isError · send.error</span></div>
+    <div class="anatomy__notes">
+      <div class="card" data-step="1"><span class="num">01</span><p><code>mutationFn</code><br>What to run: a function that returns a promise and throws on failure. It receives the variables you give to <code>mutate</code>.</p></div>
+      <div class="card" data-step="2"><span class="num">02</span><p><code>mutate(variables)</code><br>Runs it now. A query runs when a component needs it; a mutation never runs by itself.</p></div>
+      <div class="card" data-step="3"><span class="num">03</span><p><code>isPending</code> · <code>isError</code> · <code>error</code><br>The life of one call. Disable the button while it is pending; show the error if it failed.</p></div>
+      <div class="card" data-step="4"><span class="num">04</span><p><code>onSuccess</code> · <code>onError</code> · <code>onSettled</code><br>What to do afterwards: clear the cart, show a toast, tell the cache.</p></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Compare with <code>useQuery</code>: there you give a key and a function and you get data. Here you give a function and you get a <code>mutate</code> to call. No key, because nothing is stored under it: a mutation is not cached.</p>
+    <p><b>v5 detail:</b> the flag is <code>isPending</code>. The v4 name <code>isLoading</code> is gone from mutations (TypeScript says "Property 'isLoading' does not exist on type 'UseMutationResult'").</p>
+    <p><b>mutate or mutateAsync?</b> <code>mutate</code> never throws: errors go to <code>onError</code> and the global handler. <code>mutateAsync</code> returns a promise that rejects: you must catch it. Use <code>mutate</code> by default.</p>
+  </aside>
+</section>
+
+<section class="slide" id="r-mutation" data-phase="solution" data-title="Recipe: the hook that sends the order">
+  <p class="eyebrow"><b>Solution 1 · Recipe</b> Type it with me, step by step</p>
+  <h2 class="h3 mt-s">useSendOrder</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>A hook for the change</b><span>One place that knows how to send an order. Any page can use it.</span><span class="file-chip"><i data-icon="file-code"></i>src/queries/orders.ts</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Say what to run</b><span>The server keeps its own copy of the cart and prices the dishes itself: empty it, add every line, then create the order.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Say what to do when it worked</b><span>Empty the local cart, show a toast, and mark everything about orders as old.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/queries/orders.ts" data-copy data-build="1:1-4,21-22;2:5-15;3:16-20" style="--code-size:15.5px">
+        export function useSendOrder() {
+          const queryClient = useQueryClient();
+
+          return useMutation({
+            mutationFn: async () => {
+              const { items, notes } = useCartStore.getState();
+              await api("/api/v1/learning/cart", { method: "DELETE" }, token()); // start empty
+              for (const { dish, qty } of items) {
+                const body = JSON.stringify({ dishId: dish.id, quantity: qty });
+                await api("/api/v1/learning/cart", { method: "POST", body }, token());
+              }
+              const kitchenNotes = notes ? toKitchenNotes(notes) : "";
+              const body = JSON.stringify({ kitchenNotes });
+              return api<Order>("/api/v1/enterprise/orders", { method: "POST", body }, token());
+            },
+            onSuccess: () => {
+              useCartStore.getState().clear(); // the order left: empty the local cart
+              toast.success("Your order is with the kitchen.");
+              void queryClient.invalidateQueries({ queryKey: ["orders"] });
+            },
+          });
+        }
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Create <code>queries/orders.ts</code> and type the hook. The file in <code>code/after-L35</code> has the same lines, formatted a little differently.</p>
+    <p><b>Step 2:</b> the Le Bistro API keeps a copy of the cart on the server and prices every dish from its own menu, so we first make its copy match ours. (It also has a <code>cart/sync</code> endpoint; this version uses the plain ones because their behaviour is documented line by line.) <code>useCartStore.getState()</code> is the store used outside a component, from L32.</p>
+    <p><b>Step 3:</b> <code>onSuccess</code> runs only if <code>mutationFn</code> did not throw. A failure goes to <code>onError</code>, and to the global handler we write in a few slides.</p>
+    <p><b>Honest note:</b> the order, cart and kitchen endpoints were built from the Swagger description and run against our local copy of the API. They were not called on the live server: send one real order before class.</p>
+  </aside>
+</section>
+
+<section class="slide" id="r-send" data-phase="solution" data-title="Recipe: the button">
+  <p class="eyebrow"><b>Solution 1 · Recipe</b> The guard comes with the mutation</p>
+  <h2 class="h3 mt-s">The Send button</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>Get the mutation</b><span>The hook gives you <code>mutate</code> and the flags.</span><span class="file-chip"><i data-icon="file-code"></i>src/components/CartPanel.tsx</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Disable it while it runs</b><span><code>isPending</code> is true from the click until the server answers: no second click, no double order.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Run it on click</b><span>A callback given to <code>mutate</code> runs for this call only: here, close the panel.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Signed out? A link instead</b><span>The server wants a token: send the guest to the login, and back.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/components/CartPanel.tsx" data-copy data-build="1:1;2:5-8,12;3:9;4:13-17" style="--code-size:16px">
+        const sendOrder = useSendOrder();
+
+        {isSignedIn ? (
+          // isPending is true from the click until the server answers
+          <button
+            type="button"
+            className="btn"
+            disabled={sendOrder.isPending}
+            onClick={() => sendOrder.mutate(undefined, { onSuccess: onClose })}
+          >
+            {sendOrder.isPending ? "Sending…" : "Send to the kitchen"}
+          </button>
+        ) : (
+          <Link to="/login" state={{ from: "/menu" }} onClick={onClose} className="btn">
+            Sign in to send your order
+          </Link>
+        )}
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> In <code>CartPanel</code>, call the hook, add the button. Sign in as the student account (the token lives two minutes), add a dish and press the button twice quickly: one order.</p>
+    <p><b>Say:</b> <code>mutate(variables, { onSuccess })</code>: there are two places for callbacks. In <code>useMutation({ onSuccess })</code> they belong to the mutation and always run: that is the place for "clear the cart, tell the cache". In <code>mutate(…, { onSuccess })</code> they belong to this one call and run only if the component is still on screen: that is the place for "close the panel".</p>
+    <p><b>Checkpoint:</b> <code>git commit -am "L35: send the order with a mutation"</code>.</p>
+  </aside>
+</section>
+
+<section class="slide" id="r-invalidate" data-phase="solution" data-title="Recipe: invalidate by key">
+  <p class="eyebrow"><b>Solution 1 · Recipe</b> Say what is old, not who shows it</p>
+  <h2 class="h3 mt-s">invalidateQueries</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>Keys that start the same</b><span>The kitchen's queue and "My orders" both start with <code>"orders"</code>. We chose it in L34 on purpose.</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Say what is old</b><span><code>invalidateQueries({ queryKey: ["orders"] })</code> matches every key that <b>starts with</b> that.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>The cache does the rest</b><span>Entries on screen refetch now. Entries nobody uses are only marked old: they refetch the next time someone asks.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="queries/kitchen.ts · queries/orders.ts" data-copy data-build="1:1-2;2:3-7" style="--code-size:18px">
+        // kitchen.ts  → ["orders", "queue"]
+        // orders.ts   → ["orders", "mine", email]
+
+        onSuccess: () => {
+          // everything that starts with "orders" is old now
+          void queryClient.invalidateQueries({ queryKey: ["orders"] });
+        },
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> We never wrote "refetch the kitchen's queue" or "refetch my history". The button says what changed (orders), and the screens in this browser that show orders follow. This is the real reason for the key design of L34: a key is not only an address, it is a family name.</p>
+    <p><b>We checked:</b> <code>invalidateQueries({ queryKey: ["orders"] })</code> refetched the two entries a component was showing; a typo (<code>["order"]</code>) matched nothing and refetched nothing; an entry nobody was using was only marked old.</p>
+    <p><b>Next:</b> try the matching yourself.</p>
+  </aside>
+</section>
+
+<section class="slide" id="invalidate" data-phase="solution" data-title="Which entries does it mark?">
+  <p class="eyebrow"><b>Solution 1</b> Press a call, then click the number in an "In use" cell to mount or unmount a component</p>
+  <h2 class="h2 mt-s">Which entries does it mark?</h2>
+  <div class="iv" id="iv1"></div>
+  <div class="why3">
+    <div class="takeaway" data-step="1"><p class="k">A start, not a name</p><p><code>["dishes","list"]</code> also matches <code>["dishes","list","drinks"]</code>.</p></div>
+    <div class="takeaway" data-step="2"><p class="k">In use: refetch now</p><p>A screen that shows the entry updates at once.</p></div>
+    <div class="takeaway" data-step="3"><p class="k">Not in use: marked old</p><p>It refetches the next time a component asks. No wasted request.</p></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Press <code>["orders"]</code>: the two entries in use refetch (a flash and a new time); nothing else changes. Press <code>["order"]</code>, the typo: nothing happens, and nothing tells you. Press <code>["dishes","list"]</code>: <code>all</code> refetches because the menu page is open; <code>drinks</code> turns "old" and waits. Click the <code>0</code> next to <code>drinks</code> to mount a component that uses it: it refetches at once, because it is old.</p>
+    <p><b>Say:</b> The call matches by key prefix, then splits the matches in two: entries in use refetch, the rest are marked old. That is why one line after a change is cheap.</p>
+    <p><b>Remember:</b> a typo is silent. Copy the start of the key from the query file, or put the keys in one place.</p>
+  </aside>
+</section>
+
+<section class="slide" id="r-toast" data-phase="solution" data-title="Recipe: one place for every failure">
+  <p class="eyebrow"><b>Solution 1 · Recipe</b> The guest must hear about it</p>
+  <h2 class="h3 mt-s">Toasts, and one handler for all mutations</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>A store for toasts</b><span>Zustand again (L32). The store is outside React, so <code>toast.error(…)</code> works anywhere.</span><span class="file-chip"><i data-icon="file-code"></i>src/toast/toastStore.ts</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>One handler for every failed change</b><span><code>MutationCache({ onError })</code> in the <code>QueryClient</code>: no mutation has to remember to say it failed.</span><span class="file-chip"><i data-icon="file-code"></i>src/lib/queryClient.ts</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>One component shows them</b><span><code>&lt;Toaster /&gt;</code> once, in the layout. <code>role="alert"</code> for errors, <code>"status"</code> for the rest.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/toast/toastStore.ts" data-copy data-build="1:1-10" style="--code-size:16px">
+        export const useToastStore = create<ToastState>()((set, get) => ({
+          toasts: [],
+          show: (kind, text) => {
+            const id = nextId++;
+            set((s) => ({ toasts: [...s.toasts, { id, kind, text }] }));
+            setTimeout(() => get().dismiss(id), 5000);
+          },
+          dismiss: (id) => set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) })),
+        }));
+        export const toast = { error: (text: string) => useToastStore.getState().show("error", text) };
+      </script>
+      <script type="text/plain" data-lang="tsx" data-file="src/lib/queryClient.ts" data-copy data-build="2:1-6" style="--code-size:16px">
+        mutationCache: new MutationCache({
+          onError: (error) => {
+            toast.error(error instanceof ApiError ? error.message : "No connection. Try again.");
+          },
+        }),
+        // inside new QueryClient({ … })
+      </script>
+      <script type="text/plain" data-lang="tsx" data-file="src/toast/Toaster.tsx" data-copy data-build="3:1-1" style="--code-size:16px">
+        <div key={t.id} role={t.kind === "error" ? "alert" : "status"} className="toast">…</div>
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> The toast store is the cart store with different fields: type it fast, or copy it from <code>code/after-L35</code>. Then add the <code>mutationCache</code> to the <code>QueryClient</code>, and put <code>&lt;Toaster /&gt;</code> in <code>SiteLayout</code>. Turn the network off (DevTools, Network, Offline) and press Send: a red toast.</p>
+    <p><b>Say:</b> A toast is a message that comes and goes. A <code>role="alert"</code> one is read out by a screen reader at once; a <code>status</code> one waits politely (L36 comes back to this). In L36 we replace this hand-made toaster with one from a library: the calls <code>toast.success(…)</code> and <code>toast.error(…)</code> stay, only the import line changes.</p>
+    <p><b>Remember:</b> the global handler runs for <b>every</b> failed mutation. A mutation that wants its own message can still give <code>onError</code>; both run.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="When a change goes wrong">
+  <p class="eyebrow"><b>Solution 1</b> The four mistakes you will see today</p>
+  <h2 class="h2 mt-s">When a change goes wrong</h2>
+  <div class="mistakes">
+    <div class="mistake" data-step="1"><h4>Changing data, forgetting the cache</h4><div class="bad">onSuccess: () =&gt; toast.success("Sent")</div><div class="err">No error. The kitchen's screen and "My orders" stay old until their next refresh, or F5.</div><div class="good">Add <code>queryClient.invalidateQueries({ queryKey: ["orders"] })</code></div></div>
+    <div class="mistake" data-step="2"><h4>A typo in the key you invalidate</h4><div class="bad">invalidateQueries({ queryKey: ["order"] })</div><div class="err">No error. Nothing starts with "order", so nothing is refreshed.</div><div class="good">The start of the key, copied from the query file: <code>["orders"]</code></div></div>
+    <div class="mistake" data-step="3"><h4>mutateAsync with no catch</h4><div class="bad">await send.mutateAsync();</div><div class="err">Uncaught (in promise) ApiError: the server said no, and nothing caught the rejection.</div><div class="good"><code>send.mutate()</code> with callbacks, or wrap <code>mutateAsync</code> in <code>try/catch</code></div></div>
+    <div class="mistake" data-step="4"><h4>The old way of calling it (Query v4)</h4><div class="bad">useMutation(sendOrder, { … })  ·  invalidateQueries(["orders"])  ·  send.isLoading</div><div class="err">TS2559 · Type '() =&gt; Promise&lt;…&gt;' has no properties in common with type 'UseMutationOptions&lt;…&gt;' · TS2559 · Type 'string[]' has no properties in common with type 'InvalidateQueryFilters&lt;…&gt;' · TS2339 · Property 'isLoading' does not exist on type 'UseMutationResult&lt;…&gt;'</div><div class="good">One options object, <code>{ queryKey }</code>, and <code>isPending</code></div></div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Two silent ones and two loud ones, like last time. Number 1 is the one students will meet: the order is sent, the toast says so, and the history is empty until a refresh. Number 3 shows up in the console as an "Uncaught (in promise)" and it is easy to miss.</p>
+    <p><b>Mistake 4:</b> the three TypeScript messages are the first line of three different errors. All of them were produced by compiling these lines with TypeScript 6 and TanStack Query 5.104. AIs and old tutorials write v4.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution" data-title="Which call refreshes the screens?">
+  <div class="split-5-7 fill items-center">
+    <div class="stack" style="--gap:24px">
+      <p class="eyebrow"><b>Quick check</b> Vote, then click</p>
+      <h2 class="h1">An order was sent. Which call refreshes the kitchen's queue and "My orders"?</h2>
+    </div>
+    <div class="quiz" data-quiz>
+      <div class="quiz__opts">
+        <button class="quiz__opt" data-correct><code>invalidateQueries({ queryKey: ["orders"] })</code></button>
+        <button class="quiz__opt"><code>queryClient.clear()</code></button>
+        <button class="quiz__opt"><code>invalidateQueries({ queryKey: ["order"] })</code></button>
+        <button class="quiz__opt"><code>sendOrder.reset()</code></button>
+      </div>
+      <p class="quiz__explain">A: both keys start with <code>"orders"</code>, so both match, and the ones on screen refetch. B empties the whole cache, the menu included: everything is fetched again. C has a typo: it matches nothing, silently. D clears the mutation's own state (<code>isSuccess</code>, <code>error</code>), not the cache.</p>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Fingers up for 1 to 4, then press the number key of the most common answer. If many chose B: it works, in the same way that demolishing the kitchen "refreshes" it.</p></aside>
+</section>
+
+<!-- ============================== CLASSWORK 1 ============================== -->
+
+<section class="slide" data-phase="classwork" data-title="Classwork 1: a button that changes data">
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Atelier · Classwork 1</b> 15 minutes, on your own project</p><h2 class="h1">A button that changes data</h2></div>
+    <div class="timer" data-timer="900"></div>
+  </div>
+  <div class="cw">
+    <div class="tiers">
+      <div class="tier base"><div class="tier__k"><span>Base</span><span>everyone</span></div><h3>"Place order" with a mutation</h3>
+        <ul><li>A <code>useMutation</code> that sends the cart: <code>POST https://dummyjson.com/carts/add</code> with <code>{ userId, products: [{ id, quantity }] }</code>.</li><li>The button is <code>disabled={isPending}</code> and says "Sending…".</li><li><code>onSuccess</code>: clear the cart, show a message, <code>invalidateQueries({ queryKey: ["orders"] })</code>.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Plus</span><span>most of you</span></div><h3>One place for failures</h3>
+        <ul><li>A toast store (Zustand) and a <code>MutationCache({ onError })</code> in <code>queryClient.ts</code>. Test it with a wrong URL.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Pro</span><span>fast finishers</span></div><h3>A history that follows</h3>
+        <ul><li>A "My orders" list (<code>GET /carts/user/1</code>, key <code>["orders","mine",userId]</code>) shown next to the cart, that refetches after a success. DummyJSON does not store what you send: the Network tab is the proof.</li></ul></div>
+    </div>
+    <div class="cw__side">
+      <div class="done-when"><p class="k">Done when</p><ul class="checks"><li>Pressing the button twice sends <b>one</b> request</li><li>After a success the history is refetched (Network tab)</li><li>A failed request shows a toast</li><li>No <code>refetch()</code> call inside <code>onSuccess</code>: only <code>invalidateQueries</code></li></ul></div>
+      <div class="hint" data-peek="click for a hint"><div><p class="k">Stuck?</p><pre>export function usePlaceOrder() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (cart: NewCart) =&gt; postJson&lt;Cart&gt;("/carts/add", cart),
+    onSuccess: () =&gt; {
+      useCartStore.getState().clear();
+      void queryClient.invalidateQueries({
+        queryKey: ["orders"],
+      });
+    },
+  });
+}</pre></div></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Watch for:</b> <code>refetch()</code> or <code>setState</code> inside <code>onSuccess</code> instead of invalidation; <code>mutateAsync</code> with no <code>catch</code>; a mutation called at the top of the component body (it must be in an event handler); Query v4 syntax.</p>
+    <p><b>DummyJSON:</b> <code>POST /carts/add</code> answers the new cart (a fake id, for example 209) as if it were saved; it is not stored, so the refetched history looks the same. That is expected: the lesson is that the refetch <i>happens</i>.</p>
+    <p>Full brief and solutions: <code>classwork.md</code>.</p>
+  </aside>
+</section>
+
+<!-- ============================== BREAK ============================== -->
+
+<section class="slide" data-phase="break" data-tone="dark" data-title="Pause café">
+  <div class="pause">
+    <div class="stack" style="--gap:28px">
+      <p class="eyebrow"><b>Pause café</b> 10 minutes</p>
+      <h2 class="display">Pause café</h2>
+      <p class="lead">Stand up, refill, rest your eyes. After the break: a button that answers before the server, and a list of forty orders.</p>
+      <button class="pause__btn" type="button" data-start-break><i data-icon="coffee"></i>Start the break</button>
+    </div>
+    <div class="cup" aria-hidden="true"><span class="cup__steam"></span><span class="cup__steam"></span><span class="cup__steam"></span><div class="cup__plate"></div><div class="cup__body"></div><div class="cup__coffee"></div><div class="cup__handle"></div></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Click "Start the break" (or press B). A 10-minute countdown starts with radio music. +1 / −1 minute adjusts it. When it ends, a chime plays and a "Welcome back" screen appears.</p>
+    <p><b>No internet?</b> The radio needs it. Put mp3 files in <code>_shared/music/</code> and list them in <code>tracks.js</code>.</p>
+  </aside>
+</section>
+
+<!-- ============================== PROBLEM 2 ============================== -->
+
+<section class="slide" data-phase="problem2" data-tone="dark" data-title="Faster than the kitchen">
+  <div class="problem-cover">
+    <div class="problem-cover__text">
+      <p class="eyebrow"><b>Second plat · Problem 2</b> The change works</p>
+      <h2 class="display">Faster than<br>the kitchen.</h2>
+      <p class="lead">The cook presses "Start cooking". The server needs almost a second to answer, and the cook's hands are full. What should the card do meanwhile? And what about forty orders in the history?</p>
+    </div>
+    <div class="problem-cover__photo"><img src="../img/photo-eclair.jpg" alt=""></div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Welcome back. The order goes, the screens follow. Two things are still not right. First: every press waits for the server, and a kitchen at eight in the evening presses a lot of buttons. Second: the history is one long list.</p>
+  </aside>
+</section>
+
+<section class="slide" id="slow" data-phase="problem2" data-title="Press, then wait">
+  <p class="eyebrow"><b>Problem 2</b> Press "Start cooking" on the three orders, one after the other</p>
+  <h2 class="h2 mt-s">Press, then wait</h2>
+  <div class="op" id="op1"></div>
+  <div class="why3">
+    <div class="takeaway" data-step="1"><p class="k">Nothing happens at the press</p><p>The card keeps its old status until the answer comes back.</p></div>
+    <div class="takeaway" data-step="2"><p class="k">Every press is a wait</p><p>Three presses, three times 0.8 s of looking at a card that did not move.</p></div>
+    <div class="takeaway" data-step="3"><p class="k">And the server almost always says yes</p><p>We waited for an answer we could have guessed.</p></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Press "Start cooking" on the first order and watch the "waiting" counter: 0.8 seconds with the card unchanged, then the status flips. Press the other two. The total is the time the cook spent staring.</p>
+    <p><b>Say:</b> The server almost always says yes: the order is pending, the cook pressed the button, the move is legal. We wait 0.8 s for a "yes" we could have guessed. It feels slow, and a slow kitchen screen is a screen nobody trusts.</p>
+    <p><b>Ask:</b> what could the card do at the moment of the press? <b>Expect:</b> "change at once, and fix it if the server says no". That is an optimistic update.</p>
+  </aside>
+</section>
+
+<section class="slide" id="long" data-phase="problem2" data-title="A history of forty orders">
+  <p class="eyebrow"><b>Problem 2</b> Open "My orders" of a regular guest</p>
+  <h2 class="h2 mt-s">A history of forty orders</h2>
+  <div class="hist" id="lg1"></div>
+  <div class="why3">
+    <div class="takeaway" data-step="1"><p class="k">Everything at once</p><p>The guest waits for forty orders to see the first one.</p></div>
+    <div class="takeaway" data-step="2"><p class="k">Most never scroll</p><p>Nearly everybody looks at the last two or three dinners.</p></div>
+    <div class="takeaway" data-step="3"><p class="k">It only gets worse</p><p>Next year there are eighty, and the server must send them all.</p></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Press "Open My orders": a skeleton for 2.4 seconds, then forty rows to scroll through. The counters show how long the first row took to appear.</p>
+    <p><b>Say:</b> The API pages its history (<code>/profile/orders?page=1&amp;size=3</code>), so it will happily send three at a time. Our page asks for everything. What we want: three now, and the next three when the guest gets to the end.</p>
+  </aside>
+</section>
+
+<section class="slide v-center" data-phase="problem2" data-title="What would we need now?">
+  <p class="eyebrow"><b>Problem 2</b> Your turn</p>
+  <h2 class="display mt-m" style="font-size:112px;max-width:1500px;color:var(--wine)">What would we need now?</h2>
+  <div class="need">
+    <span class="chip" data-step="1" data-fx="pop">Show the new status before the server answers</span>
+    <span class="chip" data-step="2" data-fx="pop">Undo it if the server says no</span>
+    <span class="chip" data-step="3" data-fx="pop">Load a long list a page at a time</span>
+    <span class="chip" data-step="4" data-fx="pop">Load the next page when the guest reaches the end</span>
+    <span class="chip is-answer" data-step="5" data-fx="pop"><i data-icon="zap"></i>An optimistic update, and an infinite query</span>
+  </div>
+  <aside class="notes">
+    <p><b>Ask:</b> What would a good waiter do? "Say it is coming, and run back if it is not", "bring the first dishes and the rest later". Collect answers.</p>
+    <p><b>Step 5:</b> two tools from the same library: <code>onMutate</code> with a rollback, and <code>useInfiniteQuery</code>.</p>
+  </aside>
+</section>
+
+<!-- ============================== SOLUTION 2 ============================== -->
+
+<section class="slide" id="r-optimistic" data-phase="solution2" data-title="Recipe: an optimistic update">
+  <p class="eyebrow"><b>Second plat · Recipe</b> Answer first, check afterwards</p>
+  <h2 class="h3 mt-s">Start cooking, at once</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>The change itself</b><span>A <code>PATCH</code> with the new status. The server may say 422: that move is not allowed.</span><span class="file-chip"><i data-icon="file-code"></i>src/queries/kitchen.ts</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Before the request: change the card</b><span>Cancel refreshes in flight, keep the old queue, write the new status into the cache.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>If the server says no: put it back</b><span><code>onError</code> receives what <code>onMutate</code> returned. The error toast comes from the QueryClient.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Win or lose: ask the server</b><span><code>onSettled</code> refetches, so the screen ends up showing the truth.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/queries/kitchen.ts" data-copy data-build="1:1-9,25-26;2:10-18;3:19-22;4:23-24" style="--code-size:15px">
+        export function useSetOrderStatus() {
+          const queryClient = useQueryClient();
+          const queueKey = kitchenQueries.queue().queryKey;
+
+          return useMutation({
+            mutationFn: ({ id, status }: { id: string; status: OrderStatus }) =>
+              api(`/api/v1/enterprise/orders/${id}/status`,
+                { method: "PATCH", body: JSON.stringify({ status }) }, token()),
+
+            onMutate: async ({ id, status }) => {
+              await queryClient.cancelQueries({ queryKey: queueKey }); // a refresh would overwrite us
+              const previous = queryClient.getQueryData(queueKey);
+              queryClient.setQueryData(queueKey, (queue) => queue && {
+                ...queue,
+                orders: queue.orders?.map((o) => (o.id === id ? { ...o, status } : o)) ?? null,
+              });
+              return { previous }; // kept for onError
+            },
+
+            onError: (_error, _vars, context) => {
+              if (context) queryClient.setQueryData(queueKey, context.previous);
+            },
+
+            onSettled: () => queryClient.invalidateQueries({ queryKey: queueKey }),
+          });
+        }
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Add the three callbacks one at a time and test each. Then in <code>KitchenPage</code> call <code>setStatus.mutate({ id, status: next.status })</code> from the button (the <code>NEXT</code> map says which button belongs to which status).</p>
+    <p><b>Step 2:</b> <code>cancelQueries</code> matters: the queue refreshes every five seconds, and a refresh already on its way would land after our change and put the old status back for a moment. <code>getQueryData</code> keeps a snapshot; <code>setQueryData</code> writes the new status into the same cache entry the page reads, so the card changes at once.</p>
+    <p><b>Measured:</b> in the real app the card shows the new status after about 54 ms, while the server needed 800.</p>
+    <p><b>Try the rollback:</b> two windows, same order: press Start cooking in both. The second one gets a 422 (COOKING → COOKING is not a move); its card goes to COOKING, back to PENDING, and then to COOKING again from the refetch, with a red toast. We run it in the next slide.</p>
+  </aside>
+</section>
+
+<section class="slide" id="optimistic" data-phase="solution2" data-title="Answer first">
+  <p class="eyebrow"><b>Solution 2</b> Press "Start cooking" with each setting, then make the server say no</p>
+  <h2 class="h2 mt-s">Answer first, check afterwards</h2>
+  <div class="op" id="op2" data-toggles="1"></div>
+  <div class="why3">
+    <div class="takeaway" data-step="1"><p class="k">The card answers at once</p><p><code>onMutate</code> changes the cache before the request: the cook sees the result in a few milliseconds.</p></div>
+    <div class="takeaway" data-step="2"><p class="k">The rollback is the safety net</p><p>If the server says no, the old queue is put back and a toast says why.</p></div>
+    <div class="takeaway" data-step="3"><p class="k">The server has the last word</p><p><code>onSettled</code> refetches: the screen always ends up showing the truth.</p></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> "Optimistic update" off: press "Start cooking": 0.8 s with the card unchanged, then COOKING. Switch it on (it resets) and press again: the card changes at once, and the log says how many milliseconds it took. Now tick "Another cook already pressed it" and press: the card goes to COOKING at once, then <b>back to PENDING</b> when the server says 422 (with a red toast), then to COOKING again after the refetch: that is the truth.</p>
+    <p><b>Say:</b> The user sees what will almost certainly be true, 15 times faster. When it is not, the rollback is quick and honest: it undoes the change and says why. That is the contract of an optimistic update.</p>
+    <p><b>When not to:</b> when the server may refuse often, or the result is something we cannot guess (a price, an id). A payment is not optimistic.</p>
+  </aside>
+</section>
+
+<section class="slide" id="r-infinite" data-phase="solution2" data-title="Recipe: an infinite query">
+  <p class="eyebrow"><b>Second plat · Recipe</b> The history, three at a time</p>
+  <h2 class="h3 mt-s">useInfiniteQuery</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>A query made of pages</b><span>The page number is the <b>page param</b>. The first one is <code>initialPageParam</code>.</span><span class="file-chip"><i data-icon="file-code"></i>src/queries/orders.ts</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>Say where the next page is</b><span><code>getNextPageParam</code> answers with the next number, or <code>undefined</code> on the last page.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Read the pages</b><span><code>data.pages</code> is a list of pages. <code>flatMap</code> turns it into one list of orders.</span><span class="file-chip"><i data-icon="file-code"></i>src/components/MyOrders.tsx</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>Ask for more</b><span><code>fetchNextPage()</code>, with <code>hasNextPage</code> and <code>isFetchingNextPage</code> to know whether and when.</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/queries/orders.ts" data-copy data-build="1:1-6,9-10;2:7-8" style="--code-size:16px">
+        mine: (email: string) =>
+          infiniteQueryOptions({
+            queryKey: ["orders", "mine", email],
+            queryFn: ({ pageParam }) =>
+              api<Paged<Order>>(`/api/v1/profile/orders?page=${pageParam}&size=3`, {}, token()),
+            initialPageParam: 1,
+            // undefined means "that was the last page": hasNextPage becomes false
+            getNextPageParam: (last) => (last.hasNext ? last.page + 1 : undefined),
+          }),
+      </script>
+      <script type="text/plain" data-lang="tsx" data-file="src/components/MyOrders.tsx" data-copy data-build="3:1-4;4:1,6-7" style="--code-size:16px">
+        const { data, hasNextPage, isFetchingNextPage, fetchNextPage } =
+          useInfiniteQuery(orderQueries.mine(email));
+
+        // data.pages is a list of pages: flatten them into one list
+        const orders = data?.pages.flatMap((page) => page.items) ?? [];
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Add <code>orderQueries.mine</code> next to <code>useSendOrder</code>, then a <code>MyOrders</code> component on the account page. Before class, send three or four orders from the student account so that there is more than one page.</p>
+    <p><b>Say:</b> The key starts with <code>"orders"</code> again, so a sent order invalidates the history too (slide 14). An infinite query has one cache entry with all the pages inside; invalidation refetches them all.</p>
+    <p><b>Remember:</b> <code>initialPageParam</code> is required in v5 (TypeScript says so, see the mistakes). And <code>getNextPageParam</code> must return <code>undefined</code> on the last page, or the list asks for ever.</p>
+  </aside>
+</section>
+
+<section class="slide" id="r-inview" data-phase="solution2" data-title="Recipe: load when it comes into view">
+  <p class="eyebrow"><b>Second plat · Recipe</b> The browser tells us when the end is near</p>
+  <h2 class="h3 mt-s">An empty div and an IntersectionObserver</h2>
+  <div class="recipe">
+    <ol class="steps">
+      <li data-step="1" data-on="1-1:is-now;2:is-done"><b>A hook for "it came into view"</b><span>It returns a <code>ref</code> for the element to watch, and calls <code>onEnter</code> when it appears.</span><span class="file-chip"><i data-icon="file-code"></i>src/hooks/useInView.ts</span></li>
+      <li data-step="2" data-on="2-2:is-now;3:is-done"><b>The browser does the watching</b><span><code>IntersectionObserver</code>: no scroll listener, no arithmetic. A margin of 200px starts the request a little early.</span></li>
+      <li data-step="3" data-on="3-3:is-now;4:is-done"><b>Clean up</b><span><code>disconnect()</code> in the effect's cleanup (L29): stop watching when the component goes.</span></li>
+      <li data-step="4" data-on="4-4:is-now;5:is-done"><b>The sentinel, and a real button</b><span>An empty <code>div</code> under the list. And a "Show more" button for the keyboard.</span><span class="file-chip"><i data-icon="file-code"></i>MyOrders.tsx</span></li>
+    </ol>
+    <div class="recipe__right">
+      <script type="text/plain" data-lang="tsx" data-file="src/hooks/useInView.ts" data-copy data-build="1:1-3,13-14;2:4-10;3:11-12" style="--code-size:15.5px">
+        export function useInView<T extends Element>(onEnter: () => void, enabled = true) {
+          const ref = useRef<T>(null);
+          useEffect(() => {
+            const node = ref.current;
+            if (!node || !enabled) return;
+            const observer = new IntersectionObserver(
+              ([entry]) => { if (entry.isIntersecting) onEnter(); },
+              { rootMargin: "200px" }, // start a little before it is visible
+            );
+            observer.observe(node);
+            return () => observer.disconnect(); // cleanup: stop watching
+          }, [onEnter, enabled]);
+          return ref;
+        }
+      </script>
+      <script type="text/plain" data-lang="tsx" data-file="src/components/MyOrders.tsx" data-copy data-build="4:1-6" style="--code-size:15.5px">
+        const sentinel = useInView<HTMLDivElement>(
+          () => void fetchNextPage(),
+          hasNextPage && !isFetchingNextPage,
+        );
+        <div ref={sentinel} />
+        {hasNextPage && <button onClick={() => void fetchNextPage()}>Show more orders</button>}
+      </script>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Type the hook (it is the one new idea) and use it under the list. Scroll to the end of the account page: the next three orders load by themselves.</p>
+    <p><b>Say:</b> <code>enabled</code> is false while a page is loading and when there are no more pages, so the effect disconnects, and reconnects when it is true again. When it reconnects, the observer reports the sentinel right away: if it is still in view (the page is short), the next page loads too, until the screen is full.</p>
+    <p><b>Accessibility:</b> an endless list is hard on keyboard users and on anybody who wants to reach the footer. The button is not a luxury: it is the keyboard's way in. (L36 looks at that again.)</p>
+  </aside>
+</section>
+
+<section class="slide" id="endless" data-phase="solution2" data-title="Three at a time">
+  <p class="eyebrow"><b>Solution 2</b> Scroll the list: the browser's own IntersectionObserver is running here</p>
+  <h2 class="h2 mt-s">Three at a time, as far as you scroll</h2>
+  <div class="hist" id="lg2" data-toggles="1"></div>
+  <div class="why3">
+    <div class="takeaway" data-step="1"><p class="k">The sentinel</p><p>An empty div under the list. When it comes into view, the next page is requested.</p></div>
+    <div class="takeaway" data-step="2"><p class="k">The page param</p><p>Each request asks for page N, and <code>getNextPageParam</code> says what N is next.</p></div>
+    <div class="takeaway" data-step="3"><p class="k">hasNextPage</p><p>False on the last page: the observer stops and the list says it is the end.</p></div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> The list shows the first three orders, and loads more at once: the sentinel is already in view because the box is taller than three rows. Scroll down: more pages load as the end approaches, until "That's all your orders". Switch the observer off (it resets): only the "Show more orders" button loads the next page.</p>
+    <p><b>Say:</b> The numbers on the right: how many pages and requests it took, and the flags of the infinite query. <code>hasNextPage</code> turns false on the last page because <code>getNextPageParam</code> returned <code>undefined</code>.</p>
+    <p><b>Honest detail:</b> the observer here is the browser's real one, watching a sentinel inside the scrolling box; the pages are simulated (600 ms each, 14 orders in all).</p>
+  </aside>
+</section>
+
+<section class="slide" id="end" data-phase="solution2" data-title="The numbers at the end of today">
+  <p class="eyebrow"><b>Solution 2</b> Le Bistro, version 0.9</p>
+  <h2 class="h2 mt-s">What the changes bought us</h2>
+  <div class="bn">
+    <div class="bn__c" data-step="1"><b>1</b><span>order, even after a double click</span><small>the button is disabled while it sends</small></div>
+    <div class="bn__c" data-step="2"><b>54 ms</b><span>from the press to the new status</span><small>the server needed 800 ms</small></div>
+    <div class="bn__c" data-step="3"><b>1 line</b><span>refreshes the queue and the history</span><small><code>invalidateQueries</code></small></div>
+    <div class="bn__c" data-step="4"><b>0</b><span>new packages</span><small>mutations are in the library we have</small></div>
+  </div>
+  <div class="map2 mt-m" style="grid-template-columns:minmax(0,1fr)">
+    <table class="statemap">
+      <thead><tr><th>State</th><th>Home</th></tr></thead>
+      <tbody>
+        <tr data-step="5"><td>Menu, categories, search, profile, the queue, my orders</td><td>TanStack Query: reading</td></tr>
+        <tr data-step="6"><td>Send an order, change a status</td><td>TanStack Query: mutations <small class="muted">(new)</small></td></tr>
+        <tr data-step="7"><td>The toasts</td><td>a small store <small class="muted">(until L36)</small></td></tr>
+        <tr data-step="8"><td>The cart, the session</td><td>stores, saved</td></tr>
+        <tr data-step="9"><td>The forms, category and search text</td><td>React Hook Form · the URL</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Show your live result if it works: sign in as the student, add a dish, press Send twice (one order), open "My orders". Then the kitchen page in a second window: press Start cooking and watch the card change at once.</p>
+    <p><b>The numbers</b> are measured on the real code against our local copy of the API: one order after a double click, 54 ms against 800 ms, and the rollback sequence COOKING → PENDING → COOKING. None of the order, cart or kitchen endpoints was called on the live server: run the flow once before class.</p>
+    <p><b>Say:</b> The state map from L32 is complete. The code is in <code>code/after-L35</code>.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="Mistakes of the second half">
+  <p class="eyebrow"><b>Solution 2</b> The four mistakes of the second half</p>
+  <h2 class="h2 mt-s">When the waiter runs ahead</h2>
+  <div class="mistakes">
+    <div class="mistake" data-step="1"><h4>Optimistic, but no cancelQueries</h4><div class="bad">onMutate: ({ id, status }) =&gt; { queryClient.setQueryData(…) }</div><div class="err">No error. A refresh that was already on its way lands after your change and shows the old status for a moment.</div><div class="good"><code>await queryClient.cancelQueries(…)</code> first, then change the cache</div></div>
+    <div class="mistake" data-step="2"><h4>No way back</h4><div class="bad">an onMutate with no onError and no onSettled</div><div class="err">No error. The card says COOKING for ever, although the server said no.</div><div class="good">Return <code>{ previous }</code>, restore it in <code>onError</code>, refetch in <code>onSettled</code></div></div>
+    <div class="mistake" data-step="3"><h4>A next page that never ends</h4><div class="bad">getNextPageParam: (last) =&gt; last.page + 1</div><div class="err">No error. The list asks for page after page, past the end: hasNextPage never turns false.</div><div class="good">Answer <code>undefined</code> on the last page: <code>last.hasNext ? last.page + 1 : undefined</code></div></div>
+    <div class="mistake" data-step="4"><h4>The old infinite query (Query v4)</h4><div class="bad">useInfiniteQuery(["orders"], fn, { getNextPageParam })</div><div class="err">TS2769 · Property 'initialPageParam' is missing in type '{ queryKey: …; queryFn: …; getNextPageParam: … }' but required in type 'UseInfiniteQueryOptions&lt;…&gt;'</div><div class="good">One options object with <code>initialPageParam: 1</code></div></div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> The first three are silent. Number 1 is the subtle one: it works nearly always, and flickers once in a while, only when a refresh is in flight. Number 3 is the classic infinite-scroll bug.</p>
+    <p><b>Mistake 4:</b> the TypeScript message is long: it lists three overloads, and repeats the missing-property line under each. The line shown is the one to read. Produced by compiling this call with TypeScript 6 and Query 5.104.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="solution2" data-title="What is onMutate's return value for?">
+  <div class="split-5-7 fill items-center">
+    <div class="stack" style="--gap:24px">
+      <p class="eyebrow"><b>Quick check</b> Vote, then click</p>
+      <h2 class="h1">What happens to the value that <code>onMutate</code> returns?</h2>
+    </div>
+    <div class="quiz" data-quiz>
+      <div class="quiz__opts">
+        <button class="quiz__opt">It becomes the new data of the query</button>
+        <button class="quiz__opt" data-correct>It arrives as <code>context</code> in <code>onError</code> and <code>onSettled</code></button>
+        <button class="quiz__opt">It decides whether the mutation runs</button>
+        <button class="quiz__opt">It is sent to the server</button>
+      </div>
+      <p class="quiz__explain">B: whatever <code>onMutate</code> returns is handed to <code>onError</code> and <code>onSettled</code> as <code>context</code>. That is how the snapshot of the old queue travels to the rollback. A: we write the new data ourselves, with <code>setQueryData</code>. C: <code>onMutate</code> cannot cancel the call (throwing in it fails the mutation). D: the server gets what <code>mutationFn</code> sends.</p>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Fingers up for 1 to 4, then press the number key of the most common answer.</p></aside>
+</section>
+
+<!-- ============================== CLASSWORK 2 · WITH AI ============================== -->
+
+<section class="slide" data-phase="classwork2" data-title="Classwork 2 with AI: changes that feel instant">
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Atelier · Classwork 2 · with AI</b> 15 minutes, on your own project</p><h2 class="h1">Prompt it: changes that feel instant</h2></div>
+    <div class="timer" data-timer="900"></div>
+  </div>
+  <div class="cw">
+    <div class="stack" style="--gap:14px">
+      <div class="tier base"><div class="tier__k"><span>The task</span><span>the AI writes, you check</span></div>
+        <ul class="ai-levels"><li><b>Base</b>A "Place order" mutation: disabled while pending; on success clear the cart and invalidate.</li><li><b>Plus</b>A global error toast (<code>MutationCache</code>) and an optimistic heart, with a rollback.</li><li><b>Pro</b>An infinite product list with a "Load more" button and an <code>IntersectionObserver</code>.</li></ul></div>
+      <div class="craft-mini"><p class="craft-mini__k">Your prompt, in five parts (CRAFT)</p>
+        <div class="craft-mini__row cr-c"><span class="craft__badge">C</span><p><b>Context</b>Your shop and stack, with versions (<code>@tanstack/react-query</code> 5). Paste your cart store.</p></div>
+        <div class="craft-mini__row cr-r"><span class="craft__badge">R</span><p><b>Role</b>&quot;A React teacher who writes small TanStack Query code for a beginner.&quot;</p></div>
+        <div class="craft-mini__row cr-a"><span class="craft__badge">A</span><p><b>Action</b>The Base task. Plus and Pro in follow-up prompts.</p></div>
+        <div class="craft-mini__row cr-f"><span class="craft__badge">F</span><p><b>Format</b>&quot;Only the files that change, complete, with paths. Query v5.&quot;</p></div>
+        <div class="craft-mini__row cr-t"><span class="craft__badge">T</span><p><b>Target</b>&quot;No refetch() in onSuccess. cancelQueries first. No double orders.&quot;</p></div>
+      </div>
+    </div>
+    <div class="cw__side">
+      <div class="done-when"><p class="k">Done when</p><ul class="checks"><li>Two presses send one order</li><li><code>invalidateQueries</code>, not <code>refetch()</code></li><li>Optimistic: <code>cancelQueries</code>, a snapshot, a rollback</li><li>AI.md: your prompt and one change</li></ul></div>
+      <div class="hint" data-peek="click for a sample prompt"><div><p class="k">A sample prompt · Tech store</p><pre class="is-prompt">CONTEXT
+Shop &quot;Volt&quot;. Vite + React 19 + TypeScript + Tailwind 4,
+@tanstack/react-query 5, a Zustand cart (pasted).
+ROLE
+A React teacher who writes small TanStack Query code.
+ACTION
+usePlaceOrder (useMutation): button disabled while pending;
+on success clear the cart, invalidate [&quot;orders&quot;]. A heart on
+each product: optimistic update with rollback. A toast on
+every failed mutation (MutationCache).
+FORMAT
+Only changed files, complete, with paths. Query v5.
+TARGET
+No refetch() in onSuccess. cancelQueries before the update.</pre></div></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> Same kind of task as always, with an AI: you write the prompt, it writes the code, you check it. Today's check is the rollback: does the AI's optimistic update undo itself?</p>
+    <p><b>Do:</b> Start the timer. Walk around and ask two students to explain one line the AI wrote. To test a rollback, point the mutation at a wrong URL for a moment: the heart should flip back, with a toast.</p>
+    <p><b>Watch for:</b> <code>refetch()</code> or <code>setState</code> in <code>onSuccess</code>; no <code>cancelQueries</code>; no rollback; <code>mutateAsync</code> without a <code>catch</code>; Query v4 syntax. The follow-up prompts are in <code>classwork.md</code>.</p>
+    <p><b>Then:</b> the Masterclass: the whole Le Bistro so far, in one prompt.</p>
+  </aside>
+</section>
+
+<!-- ============================== MASTERCLASS ============================== -->
+
+<section class="slide" data-phase="masterclass" data-title="Masterclass: Le Bistro in one prompt">
+  <p class="eyebrow"><b>Masterclass · LAB-35</b> Press next: the prompt opens part by part</p>
+  <h2 class="h2 mt-s">Le Bistro so far, in one prompt</h2>
+  <div class="craft mt-m" data-craft>
+    <div class="craft__bar"><span><i data-icon="message-square"></i>Prompt · LAB-35 · Le Bistro after L35</span><button type="button" class="copy-btn" data-craft-copy><i data-icon="copy"></i>Copy</button></div>
+    <div class="craft__part cr-c" data-step="1" data-fx="left" data-label="CONTEXT"><span class="craft__badge">C</span><p class="craft__name">Context<small>what exists and what we use</small></p><pre class="craft__text" style="--craft-size:15px">Le Bistro, a French restaurant site. Vite + React 19 + TypeScript + Tailwind CSS 4,
+react-router 8 (import from &quot;react-router&quot;), Zustand 5, react-hook-form 7, zod 4,
+@tanstack/react-query 5. API at /api through a Vite proxy: dishes, categories, search,
+login (2-minute token), profile, learning/cart (DELETE, POST), enterprise/orders (POST,
+queue), profile/orders (paged), enterprise/orders/{id}/status (PATCH, 422 if not allowed).</pre></div>
+    <div class="craft__part cr-r" data-step="2" data-fx="left" data-label="ROLE"><span class="craft__badge">R</span><p class="craft__name">Role<small>who answers</small></p><pre class="craft__text" style="--craft-size:15px">You are a senior React developer who writes code for beginners to read.</pre></div>
+    <div class="craft__part cr-a" data-step="3" data-fx="left" data-label="ACTION"><span class="craft__badge">A</span><p class="craft__name">Action<small>what to build, step by step</small></p><pre class="craft__text" style="--craft-size:15px">Build the site as it is so far (pages, role guards, stores, forms, all reading on TanStack
+Query v5) and add the changes:
+- toast/ (a Zustand store and a Toaster); lib/queryClient.ts gets a MutationCache whose
+  onError shows every failed change as a toast.
+- queries/orders.ts: useSendOrder (empty the server's cart, add each line, create the order;
+  on success clear the local cart, toast, invalidate [&quot;orders&quot;]) and a paged &quot;my orders&quot;
+  infinite query, 3 at a time, that stops at the last page.
+- queries/kitchen.ts: useSetOrderStatus, optimistic (cancelQueries, snapshot, rollback,
+  invalidate on settled). CartPanel: a button disabled while pending. MyOrders: an
+  IntersectionObserver sentinel and a &quot;Show more&quot; button. Kitchen: Start, Ready, Delivered.</pre></div>
+    <div class="craft__part cr-f" data-step="4" data-fx="left" data-label="FORMAT"><span class="craft__badge">F</span><p class="craft__name">Format<small>what the answer looks like</small></p><pre class="craft__text" style="--craft-size:15px">First a table: each change (mutation), what it sends, and what it invalidates or updates.
+Then every file in full with its path.</pre></div>
+    <div class="craft__part cr-t" data-step="5" data-fx="left" data-label="TARGET"><span class="craft__badge">T</span><p class="craft__name">Target<small>who reads it, when it's done</small></p><pre class="craft__text" style="--craft-size:15px">Beginners will read it: no double orders, no manual refetch after a change, a toast for
+every failed change, Query v5 syntax only. It must pass npm run build.</pre></div>
+  </div>
+  <aside class="notes">
+    <p><b>Say:</b> One prompt rebuilds everything Le Bistro has so far, from L27 to today. Same five parts as your classwork prompt.</p>
+    <p><b>Do:</b> Press next five times. For each part, one sentence: what would go wrong without it? (No context: Query v4 and the wrong endpoints. No role: code for experts. No action: no rollback and no toast. No format: a wall of text. No target: a <code>refetch()</code> in every <code>onSuccess</code>.)</p>
+    <p><b>Copy</b> copies the whole prompt with its five labels. Run it once before class. The script is in <code>masterclass.md</code>.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="masterclass" data-title="Run it, then check it">
+  <p class="eyebrow"><b>Masterclass · LAB-35</b> The AI writes fast. You decide if it's right.</p>
+  <h2 class="h2 mt-s">Run it, then check it</h2>
+  <div class="mc-run">
+    <ol class="mc-steps" data-step="1">
+      <li><b>Copy</b> the prompt into an AI tool<span>Claude, ChatGPT, Copilot Chat: any of them. Nothing to attach: the API is named in the prompt</span></li>
+      <li><b>Build</b> what it gives back<span>a new Vite project, every file at its path, plus <code>npm install zustand react-hook-form zod @hookform/resolvers@5 @tanstack/react-query</code></span></li>
+      <li><b>Run</b> <code>npm run dev</code> and <code>npm run build</code><span>an error message goes straight back into the chat</span></li>
+      <li><b>Compare</b> with <code>code/after-L35</code><span>the version we built by hand</span></li>
+    </ol>
+    <div class="mc-check">
+      <p class="k">Check it with what you learned today</p>
+      <ul class="checks"><li data-step="2">Query v5 only: one options object, <code>isPending</code>, <code>{ queryKey }</code>, <code>initialPageParam</code></li><li data-step="3">The button is disabled while the mutation is pending; no <code>refetch()</code> in <code>onSuccess</code>: <code>invalidateQueries</code></li><li data-step="4">The optimistic update has <code>cancelQueries</code>, a snapshot in <code>context</code>, a rollback and an <code>onSettled</code></li><li data-step="5">One <code>MutationCache.onError</code> shows every failed change; <code>getNextPageParam</code> ends with <code>undefined</code></li><li data-step="6">The infinite list has an <code>IntersectionObserver</code> with cleanup <b>and</b> a button</li></ul>
+      <div class="callout is-warn mt-m" data-step="7"><i data-icon="sparkles"></i><div><p class="small">AIs call <code>refetch()</code> or <code>setState</code> in <code>onSuccess</code> and forget the rollback. Today you can say why not.</p></div></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><b>Do:</b> Show the answer you got before class, or run it live if there is time. Go through the checks one by one, in the AI's code. Then open <code>code/after-L35</code> next to it.</p>
+    <p><b>Say:</b> Every check is something from today. Without today's lecture you could not judge this code.</p>
+  </aside>
+</section>
+
+<section class="slide" data-phase="masterclass" data-title="The short version">
+  <p class="eyebrow"><b>Masterclass · LAB-35</b> The same five parts, without the labels</p>
+  <h2 class="h2 mt-s">The short version</h2>
+  <div class="craft craft--short mt-m" data-craft data-on="1:show-parts">
+    <div class="craft__bar"><span><i data-icon="message-square"></i>Prompt · LAB-35 · the short version</span><button type="button" class="copy-btn" data-craft-copy><i data-icon="copy"></i>Copy</button></div>
+    <p class="craft__short"><span class="p-r">You're a senior React developer writing for beginners.</span> <span class="p-c">Le Bistro is a Vite + React 19 + TypeScript + Tailwind 4 app with react-router 8, Zustand 5, react-hook-form 7, zod 4 and @tanstack/react-query 5, and an API at /api through a Vite proxy (dishes, categories, search, a 2-minute token login, the profile, the server's cart, orders with a paged history and the staff-only queue, and a status endpoint that answers 422 for a move that is not allowed).</span> <span class="p-a">Build the site as it is so far (pages, role guards, stores, forms, everything read with TanStack Query v5) and add the changes: a Zustand toast store with a Toaster, and a MutationCache that shows every failed change as a toast; a useSendOrder mutation (empty the server's cart, add each line, create the order; then clear the local cart, toast and invalidate "orders") on a button that is disabled while it sends; a "my orders" infinite query, three at a time, that stops at the last page, with an IntersectionObserver sentinel and a "Show more" button; and an optimistic useSetOrderStatus for the kitchen's buttons (cancelQueries, a snapshot, a rollback, an invalidation on settled).</span> <span class="p-f">Answer with a table of each change, what it sends and what it invalidates or updates, then every file in full with its path.</span> <span class="p-t">Keep it simple for beginners, with no double orders, no manual refetch after a change and v5 syntax only, and make sure npm run build passes.</span></p>
+    <div class="craft__legend" data-step="1"><span class="cr-c">Context</span><span class="cr-r">Role</span><span class="cr-a">Action</span><span class="cr-f">Format</span><span class="cr-t">Target</span></div>
+  </div>
+  <div class="takeaway mt-m" data-step="2"><p class="k">How CRAFT works</p><p>The five parts are a checklist for your thinking, not a form to fill in. Once all five are there, the labels can go.</p></div>
+  <aside class="notes">
+    <p><b>Do:</b> Read it aloud first. Press next: each part lights up in its colour. Ask: if we delete "a snapshot, a rollback", which part is poorer? (Action: the AI may write an optimistic update that never undoes itself.)</p>
+    <p><b>Say:</b> Long or short, it is the same prompt.</p>
+  </aside>
+</section>
+
+<!-- ============================== WRAP-UP ============================== -->
+
+<section class="slide" data-phase="wrap" data-title="Two problems, two answers">
+  <p class="eyebrow"><b>Dessert</b> What we solved today</p>
+  <h2 class="h2 mt-s">Two problems, two answers</h2>
+  <div class="recap">
+    <div class="recap__row" data-step="1">
+      <div class="recap__p"><p class="k">Problem 1</p><p>A button that could send twice, told nobody, and failed in silence.</p></div>
+      <div class="recap__arrow"><i data-icon="arrow-right"></i></div>
+      <div class="recap__s"><p class="k">A mutation</p><p><code>useMutation</code> with <code>isPending</code> as the guard, <code>invalidateQueries</code> to tell the cache, and one <code>MutationCache</code> handler for every failure.</p></div>
+    </div>
+    <div class="recap__row" data-step="2">
+      <div class="recap__p"><p class="k">Problem 2</p><p>A card that waits for the server, and a history loaded all at once.</p></div>
+      <div class="recap__arrow"><i data-icon="arrow-right"></i></div>
+      <div class="recap__s"><p class="k">Answer first, a page at a time</p><p>An optimistic update with <code>cancelQueries</code>, a snapshot and a rollback; <code>useInfiniteQuery</code> with an <code>IntersectionObserver</code>.</p></div>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Ask:</b> Before each press, ask the room what the solution was. Then reveal.</p></aside>
+</section>
+
+<section class="slide" data-phase="wrap" data-title="What does this do?">
+  <p class="eyebrow"><b>Dessert</b> Click a card to check yourself</p>
+  <h2 class="h2 mt-s">What does this do?</h2>
+  <div class="flips is-small">
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">01 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">useMutation({ mutationFn, onSuccess })</script></div><div class="flip__face flip__back"><span class="flip__k">01</span><p>A change you run yourself with <code>mutate()</code>. <code>onSuccess</code> runs when it worked.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">02 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">disabled={send.isPending}</script></div><div class="flip__face flip__back"><span class="flip__k">02</span><p>True from the press until the answer: no second click, no double order.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">03 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">invalidateQueries({ queryKey: ["orders"] })</script></div><div class="flip__face flip__back"><span class="flip__k">03</span><p>Marks every key that starts with "orders" as old. Entries on screen refetch now.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">04 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">new MutationCache({ onError })</script></div><div class="flip__face flip__back"><span class="flip__k">04</span><p>One place that runs when any change fails: a toast for the guest.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">05 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">onMutate: async () => ({ previous })</script></div><div class="flip__face flip__back"><span class="flip__k">05</span><p>Runs before the request. What it returns arrives as <code>context</code> in <code>onError</code>.</p></div></div></div>
+    <div class="flip" data-flip><div class="flip__inner"><div class="flip__face"><span class="flip__k">06 <i data-icon="refresh-cw"></i></span><script type="text/plain" data-lang="tsx">getNextPageParam: (last) =>
+  last.hasNext ? last.page + 1 : undefined</script></div><div class="flip__face flip__back"><span class="flip__k">06</span><p>Says where the next page is, and <code>undefined</code> when there is none.</p></div></div></div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Point at a student for each card. They explain, then you click to flip.</p></aside>
+</section>
+
+<section class="slide" data-phase="wrap" data-title="Homework: v0.9">
+  <div class="row" style="justify-content:space-between;align-items:flex-end">
+    <div class="stack" style="--gap:12px"><p class="eyebrow"><b>Homework</b> Before L36</p><h2 class="h1">Your shop, version 0.9</h2></div>
+    <span class="sticker">Live link required</span>
+  </div>
+  <div class="hw">
+    <div class="tiers">
+      <div class="tier base"><div class="tier__k"><span>Base</span><span>required</span></div><h3>A change, done properly</h3>
+        <ul><li>A "Place order" <code>useMutation</code> (<code>POST /carts/add</code>): the button is disabled while pending and says "Sending…".</li><li><code>onSuccess</code>: clear the cart, a message, and <code>invalidateQueries</code> for the history. No <code>refetch()</code> inside.</li><li>A toast store and one <code>MutationCache.onError</code> for every failed change.</li><li>A "My orders" page that refreshes after a success.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Plus</span><span>recommended</span></div><h3>Answer first</h3>
+        <ul><li>An optimistic heart (or "mark as sold out") on the cached product list, with <code>cancelQueries</code>, a snapshot and a rollback. Test the rollback with a wrong URL.</li></ul></div>
+      <div class="tier"><div class="tier__k"><span>Pro</span><span>fast finishers</span></div><h3>A page at a time</h3>
+        <ul><li>An infinite product list (<code>/products?limit=10&amp;skip=…</code>) with a button <b>and</b> an <code>IntersectionObserver</code>.</li></ul></div>
+    </div>
+    <div class="cw__side">
+      <div class="done-when"><p class="k">Before you submit</p><ul class="checks"><li>Pressing the button twice sends one request</li><li>Search for <code>refetch(</code>: none in an <code>onSuccess</code></li><li>A failed request shows a toast</li><li><code>npm run build</code> passes, the Vercel link works</li></ul></div>
+      <p class="small muted">Full brief and grading: <code>homework.md</code>.</p>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Say:</b> Submit the GitHub link and the Vercel link. DummyJSON answers <code>POST /carts/add</code> and <code>PUT /products/{id}</code> as if it had saved the change (it does not): look at the Network tab, and at the cache, not at the server.</p></aside>
+</section>
+
+<section class="slide" data-phase="wrap" data-tone="dark" data-title="Merci">
+  <div class="merci">
+    <div class="stack" style="--gap:22px">
+      <p class="eyebrow"><b>L35</b> Le serveur</p>
+      <h2 class="display">Merci!</h2>
+      <p class="lead">Questions now, or in the class chat. See you at L36.</p>
+    </div>
+    <div class="teaser" data-step="1">
+      <p class="k">Next time · L36</p>
+      <h3>Open the cart with Tab.</h3>
+      <p>Put the mouse away. Open the cart with Enter, then press Tab ten times: you are walking through the page behind it. Press Esc: nothing. The cart opens, and the keyboard is left outside. We'll make every dialog work with a keyboard, and a good UI kit will help.</p>
+    </div>
+  </div>
+  <aside class="notes"><p><b>Do:</b> Step 1 shows the next problem. Put the mouse aside, press Tab until "Your order" has focus, press Enter, then Tab ten times and Esc. Where does the focus go? Does Esc close it? That is the hook for L36.</p></aside>
+</section>
+
+</div>
+</div>
+
+<script src="../_shared/vendor/icons.js"></script>
+<script src="../_shared/vendor/prism/prism.min.js" data-manual></script>
+<script src="../_shared/vendor/prism/prism-jsx.min.js"></script>
+<script src="../_shared/vendor/prism/prism-typescript.min.js"></script>
+<script src="../_shared/vendor/prism/prism-tsx.min.js"></script>
+<script src="../_shared/vendor/prism/prism-bash.min.js"></script>
+<script src="../_shared/vendor/prism/prism-json.min.js"></script>
+<script src="../_shared/music/tracks.js"></script>
+<script src="../_shared/bistro-data.js"></script>
+<script src="../_shared/deck.js"></script>
+<script src="../track.js"></script>
+<script>
+(function () {
+  'use strict';
+  Track.init();
+  Deck.init({
+    code: 'L35',
+    lecture: 35,
+    title: 'Le serveur',
+    footer: 'Le Bistro track · L35 · TanStack Query, changing data',
+    shared: '../_shared/',
+    breakMinutes: 10,
+    breakLine: 'Pause café. Stand up, refill, rest your eyes. Back in',
+    phases: [
+      { id: 'hello', label: 'Hello' }, { id: 'questions', label: 'Questions' },
+      { id: 'problem', label: 'Problem 1' }, { id: 'solution', label: 'Solution 1' }, { id: 'classwork', label: 'Classwork 1' },
+      { id: 'break', label: 'Break' },
+      { id: 'problem2', label: 'Problem 2' }, { id: 'solution2', label: 'Solution 2' }, { id: 'classwork2', label: 'Classwork 2 · AI' }, { id: 'masterclass', label: 'Masterclass' },
+      { id: 'wrap', label: 'Wrap-up' }
+    ]
+  });
+
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = Track.esc;
+  document.querySelectorAll('[data-start-break]').forEach(function (b) { b.addEventListener('click', function () { Deck.openBreak(); }); });
+  function setOn(group, btn) { Array.prototype.forEach.call(group.children, function (x) { x.classList.toggle('is-on', x === btn); }); }
+  function skel(n) { var h = ''; for (var i = 0; i < n; i++) h += '<div class="skel"></div>'; return '<div class="skel-grid">' + h + '</div>'; }
+
+  /* ---------- 1 · "Send to the kitchen": by hand, or a mutation ---------- */
+  var CART = [['Coq au Vin', 32], ['Crème Brûlée', 13], ['Espresso', 5]];
+  function makeSend(rootId) {
+    var root = $(rootId);
+    var S = { mode: 'hand', cart: true, pending: false, srv: 0, kit: 0, mine: 0, failNext: false, toasts: [], timers: [], poll: null, n: 0, active: false };
+    root.innerHTML =
+      '<div class="sd__left"><div class="seg is-modes" data-r="mode"><button type="button" class="is-on" data-m="hand">By hand (fetch)</button><button type="button" data-m="mut">useMutation + invalidate</button></div>' +
+      '<div class="mock sd__mock"><div class="mock__bar"><i></i><i></i><i></i><span>localhost:5173/menu · Your order</span></div><div class="sd__cart" data-r="cart"></div><div class="sd__toasts" data-r="toasts"></div></div>' +
+      '<div class="row" style="--gap:10px;flex-wrap:wrap"><button type="button" class="btn is-ghost" data-r="twice">Press it twice</button><label class="ph__opt sd__fail"><input type="checkbox" data-r="fail"><span><b>Make the server fail once</b></span></label><button type="button" class="btn is-ghost" data-r="reset">' + Deck.icon('rotate-ccw') + 'Reset</button></div></div>' +
+      '<div class="sd__right"><div class="counters"><div><b data-r="n-srv">0</b><span>orders at the server</span></div><div><b data-r="n-mine">0</b><span>My orders shows (this browser)</span></div><div><b data-r="n-kit">0</b><span>the kitchen\'s screen (another one)</span></div></div>' +
+      '<div class="devtools" data-r="log"><div class="devtools__head"><b>What happens</b><span>in order</span></div><div class="devtools__body"></div></div></div>';
+    var r = function (k) { return root.querySelector('[data-r="' + k + '"]'); };
+    var log = function (t, k) { Track.log(r('log'), t, k); };
+    var shown = { srv: 0, kit: 0, mine: 0 };
+    function render() {
+      var total = CART.reduce(function (s, l) { return s + l[1]; }, 0);
+      r('cart').innerHTML = S.cart
+        ? CART.map(function (l) { return '<div class="sd__line"><span>' + l[0] + '</span><i>× 1</i><i>₾' + l[1] + '</i></div>'; }).join('') +
+          '<div class="sd__total"><span>Total</span><b>₾' + total + '</b></div>' +
+          '<button type="button" class="fm__btn sd__btn" data-r="send"' + (S.mode === 'mut' && S.pending ? ' disabled' : '') + '>' + (S.mode === 'mut' && S.pending ? 'Sending…' : 'Send to the kitchen') + '</button>'
+        : '<p class="small muted">Nothing here yet — the menu is waiting.</p><button type="button" class="fm__ghost" data-r="refill">Refill the cart</button>';
+      r('toasts').innerHTML = S.toasts.map(function (t) { return '<div class="sd__toast ' + (t.kind === 'error' ? 'is-error' : '') + '" role="' + (t.kind === 'error' ? 'alert' : 'status') + '">' + esc(t.text) + '</div>'; }).join('');
+      [['srv', 'n-srv'], ['kit', 'n-kit'], ['mine', 'n-mine']].forEach(function (p) {
+        r(p[1]).textContent = S[p[0]];
+        if (shown[p[0]] !== S[p[0]]) { shown[p[0]] = S[p[0]]; Track.replay(r(p[1]).parentNode, 'is-render'); }
+      });
+    }
+    function toast(kind, text) {
+      var t = { kind: kind, text: text }; S.toasts.push(t); render();
+      S.timers.push(setTimeout(function () { S.toasts = S.toasts.filter(function (x) { return x !== t; }); render(); }, 4200));
+    }
+    function send() {
+      if (!S.cart) return;
+      if (S.mode === 'mut' && S.pending) return;     // disabled={isPending}
+      var willFail = S.failNext, n = ++S.n;
+      S.failNext = false; r('fail').checked = false;
+      if (S.mode === 'mut') S.pending = true;
+      log('→ #' + n + ' POST /enterprise/orders', 'dim'); render();
+      S.timers.push(setTimeout(function () {
+        if (willFail) {
+          if (S.mode === 'hand') log('← #' + n + ' failed: Uncaught (in promise) ApiError. The button just sits there.', 'err');
+          else { S.pending = false; log('← #' + n + ' failed → MutationCache.onError → a toast', 'warn'); toast('error', 'No connection. Try again.'); }
+          render(); return;
+        }
+        S.srv++; S.cart = false;
+        log('← #' + n + ' 201 Created: the server now has ' + S.srv + ' order' + (S.srv > 1 ? 's' : ''), 'ok');
+        if (S.mode === 'mut') {
+          S.pending = false; toast('ok', 'Your order is with the kitchen.');
+          log('onSuccess → invalidateQueries({ queryKey: ["orders"] })', 'ok');
+          S.timers.push(setTimeout(function () { S.mine = S.srv; log('← My orders refetched (the kitchen\'s screen is another browser: it waits for its own poll)', 'ok'); render(); }, 450));
+        }
+        render();
+      }, 1200));
+    }
+    function armPoll() { clearInterval(S.poll); S.poll = setInterval(function () { if (S.kit !== S.srv) { S.kit = S.srv; log('(the kitchen\'s screen asks again, every 5 s) → ' + S.kit, 'dim'); render(); } }, 5000); }
+    function reset() {
+      S.timers.forEach(clearTimeout); S.timers = []; clearInterval(S.poll);
+      S.cart = true; S.pending = false; S.srv = 0; S.kit = 0; S.mine = 0; S.failNext = false; S.toasts = []; S.n = 0; shown = { srv: 0, kit: 0, mine: 0 };
+      r('fail').checked = false; Track.clear(r('log')); render();
+      if (S.active) armPoll();
+    }
+    root.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-r],[data-m]'); if (!b) return;
+      if (b.hasAttribute('data-m')) { S.mode = b.getAttribute('data-m'); setOn(r('mode'), b); reset(); return; }
+      var k = b.getAttribute('data-r');
+      if (k === 'send') send();
+      else if (k === 'twice') { send(); S.timers.push(setTimeout(send, 150)); }
+      else if (k === 'refill') { S.cart = true; render(); }
+      else if (k === 'reset') reset();
+    });
+    r('fail').addEventListener('change', function () { S.failNext = r('fail').checked; });
+    reset();
+    return { start: function () { S.active = true; reset(); }, stop: function () { S.active = false; reset(); } };
+  }
+  var sd1 = makeSend('sd1');
+  Deck.onSlide('send', { enter: sd1.start, leave: sd1.stop });
+
+  /* ---------- 2 · which entries does invalidateQueries mark? ---------- */
+  var IV_ENTRIES = [
+    { key: ['dishes', 'list', 'all'], use: 1 }, { key: ['dishes', 'list', 'drinks'], use: 0 }, { key: ['dishes', 'search', 'coq'], use: 0 },
+    { key: ['orders', 'queue'], use: 1 }, { key: ['orders', 'mine', 'maia@example.ge'], use: 1 }, { key: ['profile', 'maia@example.ge'], use: 0 }
+  ];
+  function makeInvalidate(rootId) {
+    var root = $(rootId), E = [], timers = [];
+    root.innerHTML =
+      '<div class="iv__left"><p class="iv__cap">queryClient.invalidateQueries({ queryKey: <b>…</b> })</p><div class="chips-row" data-r="btns">' +
+      ['["orders"]', '["order"]', '["dishes","list"]', '["dishes"]', 'all'].map(function (k) { return '<button type="button" class="cbtn" data-q=\'' + (k === 'all' ? '[]' : k) + '\'>' + (k === 'all' ? 'invalidateQueries()' : k) + (k === '["order"]' ? '<small>a typo</small>' : '') + '</button>'; }).join('') +
+      '</div><div class="kl__cache iv__table" data-r="table"></div></div>' +
+      '<div class="iv__right"><div class="devtools" data-r="log"><div class="devtools__head"><b>The cache</b><span>what it did</span></div><div class="devtools__body"></div></div></div>';
+    var r = function (k) { return root.querySelector('[data-r="' + k + '"]'); };
+    var log = function (t, k) { Track.log(r('log'), t, k); };
+    function matches(key, filter) { for (var i = 0; i < filter.length; i++) if (key[i] !== filter[i]) return false; return true; }
+    function ago(e) { return Math.floor((Date.now() - e.at) / 1000) + ' s ago'; }
+    function render() {
+      r('table').innerHTML = '<table><thead><tr><th>Key</th><th>State</th><th>In use</th><th>Fetched</th></tr></thead><tbody>' + E.map(function (e, i) {
+        return '<tr class="' + (e.flash ? 'is-hit' : '') + (e.state === 'fetching' ? ' is-fetching' : '') + '"><td>' + esc(JSON.stringify(e.key)) + '</td><td class="iv__st is-' + e.state + '">' + (e.state === 'fetching' ? 'refetching…' : e.state === 'stale' ? 'old' : 'fresh') + '</td><td><button type="button" class="iv__use" data-i="' + i + '" aria-label="Toggle: a component uses this entry">' + e.use + '</button></td><td>' + ago(e) + '</td></tr>';
+      }).join('') + '</tbody></table>';
+    }
+    function refetch(e, why) {
+      e.state = 'fetching'; render();
+      timers.push(setTimeout(function () { e.state = 'fresh'; e.at = Date.now(); e.flash = true; log('← ' + JSON.stringify(e.key) + ' refetched', 'ok'); render(); timers.push(setTimeout(function () { e.flash = false; render(); }, 700)); }, 700));
+      log('→ GET for ' + JSON.stringify(e.key) + ' (' + why + ')', 'dim');
+    }
+    function invalidate(filter) {
+      log('invalidateQueries({ queryKey: ' + JSON.stringify(filter) + ' })', 'dim');
+      var hit = E.filter(function (e) { return matches(e.key, filter); });
+      if (!hit.length) { log('no key starts with ' + JSON.stringify(filter) + ': nothing is marked, nothing refetches. No error.', 'warn'); return; }
+      hit.forEach(function (e) { if (e.use) refetch(e, 'in use: refetch now'); else { e.state = 'stale'; log(JSON.stringify(e.key) + ' marked old: nobody uses it, so no request yet', 'warn'); } });
+      render();
+    }
+    root.addEventListener('click', function (ev) {
+      var b = ev.target.closest('[data-q]');
+      if (b) { invalidate(JSON.parse(b.getAttribute('data-q'))); return; }
+      var u = ev.target.closest('.iv__use'); if (!u) return;
+      var e = E[Number(u.getAttribute('data-i'))];
+      e.use = e.use ? 0 : 1;
+      if (e.use && e.state === 'stale') { log('a component mounts and uses ' + JSON.stringify(e.key) + ': it is old → refetch now', 'warn'); refetch(e, 'mounted while old'); }
+      else if (e.use) log('a component mounts and uses ' + JSON.stringify(e.key) + ': it is fresh → no request', 'ok');
+      else log('the last component using ' + JSON.stringify(e.key) + ' unmounts: inactive', 'dim');
+      render();
+    });
+    function reset() { timers.forEach(clearTimeout); timers = []; E = IV_ENTRIES.map(function (x) { return { key: x.key, use: x.use, state: 'fresh', at: Date.now() - 12000, flash: false }; }); Track.clear(r('log')); render(); }
+    var tick = null;
+    reset();
+    return { start: function () { reset(); clearInterval(tick); tick = setInterval(render, 1000); }, stop: function () { clearInterval(tick); reset(); } };
+  }
+  var iv1 = makeInvalidate('iv1');
+  Deck.onSlide('invalidate', { enter: iv1.start, leave: iv1.stop });
+
+  /* ---------- 3 · the kitchen's card: wait, or answer first ---------- */
+  var NEXT = { PENDING: ['COOKING', 'Start cooking'], COOKING: ['READY', 'Ready'], READY: ['DELIVERED', 'Delivered'] };
+  function makeBoard(rootId, withToggles) {
+    var root = $(rootId), opt = { opt: false, no: false };
+    var S = { orders: [], wait: 0, last: '—', toasts: [], timers: [] };
+    root.innerHTML =
+      '<div class="op__left">' + (withToggles
+        ? '<div class="ph__opts"><label class="ph__opt"><input type="checkbox" data-opt="opt"><span><b>Optimistic update</b> <code>onMutate</code> · <code>onError</code> · <code>onSettled</code></span></label>' +
+          '<label class="ph__opt"><input type="checkbox" data-opt="no"><span><b>Another cook already pressed it</b> <code>the next press gets a 422</code></span></label></div>' : '') +
+      '<div class="op__board" data-r="board"></div></div>' +
+      '<div class="op__right"><div class="counters"><div><b data-r="n-wait">0.0</b><span>seconds staring at a card</span></div><div><b data-r="n-last">—</b><span>press → card changed</span></div></div>' +
+      '<div class="devtools" data-r="log"><div class="devtools__head"><b>What happens</b><span>with the time of each step</span></div><div class="devtools__body"></div></div>' +
+      '<div class="sd__toasts op__toasts" data-r="toasts"></div></div>';
+    var r = function (k) { return root.querySelector('[data-r="' + k + '"]'); };
+    var log = function (t, k) { Track.log(r('log'), t, k); };
+    function render() {
+      r('board').innerHTML = S.orders.map(function (o) {
+        var nx = NEXT[o.status];
+        return '<div class="op__card' + (o.flash ? ' is-flash' : '') + '"><span><b>' + esc(o.who) + '</b> · ' + o.items + ' item' + (o.items > 1 ? 's' : '') + '<em class="op__st is-' + o.status.toLowerCase() + '">' + o.status + '</em></span><span class="op__act"><i>₾' + o.total + '</i>' + (nx ? '<button type="button" class="fm__ghost" data-id="' + o.id + '">' + nx[1] + '</button>' : '') + '</span></div>';
+      }).join('');
+      r('n-wait').textContent = S.wait.toFixed(1); r('n-last').textContent = S.last;
+      r('toasts').innerHTML = S.toasts.map(function (t) { return '<div class="sd__toast is-error" role="alert">' + esc(t) + '</div>'; }).join('');
+    }
+    function toast(t) { S.toasts.push(t); render(); S.timers.push(setTimeout(function () { S.toasts = S.toasts.filter(function (x) { return x !== t; }); render(); }, 4200)); }
+    function ms(t0) { return Date.now() - t0; }
+    function set(o, status) { o.status = status; o.flash = true; render(); S.timers.push(setTimeout(function () { o.flash = false; render(); }, 500)); }
+    function press(id) {
+      var o = S.orders.filter(function (x) { return x.id === id; })[0], nx = NEXT[o.status]; if (!nx || o.busy) return;
+      var t0 = Date.now(), before = o.status, refused = opt.no; o.busy = true;
+      if (refused) { r('board').parentNode.querySelectorAll('input[data-opt="no"]').forEach(function (c) { c.checked = false; }); opt.no = false; }
+      log('press: ' + before + ' → ' + nx[0] + '   (PATCH /orders/' + id + '/status)', 'dim');
+      function changed() { var d = ms(t0); S.last = d + ' ms'; S.wait += d / 1000; r('n-last').textContent = S.last; render(); }
+      if (opt.opt) {
+        S.timers.push(setTimeout(function () { set(o, nx[0]); changed(); log('+' + ms(t0) + ' ms  onMutate: the card shows ' + nx[0] + ' (the server has not answered)', 'ok'); }, 50));
+      }
+      S.timers.push(setTimeout(function () {
+        o.busy = false;
+        if (refused) {
+          log('+' + ms(t0) + ' ms  ← 422 Invalid transition ' + nx[0] + ' → ' + nx[0] + ' (another cook was first)', 'err');
+          toast('Invalid transition ' + nx[0] + ' → ' + nx[0] + '.');
+          if (opt.opt) { set(o, before); log('+' + ms(t0) + ' ms  onError: the old queue is put back → ' + before, 'warn'); }
+          S.timers.push(setTimeout(function () { set(o, nx[0]); log('+' + ms(t0) + ' ms  onSettled: refetch → the truth is ' + nx[0], 'ok'); if (!opt.opt) changed(); }, 450));
+        } else {
+          log('+' + ms(t0) + ' ms  ← 200 OK', 'ok');
+          if (!opt.opt) { set(o, nx[0]); changed(); log('+' + ms(t0) + ' ms  the card shows ' + nx[0], 'ok'); }
+          else log('onSettled → refetch: the server agrees', 'dim');
+        }
+      }, 800));
+    }
+    root.addEventListener('click', function (e) { var b = e.target.closest('[data-id]'); if (b) press(b.getAttribute('data-id')); });
+    root.addEventListener('change', function (e) { var o = e.target.getAttribute && e.target.getAttribute('data-opt'); if (!o) return; opt[o] = e.target.checked; if (o === 'opt') reset(); });
+    function reset() {
+      S.timers.forEach(clearTimeout); S.timers = [];
+      S.orders = [{ id: 'a1', who: 'Nino K.', items: 2, total: 64, status: 'PENDING' }, { id: 'a2', who: 'Ana T.', items: 1, total: 39, status: 'PENDING' }, { id: 'a3', who: 'Giorgi M.', items: 2, total: 18, status: 'COOKING' }];
+      S.wait = 0; S.last = '—'; S.toasts = []; Track.clear(r('log')); render();
+    }
+    reset();
+    return { reset: reset };
+  }
+  var op1 = makeBoard('op1', false), op2 = makeBoard('op2', true);
+  Deck.onSlide('slow', { enter: op1.reset, leave: op1.reset });
+  Deck.onSlide('optimistic', { enter: op2.reset, leave: op2.reset });
+
+  /* ---------- 4 · the history: everything at once, or three at a time ---------- */
+  function orderRow(i) { return '<li class="lg__row"><span>Oct ' + (22 - i) + ' · ' + (1 + (i % 3)) + ' item' + (i % 3 ? 's' : '') + '<em>DELIVERED</em></span><i>₾' + (18 + (i * 7) % 60) + '</i></li>'; }
+  function makeHistory(rootId, infinite) {
+    var root = $(rootId), TOTAL = infinite ? 14 : 40, SIZE = 3, PAGE_MS = 600, ALL_MS = 2400;
+    var S = { pages: 0, fetching: false, obs: true, io: null, req: 0, rows: 0, first: '—', opened: false, timers: [] };
+    root.innerHTML = infinite
+      ? '<div class="lg__left"><div class="ph__opts"><label class="ph__opt"><input type="checkbox" data-opt="obs" checked><span><b>Watch the end of the list</b> <code>IntersectionObserver</code></span></label></div><div class="lg__box" data-r="box"></div></div>' +
+        '<div class="lg__right"><div class="counters"><div><b data-r="n-pages">0</b><span>pages loaded</span></div><div><b data-r="n-rows">0</b><span>rows</span></div><div><b data-r="n-req">0</b><span>requests</span></div></div><div class="state" data-r="state"></div>' +
+        '<div class="devtools" data-r="log"><div class="devtools__head"><b>Network</b><span>GET /profile/orders</span></div><div class="devtools__body"></div></div>' +
+        '<div class="row" style="--gap:10px"><button type="button" class="btn is-ghost" data-r="reset">' + Deck.icon('rotate-ccw') + 'Reset</button></div></div>'
+      : '<div class="lg__left"><div class="row" style="--gap:10px"><button type="button" class="btn is-wine" data-r="open">Open My orders</button><button type="button" class="btn is-ghost" data-r="reset">' + Deck.icon('rotate-ccw') + 'Reset</button></div><div class="lg__box" data-r="box"></div></div>' +
+        '<div class="lg__right"><div class="counters"><div><b data-r="n-rows">0</b><span>rows on the page</span></div><div><b data-r="n-first">—</b><span>until the first row</span></div><div><b data-r="n-req">0</b><span>requests</span></div></div>' +
+        '<div class="devtools" data-r="log"><div class="devtools__head"><b>Network</b><span>GET /profile/orders</span></div><div class="devtools__body"></div></div></div>';
+    var r = function (k) { return root.querySelector('[data-r="' + k + '"]'); };
+    var log = function (t, k) { Track.log(r('log'), t, k); };
+    function hasNext() { return S.pages * SIZE < TOTAL; }
+    function rearm() {
+      if (S.io) { S.io.disconnect(); S.io = null; }
+      if (infinite && S.obs && hasNext() && !S.fetching) {
+        S.io = new IntersectionObserver(function (e) { if (e[0].isIntersecting) fetchNext(); }, { root: r('box'), rootMargin: '0px 0px 60px 0px' });
+        S.io.observe(r('box').querySelector('[data-r="sentinel"]'));
+      }
+    }
+    function render() {
+      var box = r('box');
+      if (infinite) {
+        var shownRows = Math.min(TOTAL, S.pages * SIZE), rows = ''; for (var i = 0; i < shownRows; i++) rows += orderRow(i + 1);
+        var keep = box.scrollTop;
+        box.innerHTML = '<ul class="lg__list">' + rows + '</ul><div data-r="sentinel" class="lg__sentinel"></div>' +
+          (hasNext() ? '<div class="lg__more"><button type="button" class="fm__ghost" data-r="more"' + (S.fetching ? ' disabled' : '') + '>' + (S.fetching ? 'Loading…' : 'Show more orders') + '</button></div>' : '<p class="small muted lg__end">That\'s all your orders.</p>');
+        box.scrollTop = keep;
+        r('n-pages').textContent = S.pages; r('n-rows').textContent = shownRows; r('n-req').textContent = S.req;
+        r('state').innerHTML = 'hasNextPage:        <b>' + hasNext() + '</b>\nisFetchingNextPage: <b>' + S.fetching + '</b>\ndata.pages:         <b>' + S.pages + '</b>';
+      } else {
+        if (!S.opened) box.innerHTML = '<p class="small muted">The guest has forty dinners behind them.</p>';
+        else if (S.fetching) box.innerHTML = skel(3) + '<div style="height:10px"></div>' + skel(3);
+        else { var all = ''; for (var j = 0; j < TOTAL; j++) all += orderRow(j + 1); box.innerHTML = '<ul class="lg__list">' + all + '</ul>'; }
+        r('n-rows').textContent = S.rows; r('n-first').textContent = S.first; r('n-req').textContent = S.req;
+      }
+    }
+    function fetchNext() {
+      if (S.fetching || !hasNext()) return;
+      S.fetching = true; S.req++;
+      log('→ GET /profile/orders?page=' + (S.pages + 1) + '&size=' + SIZE, 'dim'); render(); rearm();
+      S.timers.push(setTimeout(function () {
+        S.pages++; S.fetching = false;
+        log('← page ' + S.pages + ': ' + Math.min(SIZE, TOTAL - (S.pages - 1) * SIZE) + ' orders' + (hasNext() ? '' : ' (hasNext: false)'), 'ok');
+        render(); rearm();
+      }, PAGE_MS));
+    }
+    function open() {
+      if (S.opened) return;
+      S.opened = true; S.fetching = true; S.req = 1; log('→ GET /profile/orders?page=1&size=40', 'dim'); render();
+      S.timers.push(setTimeout(function () { S.fetching = false; S.rows = TOTAL; S.first = (ALL_MS / 1000).toFixed(1) + ' s'; log('← 200 OK: ' + TOTAL + ' orders (' + (ALL_MS / 1000).toFixed(1) + ' s)', 'ok'); render(); }, ALL_MS));
+    }
+    root.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-r]'); if (!b) return;
+      var k = b.getAttribute('data-r');
+      if (k === 'open') open(); else if (k === 'more') fetchNext(); else if (k === 'reset') reset();
+    });
+    root.addEventListener('change', function (e) { if (e.target.getAttribute && e.target.getAttribute('data-opt') === 'obs') { S.obs = e.target.checked; reset(); } });
+    function reset() {
+      S.timers.forEach(clearTimeout); S.timers = [];
+      if (S.io) { S.io.disconnect(); S.io = null; }
+      S.pages = 0; S.fetching = false; S.req = 0; S.rows = 0; S.first = '—'; S.opened = false;
+      Track.clear(r('log')); render();
+      if (infinite) fetchNext();
+    }
+    function stop() { S.timers.forEach(clearTimeout); S.timers = []; if (S.io) { S.io.disconnect(); S.io = null; } }
+    render();
+    return { reset: reset, stop: stop };
+  }
+  var lg1 = makeHistory('lg1', false), lg2 = makeHistory('lg2', true);
+  Deck.onSlide('long', { enter: lg1.reset, leave: lg1.stop });
+  Deck.onSlide('endless', { enter: lg2.reset, leave: lg2.stop });
+})();
+</script>
+</body>
+</html>
