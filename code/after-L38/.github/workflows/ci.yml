@@ -1,0 +1,51 @@
+name: CI
+
+# The robot reviewer: it runs on every pull request, and again when the code lands on main.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# A new push to the same branch cancels the older run: nobody waits for a check that is already out of date.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# The least this job needs: it reads the code and nothing else (it cannot push, comment or release).
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm # keeps ~/.npm between runs, keyed by package-lock.json
+
+      # npm ci installs exactly what package-lock.json says (npm install may "improve" it)
+      - run: npm ci
+
+      - run: npm run lint
+
+      # tsc -b type-checks the code AND the tests, then vite builds the site
+      - run: npm run build
+
+      # The first-load JavaScript has a budget (scripts/check-size.mjs). A pull request that makes
+      # the site heavier turns red, like one that breaks a test.
+      - run: npm run size
+
+      # vitest run: one pass, no watch mode. A failing test fails the step, the step fails the job,
+      # the job turns the pull request red, and the merge button waits.
+      - run: npm run coverage
+
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }} # keep the report even when a test failed: that is when you want it
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 7

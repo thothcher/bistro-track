@@ -1,0 +1,93 @@
+import type { Category, Dish, Order, QueueOrder } from "@/types";
+
+// Small, fixed data for the tests. The real API has 40+ dishes and they change;
+// a test needs the same three every time, or "it passed yesterday" means nothing.
+export const coqAuVin: Dish = {
+  id: 1,
+  name: "Coq au vin",
+  description: "Chicken braised in red wine with mushrooms.",
+  price: 32,
+  categorySlug: "mains",
+  categoryName: "Mains",
+  imageUrl: "/images/coq-au-vin.jpg",
+  isAvailable: true,
+};
+
+export const frenchOnionSoup: Dish = {
+  id: 2,
+  name: "French onion soup",
+  description: "Slow onions, beef broth, melted gruyère.",
+  price: 14.5,
+  categorySlug: "starters",
+  categoryName: "Starters",
+  imageUrl: "/images/onion-soup.jpg",
+  isAvailable: true,
+};
+
+export const cafeAuLait: Dish = {
+  id: 3,
+  name: "Café au lait",
+  description: "Strong coffee, hot milk.",
+  price: 6,
+  categorySlug: "drinks",
+  categoryName: "Drinks",
+  imageUrl: "/images/cafe-au-lait.jpg",
+  isAvailable: false, // off the menu today
+};
+
+export const dishes: Dish[] = [coqAuVin, frenchOnionSoup, cafeAuLait];
+
+// Five finished dinners, newest first. The API sends them three at a time.
+export const orders: Order[] = [
+  order("o-5", "DELIVERED", [[coqAuVin, 1], [frenchOnionSoup, 1], [cafeAuLait, 1]], "2026-10-20T19:10:00Z"),
+  order("o-4", "DELIVERED", [[frenchOnionSoup, 2]], "2026-10-18T12:30:00Z"),
+  order("o-3", "CANCELLED", [[coqAuVin, 1]], "2026-10-15T20:00:00Z"),
+  order("o-2", "DELIVERED", [[coqAuVin, 2], [cafeAuLait, 2]], "2026-10-10T18:45:00Z"),
+  order("o-1", "DELIVERED", [[frenchOnionSoup, 1]], "2026-10-02T13:05:00Z"),
+];
+
+function order(id: string, status: string, lines: [Dish, number][], createdAt: string): Order {
+  const items = lines.map(([dish, quantity]) => ({
+    dishId: dish.id,
+    dishName: dish.name,
+    unitPrice: dish.price,
+    quantity,
+    lineTotal: dish.price * quantity,
+  }));
+  return { id, status, createdAt, items, total: items.reduce((sum, i) => sum + i.lineTotal, 0) };
+}
+
+// The open orders on the pass, as the API sends them to the staff (GET /api/v1/enterprise/orders/queue)
+export function queueOrder(n: number, status: string, customerName: string | null): QueueOrder {
+  return {
+    id: `q-${n}`,
+    status,
+    customerName,
+    itemCount: 1 + (n % 3),
+    total: 20 + n,
+    createdAt: "2026-10-22T18:00:00Z",
+    slaDeadline: "2026-10-22T18:20:00Z",
+    assignedWaiter: null,
+  };
+}
+
+export const queue: QueueOrder[] = [
+  queueOrder(1, "PENDING", "Mari K."),
+  queueOrder(2, "COOKING", "Nino T."),
+  queueOrder(3, "PENDING", "Mariam B."),
+  queueOrder(4, "READY", "Giorgi M."),
+  queueOrder(5, "COOKING", null), // a guest who gave no name
+];
+
+// `count` orders at once: a Friday night
+export function manyOrders(count: number): QueueOrder[] {
+  return Array.from({ length: count }, (_, i) =>
+    queueOrder(100 + i, ["PENDING", "COOKING", "READY"][i % 3], `Guest ${i + 1}`),
+  );
+}
+
+export const categories: Category[] = [
+  { id: 1, slug: "starters", nameEn: "Starters", nameKa: "წინა კერძები", sortOrder: 1, dishCount: 1 },
+  { id: 2, slug: "mains", nameEn: "Mains", nameKa: "მთავარი კერძები", sortOrder: 2, dishCount: 1 },
+  { id: 3, slug: "drinks", nameEn: "Drinks", nameKa: "სასმელები", sortOrder: 3, dishCount: 1 },
+];

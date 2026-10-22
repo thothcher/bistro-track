@@ -1,0 +1,238 @@
+/* ==========================================================================
+   L37 · Le goûteur: the "lab report" skin.
+   Loaded after _shared/deck.css and _kit/kit.css. Everything here is a token or a restyle:
+   graph paper, sharp corners, hard shadows, IBM Plex, a highlighter instead of brass,
+   green PASS and red FAIL stamps. No other lecture of the track looks like this one.
+   ========================================================================== */
+
+:root {
+  /* paper and ink */
+  --bg: #f0f4ec;
+  --surface: #ffffff;
+  --surface-2: #e2eadd;
+  --ink: #0d1b16;
+  --ink-2: #3b4f46;
+  --ink-3: #7b8e84;
+  --line: #b9c8bd;
+  --letterbox: #050b08;
+
+  /* the brand is black ink; green and red are for verdicts only; the highlighter is yellow */
+  --accent: #0d1b16;
+  --accent-ink: #f6fff9;
+  --accent-on-dark: #5cf0a2;
+  --wine: #0d1b16;
+  --wine-deep: #000000;
+  --night: #09140f;
+  --brass: #7c5f00;
+  --brass-soft: #ffe14d;
+  --good: #0a7d4a;
+  --bad: #d0291d;
+  --warn: #a76a00;
+  --sky: #1f5fbf;
+
+  --f-display: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+
+  /* shape: instruments have corners */
+  --rad: 0;
+  --pill-r: 2px;
+  --card-r: 0px;
+  --tag-r: 0px;
+  --btn-r: 2px;
+  --r-apple: 0px;
+  --shadow-1: 0 0 0 1.5px rgba(13, 27, 22, .9), 4px 4px 0 rgba(13, 27, 22, .16);
+  --shadow-2: 0 0 0 1.5px rgba(13, 27, 22, .95), 8px 8px 0 rgba(13, 27, 22, .2);
+
+  /* code and terminal: a phosphor screen */
+  --code-bg: #0b1612;
+  --code-fg: #e4f3ea;
+  --code-dim: #6f877b;
+  --tok-keyword: #ff8f9d;
+  --tok-string: #a6f0b5;
+  --tok-fn: #ffe14d;
+  --tok-tag: #7fe5d5;
+  --tok-attr: #ffc27a;
+  --tok-num: #ffa96b;
+  --tok-punct: #8aa397;
+  --tok-class: #ffe14d;
+  --tok-hl: rgba(255, 225, 77, .1);
+  --tok-add: rgba(92, 240, 162, .16);
+  --accent-code: #ffe14d;
+  --good-code: #5cf0a2;
+  --term-bg: #0b1612;
+  --term-prompt: #5cf0a2;
+  --hs-line: #0d1b16;
+  --hs-fill: rgba(255, 225, 77, .22);
+  --hs-tip-bg: #0d1b16;
+  --hs-tag: #ffe14d;
+  --flip-back: #0d1b16;
+  --flip-back-ink: #f6fff9;
+  --curtain-bg: #0d1b16;
+  --curtain-ink: #5cf0a2;
+  --mark: rgba(255, 225, 77, .85);
+  --break-accent: #5cf0a2;
+  --break-font: var(--f-mono);
+
+  /* the extra roles of the kit */
+  --on-dark: #e4f3ea; --on-dark-hi: #f6fff9; --on-dark-dim: #8aa397;
+  --dark-surface: #11231b; --dark-surface-2: #183226;
+  --gold: #ffe14d; --gold-2: #ffd21a; --gold-soft: #fff3a8;
+  --accent-wash: #fff3a8;
+  --panel-bg: #0b1612; --panel-head: #13261d; --panel-fg: #e4f3ea;
+  --good-on-dark: #5cf0a2; --bad-on-dark: #ff9a8f;
+  --bad-ink: #8c1a10; --good-ink: #075a37;
+  --cr-c: #7c5f00; --cr-c-l: #ffe14d;
+  --cr-r: #b0261b; --cr-r-l: #ffa095;
+  --cr-a: #0a7d4a; --cr-a-l: #7df0b3;
+  --cr-f: #1f5fbf; --cr-f-l: #9cc2ff;
+  --cr-t: #6a3fb0; --cr-t-l: #cdb2ff;
+
+  /* chrome */
+  --chrome-fg: var(--ink);
+  --chrome-dim: var(--ink-3);
+  --chrome-accent: #0a7d4a;
+  --chrome-glass: rgba(255, 255, 255, .8);
+}
+
+/* ---------- the sheet: graph paper with crop marks ---------- */
+body { background: var(--letterbox); }
+.slide {
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(to right, rgba(16, 90, 62, .13) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(16, 90, 62, .13) 1px, transparent 1px),
+    linear-gradient(to right, rgba(16, 90, 62, .065) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(16, 90, 62, .065) 1px, transparent 1px);
+  background-size: 240px 240px, 240px 240px, 48px 48px, 48px 48px;
+  background-position: 24px 24px;
+}
+.slide::before {
+  content: ""; position: absolute; inset: 26px; pointer-events: none; z-index: 0;
+  --m: rgba(13, 27, 22, .75);
+  background:
+    linear-gradient(var(--m), var(--m)) left top / 30px 2px no-repeat,
+    linear-gradient(var(--m), var(--m)) left top / 2px 30px no-repeat,
+    linear-gradient(var(--m), var(--m)) right top / 30px 2px no-repeat,
+    linear-gradient(var(--m), var(--m)) right top / 2px 30px no-repeat,
+    linear-gradient(var(--m), var(--m)) left bottom / 30px 2px no-repeat,
+    linear-gradient(var(--m), var(--m)) left bottom / 2px 30px no-repeat,
+    linear-gradient(var(--m), var(--m)) right bottom / 30px 2px no-repeat,
+    linear-gradient(var(--m), var(--m)) right bottom / 2px 30px no-repeat;
+}
+.slide[data-tone="dark"] {
+  --slide-bg: var(--night);
+  --ink: var(--on-dark); --ink-2: rgba(228, 243, 234, .76); --ink-3: rgba(228, 243, 234, .5);
+  --surface: var(--dark-surface); --surface-2: var(--dark-surface-2); --line: rgba(228, 243, 234, .2);
+  background-color: var(--night);
+  background-image:
+    linear-gradient(to right, rgba(92, 240, 162, .09) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(92, 240, 162, .09) 1px, transparent 1px),
+    linear-gradient(to right, rgba(92, 240, 162, .04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(92, 240, 162, .04) 1px, transparent 1px);
+  background-size: 240px 240px, 240px 240px, 48px 48px, 48px 48px;
+  background-position: 24px 24px;
+}
+.slide[data-tone="dark"]::before { --m: rgba(92, 240, 162, .7); }
+.slide > * { position: relative; z-index: 1; }
+
+/* ---------- type ---------- */
+.display, .h1, .h2, .h3 { font-weight: 700; letter-spacing: -.028em; }
+.display { font-size: 168px; line-height: .86; }
+.h1 { font-size: 100px; line-height: .94; }
+.h2 { font-size: 70px; line-height: 1; }
+.h3 { font-size: 46px; line-height: 1.06; }
+.h4 { font-weight: 700; }
+.lead { font-size: 33px; color: var(--ink-2); }
+.eyebrow { color: var(--ink-2); letter-spacing: .14em; font-weight: 500; }
+.eyebrow b {
+  color: var(--accent-ink); background: var(--ink); padding: 5px 10px 4px; font-weight: 600; letter-spacing: .12em;
+}
+[data-tone="dark"] .eyebrow { color: rgba(228, 243, 234, .7); }
+[data-tone="dark"] .eyebrow b { color: var(--night); background: var(--accent-on-dark); }
+.it { font-family: "IBM Plex Serif", Georgia, serif; font-style: italic; font-weight: 500; }
+.wine, .brass { color: inherit; background: linear-gradient(transparent 56%, var(--mark) 56%, var(--mark) 92%, transparent 92%); padding: 0 .06em; }
+[data-tone="dark"] .wine, [data-tone="dark"] .brass { background: none; color: var(--accent-on-dark); }
+.rule-brass { height: 5px; background: var(--brass-soft); }
+code, .code-inline { background: rgba(13, 27, 22, .08); border-radius: 0; font-family: var(--f-mono); }
+[data-tone="dark"] code { background: rgba(255, 255, 255, .1); }
+.mark { background: linear-gradient(transparent 58%, var(--mark) 0) no-repeat 0 0 / 100% 100%; }
+
+/* chrome: a printed header, not a frosted pill */
+.chrome__code { font-weight: 700; }
+.rail li { font-weight: 500; }
+.rail li.is-current { color: var(--ink); background: var(--brass-soft); }
+.rail li.is-current::before, .rail li.is-current::after { content: none; }
+.stage[data-tone="dark"] .rail li.is-current { color: var(--night); background: var(--accent-on-dark); }
+.chrome__right, .chrome__nav { border-radius: 0; backdrop-filter: none; box-shadow: 0 0 0 1.5px var(--ink); background: rgba(255, 255, 255, .86); }
+.stage[data-tone="dark"] .chrome__right, .stage[data-tone="dark"] .chrome__nav { box-shadow: 0 0 0 1.5px rgba(92, 240, 162, .6); background: rgba(9, 20, 15, .8); }
+.break-btn { border-radius: 0; }
+.progress { height: 6px; background: transparent; }
+.progress span { background: repeating-linear-gradient(135deg, var(--ink) 0 8px, var(--brass-soft) 8px 16px); }
+.stage[data-tone="dark"] .progress span { background: repeating-linear-gradient(135deg, var(--accent-on-dark) 0 8px, transparent 8px 16px); }
+
+/* ---------- boxes ---------- */
+.card, .takeaway, .callout, .qa-card, .done-when, .tier, .stage-card, .recap__p, .recap__s, .mistake, .flip__face, .quiz__opt, .term, .frame, .shot {
+  border-radius: 0;
+}
+.card, .qa-card, .tier, .recap__p, .recap__s, .done-when { box-shadow: var(--shadow-1); }
+.takeaway { border-left: 8px solid var(--brass-soft); background: var(--surface); box-shadow: var(--shadow-1); }
+.takeaway .k, .done-when .k, .tier__k { font-family: var(--f-mono); letter-spacing: .14em; }
+.callout { box-shadow: var(--shadow-1); border-width: 0; border-left: 8px solid var(--ink); background: var(--surface); }
+.callout.is-warn { border-left-color: var(--warn); }
+.callout.is-bad { border-left-color: var(--bad); }
+.callout.is-good { border-left-color: var(--good); }
+.chip { border-radius: var(--pill-r); font-family: var(--f-mono); font-weight: 600; letter-spacing: .04em; }
+.chip.is-wine { background: var(--ink); color: var(--accent-ink); }
+.chip.is-good { background: rgba(10, 125, 74, .14); color: var(--good); box-shadow: inset 0 0 0 1.5px var(--good); }
+.chip.is-bad { background: rgba(208, 41, 29, .12); color: var(--bad); box-shadow: inset 0 0 0 1.5px var(--bad); }
+.btn, .copy-btn, .seg button, .quiz__reset { border-radius: 0; }
+.quiz__opt { box-shadow: var(--shadow-1); border: 0; }
+.quiz__opt:hover { transform: translate(-2px, -2px); box-shadow: 0 0 0 1.5px var(--ink), 6px 6px 0 rgba(13, 27, 22, .22); }
+.node { border-radius: 0; box-shadow: 0 0 0 1.5px var(--ink), 4px 4px 0 rgba(13, 27, 22, .16); background: var(--surface); }
+.node.is-wine { background: var(--ink); color: var(--accent-ink); }
+.node.is-brass { background: var(--brass-soft); color: var(--ink); }
+.node.is-ghost { box-shadow: 0 0 0 1.5px var(--ink-3); border-style: dashed; background: transparent; }
+.region { border-radius: 0; border: 2px dashed var(--ink-3); background: rgba(255, 255, 255, .45); }
+.box-label { font-family: var(--f-mono); }
+.wire.is-wine { --wire: var(--ink); }
+.state { border-radius: 0; box-shadow: var(--shadow-1); }
+
+/* code panes */
+.code, .term, .state, .term__bar { border-radius: 0; }
+.code { box-shadow: var(--shadow-2); }
+.code__file { font-family: var(--f-mono); letter-spacing: .08em; }
+
+/* ---------- the test plan (today's menu) ---------- */
+.menu-card { background: var(--surface); border-radius: 0; box-shadow: var(--shadow-2); padding: 0; overflow: hidden; }
+.menu-card::before, .menu-card::after { content: none; }
+.menu-card__head { background: var(--ink); color: var(--accent-ink); padding: 18px 40px 16px; margin: 0; border: 0; }
+.menu-card__head .eyebrow { color: var(--accent-on-dark); }
+.menu-card__head h2 { font: 700 56px/1 var(--f-display); letter-spacing: -.02em; color: #fff; margin: 4px 0 0; }
+.menu-card__list { padding: 16px 40px 20px; gap: 9px; }
+.course { border-bottom: 1.5px dashed var(--line); padding-bottom: 6px; }
+.course__k { font-family: var(--f-mono); font-weight: 600; letter-spacing: .06em; color: var(--ink-2); }
+.course__name { font: 600 31px/1.15 var(--f-body); }
+.course__name small { font-weight: 400; color: var(--ink-3); }
+.course__t { font-family: var(--f-mono); font-weight: 700; background: var(--brass-soft); color: var(--ink); padding: 4px 10px; border-radius: 0; }
+.course.is-pause .course__name { color: var(--ink); }
+.course.is-pause .course__t { background: var(--ink); color: var(--accent-on-dark); }
+
+/* ---------- covers and the problem slide ---------- */
+.cover__hello { font-family: "IBM Plex Serif", Georgia, serif; font-style: italic; font-weight: 500; color: var(--ink-2); }
+.cover__meta dt { font-family: var(--f-mono); letter-spacing: .12em; color: var(--ink-3); }
+.cover__meta dd { font-weight: 600; }
+.problem-cover__text .display { font-size: 170px; }
+
+/* ---------- stamps (PASS / FAIL) ---------- */
+.stp {
+  display: inline-block; font: 700 38px/1 var(--f-mono); letter-spacing: .16em; text-transform: uppercase;
+  padding: 12px 22px 10px; border: 5px double currentColor; color: var(--good); transform: rotate(-7deg);
+  mix-blend-mode: multiply; opacity: .94; background: rgba(10, 125, 74, .05);
+}
+.stp.is-fail { color: var(--bad); background: rgba(208, 41, 29, .05); }
+.stp.is-big { font-size: 64px; padding: 18px 34px 14px; border-width: 8px; }
+.stp.is-small { font-size: 22px; padding: 7px 14px 5px; border-width: 4px; }
+[data-tone="dark"] .stp { mix-blend-mode: normal; color: var(--accent-on-dark); background: rgba(92, 240, 162, .08); }
+[data-tone="dark"] .stp.is-fail { color: var(--bad-on-dark); background: rgba(255, 154, 143, .08); }
+.tape { position: absolute; width: 150px; height: 44px; background: rgba(255, 225, 77, .72); transform: rotate(-3deg); box-shadow: 0 1px 2px rgba(0, 0, 0, .15); }
